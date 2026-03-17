@@ -1,0 +1,32 @@
+anyio==4.12.1
+beautifulsoup4==4.14.3
+certifi==2026.2.25
+charset-normalizer==3.4.5
+deep-translator==1.11.4
+exceptiongroup==1.3.1
+filelock==3.25.2
+fsspec==2026.2.0
+googletrans==4.0.2
+h11==0.16.0
+h2==4.3.0
+hpack==4.1.0
+httpcore==1.0.9
+httpx==0.28.1
+hyperframe==6.1.0
+idna==3.11
+Jinja2==3.1.6
+langdetect==1.0.9
+MarkupSafe==3.0.3
+mpmath==1.3.0
+networkx==3.4.2
+numpy==2.2.6
+pillow==12.1.1
+requests==2.32.5
+six==1.17.0
+soupsieve==2.8.3
+sympy==1.14.0
+torch @ file:///D:/AI/Packages/ComfyUI/torch-2.4.1%2Bcu121-cp310-cp310-win_amd64.whl#sha256=fe3bf682e86c08d6a8ec0ee30811732487fa688fc556d6e8f92d853d85507c0d
+torchaudio @ file:///D:/AI/Packages/ComfyUI/torchaudio-2.4.1%2Bcu121-cp310-cp310-win_amd64.whl#sha256=317f0827ff010bf71ce9b52ce240856742272440fc9542d8f8ea98212f39d654
+torchvision @ file:///D:/AI/Packages/ComfyUI/torchvision-0.19.1%2Bcu121-cp310-cp310-win_amd64.whl#sha256=e530c6bbb72f587f0e94740758f005c99e6de871ed9d10afffd8f18bd41e5df0
+typing_extensions==4.15.0
+urllib3==2.6.3
