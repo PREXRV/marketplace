@@ -1,0 +1,255 @@
+import axios from 'axios';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+
+export const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Interceptor для добавления токена
+api.interceptors.request.use(
+  (config) => {
+    if (typeof window !== 'undefined') {
+      const tokens = localStorage.getItem('auth_tokens');
+      if (tokens) {
+        try {
+          const parsedTokens = JSON.parse(tokens);
+          if (parsedTokens.access) {
+            config.headers.Authorization = `Bearer ${parsedTokens.access}`;
+          }
+        } catch (error) {
+          console.error('Ошибка парсинга токена:', error);
+        }
+      }
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor для обработки ответов
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      console.log('Токен истек или недействителен');
+      // Можно добавить логику обновления токена или редирект на логин
+    }
+    return Promise.reject(error);
+  }
+);
+
+// API методы для партнерской программы
+export const affiliateAPI = {
+  // Программы (публичный доступ)
+  getTiers: () => api.get('/affiliates/programs/'),
+  
+  // Регистрация партнера (публичный доступ)
+  register: (data: any) => api.post('/affiliates/list/register/', data),
+  
+  // Дашборд партнера (требует авторизации)
+  getDashboard: () => api.get('/affiliates/list/dashboard/'),
+  
+  // Данные текущего партнера (требует авторизации)
+  getMe: () => api.get('/affiliates/list/me/'),
+  
+  // Промоматериалы (публичный просмотр)
+  getMaterials: () => api.get('/affiliates/materials/'),
+  
+  // Скачать промоматериал (требует авторизации)
+  downloadMaterial: (id: number) => api.post(`/affiliates/materials/${id}/download/`),
+  
+  // Запросить выплату (требует авторизации)
+  requestPayout: (amount: number) => api.post('/affiliates/list/request_payout/', { amount }),
+};
+
+export const partnershipAPI = {
+  // ✅ Заявки
+  applyForPartnership: (data: { agreed_to_terms: boolean }) => 
+    api.post('/partnership/applications/', data),
+  
+  getMyApplication: async () => {
+    try {
+      return await api.get('/partnership/applications/my_application/');
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        console.log('Заявка не найдена');
+        return { data: null };
+      }
+      throw error;
+    }
+  },
+  
+  // ✅ Партнер
+  getPartnerProfile: async () => {
+    try {
+      return await api.get('/partnership/partners/me/');
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        console.log('Пользователь не является партнером');
+        return { data: null };
+      }
+      throw error;
+    }
+  },
+  
+  getPartnerDashboard: async () => {
+    try {
+      return await api.get('/partnership/partners/dashboard/');
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        console.log('Дашборд партнера недоступен');
+        return { data: null };
+      }
+      throw error;
+    }
+  },
+  
+  // ✅ Соцсети
+  getSocialMedia: () => 
+    api.get('/partnership/social-media/'),
+  
+  addSocialMedia: (data: any) => 
+    api.post('/partnership/social-media/', data),
+  
+  deleteSocialMedia: (id: number) => 
+    api.delete(`/partnership/social-media/${id}/`),
+
+  // ✅ Аналитика
+  getAnalytics: async () => {
+    try {
+      return await api.get('/partnership/analytics/');
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        console.log('Аналитика недоступна');
+        return { data: { clicks: 0, conversions: 0, revenue: 0 } };
+      }
+      throw error;
+    }
+  },
+
+  // ✅ Рефералка
+  getReferrals: async () => {
+    try {
+      return await api.get('/partnership/referrals/');
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        console.log('Рефералы не найдены');
+        return { data: [] };
+      }
+      throw error;
+    }
+  },
+  
+  // ✅ Запросы товаров
+  getProductRequests: () => 
+    api.get('/partnership/product-requests/'),
+  
+  requestProduct: (data: any) => 
+    api.post('/partnership/product-requests/', data),
+  
+  uploadContract: (requestId: number, file: File) => {
+    const formData = new FormData();
+    formData.append('contract_file', file);
+    return api.post(`/partnership/product-requests/${requestId}/upload_contract/`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  
+  // ✅ Видео
+  getVideos: () => 
+    api.get('/partnership/videos/'),
+  
+  uploadVideo: (data: any) => 
+    api.post('/partnership/videos/', data),
+  
+  // ✅ Возвраты
+  getRefunds: () => 
+    api.get('/partnership/refunds/'),
+  
+  requestRefund: (data: any) => 
+    api.post('/partnership/refunds/', data),
+};
+
+// ✅ Chat API
+export const chatAPI = {
+  getRooms: () => api.get('/chat/rooms/'),
+  getMessages: (roomId: number) => api.get(`/chat/rooms/${roomId}/messages/`),
+  sendMessage: (roomId: number, message: string) => 
+    api.post(`/chat/rooms/${roomId}/messages/`, { message }),
+  createRoom: (data: any) => api.post('/chat/rooms/', data),
+};
+
+// ✅ Notifications API
+export const notificationsAPI = {
+  getAll: async () => {
+    try {
+      return await api.get('/notifications/');
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        console.log('Уведомления недоступны');
+        return { data: [] };
+      }
+      throw error;
+    }
+  },
+  
+  getUnread: async () => {
+    try {
+      return await api.get('/notifications/unread/');
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        console.log('Непрочитанные уведомления недоступны');
+        return { data: [] };
+      }
+      throw error;
+    }
+  },
+  
+  markAsRead: (id: number) => 
+    api.post(`/notifications/${id}/read/`),
+  
+  markAllAsRead: () => 
+    api.post('/notifications/mark_all_read/'),
+};
+
+// ✅ Gamification API
+export const gamificationAPI = {
+  getProfile: async () => {
+    try {
+      return await api.get('/gamification/profile/');
+    } catch (error: any) {
+      if (error.response?.status === 404) {
+        console.log('Геймификация недоступна');
+        return { 
+          data: { 
+            level_info: {
+              level: 1,
+              experience: 0,
+              experience_needed: 1000,
+              progress_percent: 0,
+              bonus_points: 0
+            }
+          } 
+        };
+      }
+      throw error;
+    }
+  },
+  
+  getAchievements: () => 
+    api.get('/gamification/achievements/'),
+  
+  getBadges: () => 
+    api.get('/gamification/badges/'),
+  
+  getLeaderboard: () => 
+    api.get('/gamification/leaderboard/'),
+};
+
+export default api;
