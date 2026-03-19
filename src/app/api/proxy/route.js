@@ -1,25 +1,46 @@
-// frontend/src/app/api/proxy/route.js
 import { NextResponse } from 'next/server';
 
-export async function GET(req) {
+// Универсальный proxy для всех HTTP-методов
+export async function handler(req) {
   try {
-    const token = req.headers.get('authorization'); // токен из фронта
-    const originalPath = req.nextUrl.pathname.replace('/api/proxy', ''); // реальный путь на ngrok
-    const url = `https://pearle-physiognomonical-dorsally.ngrok-free.dev${originalPath}${req.nextUrl.search}`;
+    // Получаем путь к ngrok API из query или body
+    const method = req.method;
+    const token = req.headers.get('authorization') || '';
+    
+    let path = req.nextUrl.searchParams.get('path');
+    let bodyData;
 
-    const res = await fetch(url, {
-      headers: {
-        'Authorization': token || '',
-      },
-    });
+    if (!path && method !== 'GET') {
+      const json = await req.json();
+      path = json.path;
+      bodyData = json.body;
+    }
 
+    if (!path) return NextResponse.json({ error: 'Path not provided' }, { status: 400 });
+
+    const url = `https://pearle-physiognomonical-dorsally.ngrok-free.dev${path}`;
+
+    const fetchOptions = {
+      method,
+      headers: { 
+        Authorization: token,
+        'Content-Type': 'application/json'
+      }
+    };
+
+    if (bodyData) fetchOptions.body = JSON.stringify(bodyData);
+
+    const res = await fetch(url, fetchOptions);
     const data = await res.json();
 
-    const response = NextResponse.json(data);
-    response.headers.set('Access-Control-Allow-Origin', '*'); // чтобы фронт не ругался
-    response.headers.set('Access-Control-Allow-Credentials', 'true');
-    return response;
+    return NextResponse.json(data, { status: res.status });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+
+// Проброс всех методов
+export const GET = handler;
+export const POST = handler;
+export const PUT = handler;
+export const DELETE = handler;
