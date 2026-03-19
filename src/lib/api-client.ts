@@ -15,6 +15,8 @@ export async function apiFetch<T>(
     ...fetchOptions,
     headers: {
       'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
+      Authorization: `Bearer ${localStorage.getItem("access") || ""}`,
       ...(fetchOptions.headers || {})
     },
     next: { revalidate }
