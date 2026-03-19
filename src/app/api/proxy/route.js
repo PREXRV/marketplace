@@ -40,9 +40,3 @@ export const POST = async (req) => {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 };
-
-// Проброс всех методов
-export const GET = handler;
-export const POST = handler;
-export const PUT = handler;
-export const DELETE = handler;
