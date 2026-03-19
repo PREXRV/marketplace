@@ -1,42 +1,62 @@
-// src/app/api/proxy/route.js
 import { NextResponse } from 'next/server';
 
-export const GET = async (req) => {
-  try {
-    const token = req.headers.get('authorization'); // токен с фронта
-    const path = req.nextUrl.searchParams.get('path'); // ?path=/api/...
-    if (!path) return NextResponse.json({ error: 'No path provided' }, { status: 400 });
+const BASE_URL = 'https://pearle-physiognomonical-dorsally.ngrok-free.dev';
 
-    const res = await fetch('https://pearle-physiognomonical-dorsally.ngrok-free.dev' + path, {
-      headers: { Authorization: token },
+// ✅ ОБЯЗАТЕЛЬНО для CORS
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+
+export async function GET(req) {
+  try {
+    const token = req.headers.get('authorization');
+    const path = req.nextUrl.searchParams.get('path');
+
+    const res = await fetch(BASE_URL + path, {
+      headers: { Authorization: token || '' },
     });
 
     const data = await res.json();
-    return NextResponse.json(data);
-  } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
-};
 
-export const POST = async (req) => {
+    return NextResponse.json(data, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+  } catch (e) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
+  }
+}
+
+export async function POST(req) {
   try {
     const { path, body } = await req.json();
     const token = req.headers.get('authorization');
 
-    if (!path) return NextResponse.json({ error: 'No path provided' }, { status: 400 });
-
-    const res = await fetch('https://pearle-physiognomonical-dorsally.ngrok-free.dev' + path, {
+    const res = await fetch(BASE_URL + path, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: token,
+        Authorization: token || '',
       },
       body: JSON.stringify(body),
     });
 
     const data = await res.json();
-    return NextResponse.json(data);
-  } catch (err) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+
+    return NextResponse.json(data, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+  } catch (e) {
+    return NextResponse.json({ error: e.message }, { status: 500 });
   }
-};
+}
