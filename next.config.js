@@ -27,11 +27,11 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
-        destination: 'https://pearle-physiognomonical-dorsally.ngrok-free.dev/api/:path*',
+        source: '/api/:path*',  // локальный путь на фронтенде
+        destination: 'https://pearle-physiognomonical-dorsally.ngrok-free.dev/api/:path*', // ngrok API
       },
     ]
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
