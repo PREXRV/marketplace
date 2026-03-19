@@ -1,12 +1,10 @@
 // src/app/api/proxy/route.js
 import { NextResponse } from 'next/server';
 
-export async function GET(req) {
+export const GET = async (req) => {
   try {
     const token = req.headers.get('authorization'); // токен с фронта
-    const searchParams = req.nextUrl.search; // ?path=...
-    const path = new URLSearchParams(searchParams).get('path');
-
+    const path = req.nextUrl.searchParams.get('path'); // ?path=/api/...
     if (!path) return NextResponse.json({ error: 'No path provided' }, { status: 400 });
 
     const res = await fetch('https://pearle-physiognomonical-dorsally.ngrok-free.dev' + path, {
@@ -18,9 +16,9 @@ export async function GET(req) {
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
-}
+};
 
-export async function POST(req) {
+export const POST = async (req) => {
   try {
     const { path, body } = await req.json();
     const token = req.headers.get('authorization');
@@ -41,7 +39,7 @@ export async function POST(req) {
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
-}
+};
 
 // Проброс всех методов
 export const GET = handler;
