@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'https://marketplace-backend-70h9.onrender.com/api';
-const API_BASE_URL = 'https://marketplace-backend-70h9.onrender.com/api';
+const API_URL = 'https://my-backend-production-a9a8.up.railway.app/api';
+const API_BASE_URL = 'https://my-backend-production-a9a8.up.railway.app/api';
 
 
 
