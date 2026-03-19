@@ -27,10 +27,10 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',  // локальный путь на фронтенде
-        destination: 'https://pearle-physiognomonical-dorsally.ngrok-free.dev/api/:path*', // ngrok API
+        source: '/api/:path*',   // все запросы, начинающиеся с /api/
+        destination: 'https://pearle-physiognomonical-dorsally.ngrok-free.dev/api/:path*', 
       },
-    ]
+    ];
   },
 };
 
