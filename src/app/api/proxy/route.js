@@ -1,39 +1,43 @@
+// src/app/api/proxy/route.js
 import { NextResponse } from 'next/server';
 
-// Универсальный proxy для всех HTTP-методов
-export async function handler(req) {
+export async function GET(req) {
   try {
-    // Получаем путь к ngrok API из query или body
-    const method = req.method;
-    const token = req.headers.get('authorization') || '';
-    
-    let path = req.nextUrl.searchParams.get('path');
-    let bodyData;
+    const token = req.headers.get('authorization'); // токен с фронта
+    const searchParams = req.nextUrl.search; // ?path=...
+    const path = new URLSearchParams(searchParams).get('path');
 
-    if (!path && method !== 'GET') {
-      const json = await req.json();
-      path = json.path;
-      bodyData = json.body;
-    }
+    if (!path) return NextResponse.json({ error: 'No path provided' }, { status: 400 });
 
-    if (!path) return NextResponse.json({ error: 'Path not provided' }, { status: 400 });
+    const res = await fetch('https://pearle-physiognomonical-dorsally.ngrok-free.dev' + path, {
+      headers: { Authorization: token },
+    });
 
-    const url = `https://pearle-physiognomonical-dorsally.ngrok-free.dev${path}`;
-
-    const fetchOptions = {
-      method,
-      headers: { 
-        Authorization: token,
-        'Content-Type': 'application/json'
-      }
-    };
-
-    if (bodyData) fetchOptions.body = JSON.stringify(bodyData);
-
-    const res = await fetch(url, fetchOptions);
     const data = await res.json();
+    return NextResponse.json(data);
+  } catch (err) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
 
-    return NextResponse.json(data, { status: res.status });
+export async function POST(req) {
+  try {
+    const { path, body } = await req.json();
+    const token = req.headers.get('authorization');
+
+    if (!path) return NextResponse.json({ error: 'No path provided' }, { status: 400 });
+
+    const res = await fetch('https://pearle-physiognomonical-dorsally.ngrok-free.dev' + path, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: token,
+      },
+      body: JSON.stringify(body),
+    });
+
+    const data = await res.json();
+    return NextResponse.json(data);
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
