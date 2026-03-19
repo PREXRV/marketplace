@@ -22,6 +22,16 @@ const nextConfig = {
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
+  
+  // 🔥 NGROK PROXY — CORS killer!
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'https://pearle-physiognomonical-dorsally.ngrok-free.dev/api/:path*',
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig
