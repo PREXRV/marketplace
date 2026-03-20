@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'https://my-backend-production-a9a8.up.railway.app/api';
-const API_BASE_URL = 'https://my-backend-production-a9a8.up.railway.app/api';
+const API_URL = 'https://fulfilling-success-production-3288.up.railway.app/api';
+const API_BASE_URL = 'https://fulfilling-success-production-3288.up.railway.app/api';
 
 
 
