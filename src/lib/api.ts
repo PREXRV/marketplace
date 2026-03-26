@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const API_URL = 'https://fulfilling-success-production-3288.up.railway.app/api';
-const API_BASE_URL = 'https://fulfilling-success-production-3288.up.railway.app/api';
-
-
+// ✅ Все запросы идут через /api/ → Next.js proxy → бэкенд
+// Никаких прямых URL к Railway/localhost — CORS убит навсегда
+const API_URL      = '/api';
+const API_BASE_URL = '/api';
 
 // ==================== ИНТЕРФЕЙСЫ ====================
 
@@ -33,6 +33,7 @@ export interface ProductAttribute {
 export interface ProductImage {
   id: number;
   image: string;
+  image_url?: string;   // ✅ прямой URL из бакета
   alt_text: string;
   is_main: boolean;
   order: number;
@@ -42,26 +43,22 @@ export interface ProductVariant {
   id: number;
   name: string;
   sku: string;
-
   price: string | null;
   final_price?: string | null;
-
   discount_percentage?: number;
-
   stock: number;
   color: string;
   size: string;
-
   is_active: boolean;
-
   image?: string;
-  image_url?: string;
+  image_url?: string;   // ✅ прямой URL из бакета
 }
 
 export interface ReviewMedia {
   id: number;
   media_type: 'image' | 'video';
   file: string;
+  file_url?: string;    // ✅ прямой URL из бакета
   created_at: string;
   review?: {
     id: number;
@@ -74,17 +71,17 @@ export interface ReviewMedia {
 }
 
 export interface MediaGalleryItem {
-  id: number
-  review: number
-  file: string
-  file_url: string
-  media_type: 'image' | 'video'
-  author_name: string | null
-  author_username: string | null
-  author_avatar?: string | null
-  rating: number
-  comment: string | null
-  created_at: string
+  id: number;
+  review: number;
+  file: string;
+  file_url: string;     // ✅ всегда полный URL из бакета
+  media_type: 'image' | 'video';
+  author_name: string | null;
+  author_username: string | null;
+  author_avatar?: string | null;
+  rating: number;
+  comment: string | null;
+  created_at: string;
 }
 
 export interface ReviewReply {
@@ -167,10 +164,10 @@ export interface RewardItem {
   icon?: string;
   cost: number;
   stock: number;
-  badge_color?: string;        // ← добавь
-  badge_text_color?: string;   // ← добавь
-  tag_name?: string;           // ← добавь
-  purchased_count?: number; 
+  badge_color?: string;
+  badge_text_color?: string;
+  tag_name?: string;
+  purchased_count?: number;
   image: string | null;
   available: boolean;
   is_active: boolean;
@@ -281,12 +278,7 @@ export interface Review {
 export interface ReviewStats {
   count: number;
   average_rating: number;
-  distribution: {
-    [key: number]: {
-      count: number;
-      percentage: number;
-    };
-  };
+  distribution: { [key: number]: { count: number; percentage: number } };
 }
 
 export interface CreateReviewData {
@@ -303,13 +295,13 @@ export interface CreateReviewData {
 }
 
 export interface SaleInfo {
-  id: number
-  name: string
-  description?: string
-  start_date?: string
-  end_date?: string
-  discount_type?: string
-  discount_value?: string
+  id: number;
+  name: string;
+  description?: string;
+  start_date?: string;
+  end_date?: string;
+  discount_type?: string;
+  discount_value?: string;
 }
 
 export interface Product {
@@ -324,7 +316,7 @@ export interface Product {
   has_sale_discount?: boolean;
   sale_discount_amount?: string;
   discount_percentage?: number;
-  active_sale?: SaleInfo | null
+  active_sale?: SaleInfo | null;
   sku: string;
   stock: number;
   status: string;
@@ -335,7 +327,7 @@ export interface Product {
   is_in_stock: boolean;
   average_rating: number;
   reviews_count: number;
-  primary_image?: string;
+  primary_image?: string;   // ✅ уже полный URL из бакета
   images: ProductImage[];
   videos?: { url: string; title?: string }[];
   variants: ProductVariant[];
@@ -360,6 +352,7 @@ export interface Category {
   slug: string;
   description: string;
   image: string | null;
+  image_url?: string;   // ✅ прямой URL из бакета
   parent: number | null;
   is_active: boolean;
   order: number;
@@ -488,6 +481,7 @@ export interface ProductFilters {
   aliexpress_url?: string;
 }
 
+// ✅ User с avatar_url (URL из бакета) и avatar (write-only для загрузки)
 export interface User {
   id: number;
   username: string;
@@ -495,7 +489,8 @@ export interface User {
   first_name: string;
   last_name: string;
   phone: string;
-  avatar?: string;
+  avatar?: string | null;       // write-only (для загрузки файла)
+  avatar_url?: string | null;   // read (прямой URL из Яндекс бакета)
   birth_date?: string;
   city: string;
   address: string;
@@ -707,7 +702,7 @@ export interface Banner {
   subtitle?: string;
   description?: string;
   media_url?: string;
-  media_file?: string;
+  media_file?: string;    // ✅ URL из бакета
   button_text?: string;
   button_link?: string;
   button_style?: string;
@@ -740,7 +735,7 @@ export interface SocialPost {
   title?: string;
   text?: string;
   short_text?: string;
-  image?: string;
+  image?: string;         // ✅ URL из бакета
   image_url?: string;
   thumbnail_url?: string;
   video_url?: string;
@@ -783,8 +778,6 @@ export interface DeliveryPriceCalculation {
   is_free: boolean;
 }
 
-// ==================== PAYMENTS (ЮКАССА) ====================
-
 export interface PaymentResponse {
   success: boolean;
   payment_url?: string;
@@ -799,7 +792,6 @@ export interface PaymentStatus {
   order_status: string;
 }
 
-// Заглушка для PromoCode (используется в Order)
 export interface PromoCode {
   id?: number;
   code: string;
@@ -850,7 +842,9 @@ export const api = {
         }
       });
     }
-    const url = params.toString() ? `${API_URL}/products/?${params.toString()}` : `${API_URL}/products/`;
+    const url = params.toString()
+      ? `${API_URL}/products/?${params.toString()}`
+      : `${API_URL}/products/`;
     const response = await axios.get(url);
     return response.data.results || response.data;
   },
@@ -980,7 +974,11 @@ export const api = {
     return response.json();
   },
 
-  changePassword: async (token: string, data: { old_password: string; new_password: string; new_password2: string }) => {
+  changePassword: async (token: string, data: {
+    old_password: string;
+    new_password: string;
+    new_password2: string;
+  }) => {
     const response = await fetch(`${API_URL}/profile/change-password/`, {
       method: 'POST',
       headers: {
@@ -1009,6 +1007,7 @@ export const api = {
       throw new Error(error.error || 'Ошибка загрузки аватарки');
     }
     return response.json();
+    // ✅ response содержит { avatar_url, user } — используй data.avatar_url для отображения
   },
 
   deleteAvatar: async (token: string) => {
@@ -1023,7 +1022,6 @@ export const api = {
     return response.json();
   },
 
-  // ✅ Установить активный тег профиля
   setActiveTag: async (token: string, tagId: number | null): Promise<any> => {
     const response = await fetch(`${API_URL}/profile/set-active-tag/`, {
       method: 'POST',
@@ -1133,7 +1131,6 @@ export const api = {
     return response.json();
   },
 
-  // ✅ ИСПРАВЛЕНО
   addReviewReply: async (token: string, reviewId: number, text: string) => {
     const response = await fetch(`${API_URL}/reviews/${reviewId}/add_reply/`, {
       method: 'POST',
@@ -1150,7 +1147,6 @@ export const api = {
     return response.json();
   },
 
-
   getReviewStats: async (productId: number): Promise<ReviewStats> => {
     const response = await axios.get(`${API_URL}/reviews/stats/?product=${productId}`);
     return response.data;
@@ -1164,10 +1160,10 @@ export const api = {
     formData.append('rating', reviewData.rating.toString());
     formData.append('title', reviewData.title);
     formData.append('comment', reviewData.comment);
-    if (reviewData.pros) formData.append('pros', reviewData.pros);
-    if (reviewData.cons) formData.append('cons', reviewData.cons);
+    if (reviewData.pros)         formData.append('pros', reviewData.pros);
+    if (reviewData.cons)         formData.append('cons', reviewData.cons);
     if (reviewData.order_number) formData.append('order_number', reviewData.order_number);
-    if (reviewData.media_files && reviewData.media_files.length > 0) {
+    if (reviewData.media_files?.length) {
       reviewData.media_files.forEach(file => formData.append('media_files', file));
     }
     const headers: Record<string, string> = {};
@@ -1292,127 +1288,86 @@ export const api = {
   getNotifications: async (token: string): Promise<Notification[]> => {
     try {
       const response = await fetch(`${API_URL}/notifications/`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       if (!response.ok) return [];
       const data = await response.json();
-      if (Array.isArray(data)) return data;
-      return data.results || data.notifications || [];
-    } catch {
-      return [];
-    }
+      return Array.isArray(data) ? data : data.results || data.notifications || [];
+    } catch { return []; }
   },
 
   getUnreadNotifications: async (token: string): Promise<NotificationResponse> => {
     try {
       const response = await fetch(`${API_URL}/notifications/unread/`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       if (!response.ok) return { count: 0, notifications: [] };
       return response.json();
-    } catch {
-      return { count: 0, notifications: [] };
-    }
+    } catch { return { count: 0, notifications: [] }; }
   },
 
   getAllNotifications: async (token: string): Promise<Notification[]> => {
     try {
       const response = await fetch(`${API_URL}/notifications/`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       if (!response.ok) return [];
       const data = await response.json();
       return data.results || data;
-    } catch {
-      return [];
-    }
+    } catch { return []; }
   },
 
   getUnreadCount: async (token: string): Promise<{ count: number }> => {
     try {
       const response = await fetch(`${API_URL}/notifications/unread_count/`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       if (!response.ok) return { count: 0 };
       return response.json();
-    } catch {
-      return { count: 0 };
-    }
+    } catch { return { count: 0 }; }
   },
 
   markNotificationAsRead: async (token: string, notificationId: number) => {
     try {
       const response = await fetch(`${API_URL}/notifications/${notificationId}/mark_as_read/`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       if (!response.ok) throw new Error();
       return response.json();
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   },
 
   markAllNotificationsAsRead: async (token: string) => {
     try {
       const response = await fetch(`${API_URL}/notifications/mark_all_as_read/`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       if (!response.ok) throw new Error();
       return response.json();
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   },
 
   deleteNotification: async (token: string, notificationId: number) => {
     try {
       const response = await fetch(`${API_URL}/notifications/${notificationId}/delete_notification/`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       if (!response.ok) throw new Error();
       return response.json();
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   },
 
   getOrderStatusHistory: async (token: string, orderId: number) => {
     try {
       const response = await fetch(`${API_URL}/orders/${orderId}/history/`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       if (!response.ok) return [];
       return response.json();
-    } catch {
-      return [];
-    }
+    } catch { return []; }
   },
 
   // ==================== GAMIFICATION ====================
@@ -1462,10 +1417,7 @@ export const api = {
   startQuest: async (questId: number, token: string): Promise<UserQuest> => {
     const response = await fetch(`${API_BASE_URL}/gamification/quests/${questId}/start/`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
     });
     if (!response.ok) throw new Error('Failed to start quest');
     return response.json();
@@ -1474,10 +1426,7 @@ export const api = {
   claimQuestReward: async (questId: number, token: string): Promise<any> => {
     const response = await fetch(`${API_BASE_URL}/gamification/quests/${questId}/claim_reward/`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
     });
     if (!response.ok) throw new Error('Failed to claim quest reward');
     return response.json();
@@ -1495,10 +1444,7 @@ export const api = {
   purchaseReward: async (rewardId: number, token: string): Promise<any> => {
     const response = await fetch(`${API_BASE_URL}/gamification/rewards/${rewardId}/purchase/`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
     });
     if (!response.ok) {
       const error = await response.json();
@@ -1515,13 +1461,11 @@ export const api = {
     return response.json();
   },
 
+  // ✅ Исправлен захардкоженный localhost
   clickQuest: async (questId: number, token: string): Promise<any> => {
-    const response = await fetch(`http://127.0.0.1:8000/api/gamification/quests/${questId}/click/`, {
+    const response = await fetch(`${API_BASE_URL}/gamification/quests/${questId}/click/`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
     });
     const json = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(json.detail || 'Failed to track quest click');
@@ -1531,10 +1475,7 @@ export const api = {
   toggleBadge: async (token: string, badgeId: number): Promise<any> => {
     const response = await fetch(`${API_BASE_URL}/gamification/badges/${badgeId}/toggle/`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
     });
     if (!response.ok) {
       const error = await response.json();
@@ -1543,8 +1484,6 @@ export const api = {
     return response.json();
   },
 
-
-  // ✅ НОВЫЙ МЕТОД — добавить бесплатный товар в корзину
   addFreeProductToCart: async (
     productId: number,
     purchaseId: number,
@@ -1552,10 +1491,7 @@ export const api = {
   ): Promise<{ success: boolean; message: string; product_slug?: string }> => {
     const response = await fetch(`${API_BASE_URL}/gamification/rewards/add_free_to_cart/`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ product_id: productId, purchase_id: purchaseId }),
     });
     if (!response.ok) {
@@ -1565,14 +1501,10 @@ export const api = {
     return response.json();
   },
 
-  // ✅ НОВЫЙ МЕТОД — использовать покупку (надеть тег / активировать)
   useRewardPurchase: async (purchaseId: number, token: string): Promise<any> => {
     const response = await fetch(`${API_BASE_URL}/gamification/rewards/${purchaseId}/use/`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
     });
     if (!response.ok) {
       const error = await response.json();
@@ -1583,7 +1515,7 @@ export const api = {
 
   getLeaderboard: async (year?: number, month?: number): Promise<LeaderboardEntry[]> => {
     const params = new URLSearchParams();
-    if (year) params.append('year', year.toString());
+    if (year)  params.append('year', year.toString());
     if (month) params.append('month', month.toString());
     const response = await fetch(`${API_BASE_URL}/gamification/leaderboard/?${params}`);
     if (!response.ok) throw new Error('Failed to fetch leaderboard');
@@ -1607,10 +1539,7 @@ export const api = {
   claimDailyBonus: async (token: string): Promise<any> => {
     const response = await fetch(`${API_BASE_URL}/gamification/daily-bonus/claim/`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
     });
     if (!response.ok) {
       const error = await response.json();
@@ -1633,10 +1562,7 @@ export const api = {
     const response = await fetch(`${API_URL}/promo-codes/validate/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        code: code.toUpperCase().trim(),
-        order_amount: orderAmount || 0,
-      }),
+      body: JSON.stringify({ code: code.toUpperCase().trim(), order_amount: orderAmount || 0 }),
     });
     if (!response.ok) {
       const error = await response.json();
@@ -1649,10 +1575,7 @@ export const api = {
     const response = await fetch(`${API_URL}/promo-codes/validate/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        code: code.toUpperCase().trim(),
-        order_amount: orderTotal,
-      }),
+      body: JSON.stringify({ code: code.toUpperCase().trim(), order_amount: orderTotal }),
     });
     if (!response.ok) {
       const error = await response.json();
@@ -1691,6 +1614,7 @@ export const api = {
     if (!response.ok) throw new Error('Ошибка загрузки возврата');
     return response.json();
   },
+
   // ==================== HOMEPAGE ====================
 
   publicHomepage: async (): Promise<{
@@ -1713,13 +1637,7 @@ export const api = {
       if (!response.ok) throw new Error('Failed to load homepage');
       return response.json();
     } catch {
-      return {
-        banners: [],
-        social_posts: [],
-        youtube_videos: [],
-        products_on_sale: [],
-        sale_info: null,
-      };
+      return { banners: [], social_posts: [], youtube_videos: [], products_on_sale: [], sale_info: null };
     }
   },
 
@@ -1730,9 +1648,7 @@ export const api = {
       });
       if (!response.ok) return null;
       return response.json();
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   },
 
   createPayment: async (orderId: number): Promise<PaymentResponse> => {
@@ -1748,15 +1664,21 @@ export const api = {
     const res = await fetch(`${API_URL}/orders/payment/status/${orderId}/`);
     return res.json();
   },
-
 };
 
 // ==================== УТИЛИТЫ ====================
 
-export const getImageUrl = (imagePath: string): string => {
+/**
+ * ✅ getImageUrl — больше НЕ добавляет localhost к URL.
+ * Все медиа из бакета уже приходят с полным URL (https://storage.yandexcloud.net/...)
+ * Функция нужна только как fallback для плейсхолдера.
+ */
+export const getImageUrl = (imagePath: string | null | undefined): string => {
   if (!imagePath) return 'https://placehold.co/400x400/e2e8f0/64748b.png?text=No+Image';
+  // Если уже полный URL (из бакета или внешний) — возвращаем как есть
   if (imagePath.startsWith('http')) return imagePath;
-  return `http://127.0.0.1:8000${imagePath}`;
+  // Fallback: относительный путь — маловероятно после перехода на бакет
+  return imagePath;
 };
 
 export const formatPrice = (price: string | number): string => {

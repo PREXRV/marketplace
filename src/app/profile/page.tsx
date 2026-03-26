@@ -1,4 +1,3 @@
-// src/app/profile/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -7,11 +6,11 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { api, GamificationProfile, getImageUrl } from '@/lib/api';
-import { 
+import AvatarUpload from '@/components/AvatarUpload';
+import { api, GamificationProfile } from '@/lib/api';
+import {
   User, Package, Heart, Star, Settings, MapPin, Bell,
-  ShoppingBag, ChevronRight, Trophy, Sparkles, Gift,
-  Handshake,
+  ShoppingBag, ChevronRight, Trophy, Sparkles, Gift, Handshake,
 } from 'lucide-react';
 
 interface ProfileStats {
@@ -48,14 +47,13 @@ export default function ProfilePage() {
   const [stats, setStats] = useState<ProfileStats>({
     orders_count: 0, favorites_count: 0, reviews_count: 0, unread_notifications: 0,
   });
-  const [gamification, setGamification]   = useState<GamificationProfile | null>(null);
-  const [loading, setLoading]             = useState(true);
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [badgesCount, setBadgesCount]     = useState(0);
-  const [partnerStatus, setPartnerStatus] = useState<PartnerStatus>('none'); // ✅
-  const [userTags, setUserTags]           = useState<UserTag[]>([]);
-  const [activeTags, setActiveTags]       = useState<UserTag[]>([]);
-  const [tagLoading, setTagLoading]       = useState<number | null>(null);
+  const [gamification, setGamification]       = useState<GamificationProfile | null>(null);
+  const [loading, setLoading]                 = useState(true);
+  const [badgesCount, setBadgesCount]         = useState(0);
+  const [partnerStatus, setPartnerStatus]     = useState<PartnerStatus>('none');
+  const [userTags, setUserTags]               = useState<UserTag[]>([]);
+  const [activeTags, setActiveTags]           = useState<UserTag[]>([]);
+  const [tagLoading, setTagLoading]           = useState<number | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -93,26 +91,18 @@ export default function ProfilePage() {
 
       try {
         const { partnershipAPI } = await import('@/services/api');
-
-        // Сначала проверяем — является ли уже партнёром
         const partnerRes = await partnershipAPI.getPartnerProfile();
         if (partnerRes?.data) {
           setPartnerStatus('approved');
         } else {
-          // Если нет — смотрим заявку
           const appRes = await partnershipAPI.getMyApplication();
-          if (appRes?.data?.status === 'pending') {
-            setPartnerStatus('pending');
-          } else if (appRes?.data?.status === 'approved') {
-            setPartnerStatus('approved');
-          } else {
-            setPartnerStatus('none');
-          }
+          if (appRes?.data?.status === 'pending') setPartnerStatus('pending');
+          else if (appRes?.data?.status === 'approved') setPartnerStatus('approved');
+          else setPartnerStatus('none');
         }
       } catch {
         setPartnerStatus('none');
       }
-
     } catch {} finally {
       setLoading(false);
     }
@@ -129,7 +119,7 @@ export default function ProfilePage() {
       const updated = await api.getProfile(tokens.access);
       setActiveTags((updated as any).active_tags || []);
       setUserTags((updated as any).tags || []);
-    } catch (e) {
+    } catch {
       setActiveTags(prev => isActive ? [...prev, tag] : prev.filter(t => t.id !== tag.id));
     } finally {
       setTagLoading(null);
@@ -148,44 +138,19 @@ export default function ProfilePage() {
     } catch { setActiveTags(prev); }
   };
 
-  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !tokens) return;
-    if (!file.type.startsWith('image/')) { alert('Пожалуйста, выберите изображение'); return; }
-    if (file.size > 5 * 1024 * 1024) { alert('Размер файла не должен превышать 5MB'); return; }
-    try {
-      setUploadingAvatar(true);
-      const response = await api.uploadAvatar(tokens.access, file);
-      updateUser(response.user);
-    } catch (error: any) {
-      alert(error.message || 'Ошибка загрузки аватара');
-    } finally { setUploadingAvatar(false); }
-  };
-
-  const handleDeleteAvatar = async () => {
-    if (!confirm('Удалить аватар?') || !tokens) return;
-    try {
-      setUploadingAvatar(true);
-      await api.deleteAvatar(tokens.access);
-      updateUser({ ...user!, avatar: null });
-    } catch (error: any) {
-      alert(error.message || 'Ошибка удаления аватара');
-    } finally { setUploadingAvatar(false); }
-  };
-
   if (authLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4" />
           <p className="text-gray-600">Загрузка профиля...</p>
         </div>
       </div>
     );
   }
 
-  const levelInfo   = gamification?.level_info;
-  const allQuests   = [
+  const levelInfo = gamification?.level_info;
+  const allQuests = [
     ...((gamification?.quests?.daily as any) || []),
     ...((gamification?.quests?.weekly as any) || []),
     ...((gamification?.quests?.achievements as any) || []),
@@ -197,37 +162,24 @@ export default function ProfilePage() {
     { icon: Heart,     label: 'Избранное',     href: '/profile/favorites',     badge: stats.favorites_count },
     { icon: Star,      label: 'Отзывы',        href: '/profile/reviews',       badge: stats.reviews_count },
     { icon: Trophy,    label: 'Геймификация',  href: '/profile/gamification',  badge: activeQuests.length },
-    {
-      icon: Handshake,
-      label: 'Партнёрка',
-      href: '/profile/partnership',
-      badge: 0,
-      partnerStatus, // ✅ передаём статус
-    },
+    { icon: Handshake, label: 'Партнёрка',     href: '/profile/partnership',   badge: 0, partnerStatus },
     { icon: MapPin,    label: 'Адреса',        href: '/profile/addresses' },
     { icon: Bell,      label: 'Уведомления',   href: '/profile/notifications', badge: stats.unread_notifications },
     { icon: Settings,  label: 'Настройки',     href: '/profile/settings' },
   ];
 
-  // ✅ Стили баннера по статусу
   const bannerStyle = {
     approved: {
       wrap:   'bg-gradient-to-r from-purple-600 to-blue-600 text-white',
-      icon:   'bg-white/20',
-      iconEl: 'text-white',
-      arrow:  'text-white/60',
+      icon:   'bg-white/20', iconEl: 'text-white', arrow: 'text-white/60',
     },
     pending: {
       wrap:   'bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200',
-      icon:   'bg-yellow-100',
-      iconEl: 'text-yellow-600',
-      arrow:  'text-yellow-400',
+      icon:   'bg-yellow-100', iconEl: 'text-yellow-600', arrow: 'text-yellow-400',
     },
     none: {
       wrap:   'bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-100',
-      icon:   'bg-purple-100',
-      iconEl: 'text-purple-600',
-      arrow:  'text-purple-300',
+      icon:   'bg-purple-100', iconEl: 'text-purple-600', arrow: 'text-purple-300',
     },
   }[partnerStatus];
 
@@ -235,7 +187,6 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="container mx-auto px-4 py-8">
-
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-1">Мой профиль</h1>
           <p className="text-gray-500">Управление аккаунтом и активностями</p>
@@ -247,43 +198,35 @@ export default function ProfilePage() {
           <div className="lg:col-span-1 space-y-4">
             <div className="bg-gradient-to-br from-primary to-purple-600 rounded-2xl shadow-xl p-6 text-white">
               <div className="flex flex-col items-center text-center">
-                <div className="relative mb-4">
-                  <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center border-4 border-white/30 overflow-hidden">
-                    {user.avatar
-                      ? <img src={getImageUrl(user.avatar)} alt={user.username} className="w-full h-full object-cover" />
-                      : <User className="w-12 h-12 text-white" />
-                    }
-                  </div>
-                  <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition cursor-pointer">
-                    {uploadingAvatar
-                      ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                      : <Settings className="w-4 h-4 text-primary" />
-                    }
-                  </label>
-                  <input id="avatar-upload" type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" disabled={uploadingAvatar} />
+
+                {/* ✅ Используем переписанный AvatarUpload с поддержкой бакета */}
+                <div className="mb-4">
+                  <AvatarUpload
+                    size={96}
+                    showDelete={false}
+                  />
                 </div>
 
                 <h2 className="text-xl font-bold mb-0.5">
-                  {user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.username}
+                  {user.first_name && user.last_name
+                    ? `${user.first_name} ${user.last_name}`
+                    : user.username}
                 </h2>
                 <p className="text-white/70 text-sm mb-2">{user.email}</p>
 
                 {activeTags.length > 0 && (
                   <div className="flex flex-wrap justify-center gap-1.5 mb-3">
                     {activeTags.map(tag => (
-                      <span key={tag.slug} className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold shadow"
-                        style={{ backgroundColor: tag.background_color, color: tag.text_color }}>
+                      <span
+                        key={tag.slug}
+                        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold shadow"
+                        style={{ backgroundColor: tag.background_color, color: tag.text_color }}
+                      >
                         {tag.icon && <span>{tag.icon}</span>}
                         {tag.name}
                       </span>
                     ))}
                   </div>
-                )}
-
-                {user.avatar && (
-                  <button onClick={handleDeleteAvatar} disabled={uploadingAvatar} className="text-xs text-white/60 hover:text-white underline mb-3">
-                    Удалить аватар
-                  </button>
                 )}
 
                 {levelInfo && (
@@ -296,7 +239,10 @@ export default function ProfilePage() {
                       <span className="text-white/80">{levelInfo.experience} / {levelInfo.experience_needed} XP</span>
                     </div>
                     <div className="w-full bg-white/20 rounded-full h-2 mb-4">
-                      <div className="bg-white h-full rounded-full transition-all duration-500" style={{ width: `${levelInfo.progress_percent}%` }} />
+                      <div
+                        className="bg-white h-full rounded-full transition-all duration-500"
+                        style={{ width: `${levelInfo.progress_percent}%` }}
+                      />
                     </div>
                     <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/20">
                       <div className="text-center">
@@ -327,12 +273,15 @@ export default function ProfilePage() {
                   const isApproved = ps === 'approved';
                   const isPending  = ps === 'pending';
                   return (
-                    <Link key={item.href} href={item.href}
+                    <Link
+                      key={item.href}
+                      href={item.href}
                       className={`flex items-center justify-between px-3 py-2.5 rounded-lg transition group ${
                         isApproved ? 'bg-gradient-to-r from-purple-50 to-blue-50 hover:from-purple-100 hover:to-blue-100'
                         : isPending ? 'bg-yellow-50 hover:bg-yellow-100'
                         : 'hover:bg-gray-50'
-                      }`}>
+                      }`}
+                    >
                       <div className="flex items-center gap-3">
                         <item.icon className={`w-4 h-4 transition ${
                           isApproved ? 'text-purple-500'
@@ -346,7 +295,6 @@ export default function ProfilePage() {
                         }`}>
                           {item.label}
                         </span>
-                        {/* ✅ Бейдж статуса партнёра */}
                         {isApproved && (
                           <span className="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full font-bold">
                             Партнёр ✓
@@ -398,7 +346,7 @@ export default function ProfilePage() {
               ))}
             </div>
 
-            {/* ✅ Баннер партнёрки — 3 состояния */}
+            {/* Баннер партнёрки */}
             <Link href="/profile/partnership">
               <div className={`rounded-2xl p-6 flex items-center gap-5 shadow-sm transition hover:shadow-md cursor-pointer ${bannerStyle.wrap}`}>
                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 ${bannerStyle.icon}`}>
@@ -439,7 +387,7 @@ export default function ProfilePage() {
                 <div className="space-y-3">
                   {activeQuests.slice(0, 3).map((quest) => (
                     <div key={quest.id ?? quest.quest.name} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-                      <div className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></div>
+                      <div className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm truncate">{quest.quest.name}</p>
                         <div className="flex items-center gap-2 mt-1">
@@ -468,7 +416,6 @@ export default function ProfilePage() {
                   </span>
                 )}
               </div>
-
               {userTags.length > 0 ? (
                 <>
                   <p className="text-sm text-gray-400 mb-5">Нажмите на тег чтобы надеть или снять его</p>
@@ -478,13 +425,16 @@ export default function ProfilePage() {
                       const isLoading   = tagLoading === tag.id;
                       const isPermanent = isActive && tag.is_permanent;
                       return (
-                        <button key={tag.slug} onClick={() => handleTagToggle(tag)}
+                        <button
+                          key={tag.slug}
+                          onClick={() => handleTagToggle(tag)}
                           disabled={tagLoading !== null || isPermanent}
                           title={isPermanent ? '🔒 Тег закреплён администратором' : isActive ? 'Снять тег' : 'Надеть тег'}
                           className={`px-4 py-2 rounded-full font-bold text-sm transition-all duration-200 hover:scale-105 shadow-md select-none
                             ${isActive ? 'ring-4 ring-offset-2 ring-blue-400 scale-105 shadow-lg' : 'opacity-70 hover:opacity-100'}
                             ${isPermanent || tagLoading !== null ? 'cursor-not-allowed' : 'cursor-pointer'}`}
-                          style={{ backgroundColor: tag.background_color, color: tag.text_color }}>
+                          style={{ backgroundColor: tag.background_color, color: tag.text_color }}
+                        >
                           {isLoading ? (
                             <span className="flex items-center gap-1.5">
                               <span className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin inline-block" />
@@ -503,8 +453,11 @@ export default function ProfilePage() {
                     })}
                   </div>
                   {activeTags.some(t => !t.is_permanent) && (
-                    <button onClick={handleClearAllTags} disabled={tagLoading !== null}
-                      className="mt-4 text-sm text-gray-400 hover:text-red-500 transition flex items-center gap-1 disabled:opacity-50">
+                    <button
+                      onClick={handleClearAllTags}
+                      disabled={tagLoading !== null}
+                      className="mt-4 text-sm text-gray-400 hover:text-red-500 transition flex items-center gap-1 disabled:opacity-50"
+                    >
                       <span>✕</span> Снять все теги
                     </button>
                   )}

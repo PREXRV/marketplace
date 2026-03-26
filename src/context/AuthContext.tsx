@@ -4,13 +4,18 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { api, AuthTokens, LoginData, RegisterData } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 export interface User {
   id: number;
   username: string;
   email: string;
   first_name?: string;
   last_name?: string;
-  avatar?: string;
+  // ✅ avatar — write-only поле (для отправки файла на бэк)
+  // ✅ avatar_url — read поле (прямая ссылка на Яндекс бакет)
+  avatar?: string | null;
+  avatar_url?: string | null;
   phone?: string;
   city?: string;
   address?: string;
@@ -20,6 +25,11 @@ export interface User {
   date_joined?: string;
   orders_count?: number;
   active_badges?: any[];
+  // Геймификация / теги
+  tags?: any[];
+  active_tags?: any[];
+  level_data?: any;
+  referral_data?: any;
 }
 
 interface AuthContextType {
@@ -32,9 +42,10 @@ interface AuthContextType {
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
+  // ✅ updateAvatar теперь принимает avatar_url (URL из бакета)
   updateAvatar: (avatarUrl: string | null) => void;
   fetchProfile: () => Promise<void>;
-  refreshToken: () => Promise<string | null>; // ✅ новое
+  refreshToken: () => Promise<string | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -48,7 +59,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAuthenticated = !!user && !!tokens?.access;
   const token = tokens?.access || null;
 
-  // ✅ Обновление access токена через refresh
+  // ==================== TOKEN REFRESH ====================
+
   const refreshToken = async (): Promise<string | null> => {
     try {
       const storedTokens = localStorage.getItem('auth_tokens');
@@ -57,23 +69,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const parsed: AuthTokens = JSON.parse(storedTokens);
       if (!parsed.refresh) return null;
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/token/refresh/`, {
+      const res = await fetch(`${API_URL}/auth/token/refresh/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh: parsed.refresh }),
       });
 
-      if (!res.ok) {
-        logout();
-        return null;
-      }
+      if (!res.ok) { logout(); return null; }
 
       const data = await res.json();
-      const newTokens: AuthTokens = {
-        access: data.access,
-        refresh: parsed.refresh, // refresh остаётся прежним
-      };
-
+      const newTokens: AuthTokens = { access: data.access, refresh: parsed.refresh };
       setTokens(newTokens);
       localStorage.setItem('auth_tokens', JSON.stringify(newTokens));
       return data.access;
@@ -83,14 +88,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // ==================== FETCH PROFILE ====================
+
   const fetchProfile = async () => {
     try {
       if (!tokens?.access) return;
       const freshUser = await api.getProfile(tokens.access);
+      // ✅ freshUser содержит avatar_url — прямую ссылку из бакета
       setUser(freshUser);
       localStorage.setItem('auth_user', JSON.stringify(freshUser));
     } catch (error: any) {
-      // ✅ Если 401 — пробуем рефреш
       if (error?.status === 401 || error?.message?.includes('401')) {
         const newAccess = await refreshToken();
         if (newAccess) {
@@ -104,64 +111,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // ==================== INIT ====================
+
   useEffect(() => {
     const loadUser = async () => {
       try {
         const storedTokens = localStorage.getItem('auth_tokens');
-        const storedUser = localStorage.getItem('auth_user');
+        const storedUser   = localStorage.getItem('auth_user');
 
-        if (
-          storedTokens && storedUser &&
-          storedTokens !== 'undefined' && storedTokens !== 'null' &&
-          storedUser !== 'undefined' && storedUser !== 'null'
-        ) {
+        const validTokens = storedTokens && storedTokens !== 'undefined' && storedTokens !== 'null';
+        const validUser   = storedUser   && storedUser   !== 'undefined' && storedUser   !== 'null';
+
+        if (validTokens && validUser) {
+          const parsedTokens: AuthTokens = JSON.parse(storedTokens!);
+          const parsedUser: User         = JSON.parse(storedUser!);
+
+          // Сразу показываем кешированного пользователя
+          setTokens(parsedTokens);
+          setUser(parsedUser);
+
+          // Фоново обновляем профиль
           try {
-            const parsedTokens: AuthTokens = JSON.parse(storedTokens);
-            const parsedUser: User = JSON.parse(storedUser);
+            const freshUser = await api.getProfile(parsedTokens.access);
+            setUser(freshUser);
+            localStorage.setItem('auth_user', JSON.stringify(freshUser));
+          } catch {
+            // Access истёк — пробуем refresh
+            const res = await fetch(`${API_URL}/auth/token/refresh/`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ refresh: parsedTokens.refresh }),
+            });
 
-            setTokens(parsedTokens);
-            setUser(parsedUser);
+            if (res.ok) {
+              const data = await res.json();
+              const newTokens: AuthTokens = { access: data.access, refresh: parsedTokens.refresh };
+              setTokens(newTokens);
+              localStorage.setItem('auth_tokens', JSON.stringify(newTokens));
 
-            // Пробуем загрузить свежий профиль
-            try {
-              const freshUser = await api.getProfile(parsedTokens.access);
+              const freshUser = await api.getProfile(data.access);
               setUser(freshUser);
               localStorage.setItem('auth_user', JSON.stringify(freshUser));
-            } catch {
-              // ✅ access истёк — пробуем refresh
-              console.log('Access токен истёк, обновляем...');
-              const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/token/refresh/`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ refresh: parsedTokens.refresh }),
-              });
-
-              if (res.ok) {
-                const data = await res.json();
-                const newTokens: AuthTokens = { access: data.access, refresh: parsedTokens.refresh };
-                setTokens(newTokens);
-                localStorage.setItem('auth_tokens', JSON.stringify(newTokens));
-
-                // Загружаем профиль с новым токеном
-                const freshUser = await api.getProfile(data.access);
-                setUser(freshUser);
-                localStorage.setItem('auth_user', JSON.stringify(freshUser));
-                console.log('✅ Токен обновлён');
-              } else {
-                // refresh тоже истёк — выходим
-                console.log('Refresh токен истёк, выход');
-                logout();
-              }
+            } else {
+              logout();
             }
-          } catch (parseError) {
-            localStorage.removeItem('auth_tokens');
-            localStorage.removeItem('auth_user');
           }
         } else {
-          if (storedTokens === 'undefined' || storedTokens === 'null') localStorage.removeItem('auth_tokens');
-          if (storedUser === 'undefined' || storedUser === 'null') localStorage.removeItem('auth_user');
+          // Чистим мусор из localStorage
+          if (!validTokens) localStorage.removeItem('auth_tokens');
+          if (!validUser)   localStorage.removeItem('auth_user');
         }
-      } catch (error) {
+      } catch {
         logout();
       } finally {
         setLoading(false);
@@ -171,19 +171,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadUser();
   }, []);
 
-  // ✅ Авто-рефреш каждые 4 минуты (access живёт 5 минут обычно)
+  // Авто-рефреш токена каждые 4 минуты
   useEffect(() => {
     if (!isAuthenticated) return;
-
-    const interval = setInterval(() => {
-      refreshToken();
-    }, 4 * 60 * 1000);
-
+    const interval = setInterval(refreshToken, 4 * 60 * 1000);
     return () => clearInterval(interval);
   }, [isAuthenticated]);
 
+  // ==================== AUTH ACTIONS ====================
+
   const login = async (data: LoginData | string, userData?: User) => {
     try {
+      // Поддержка прямой передачи токена (для SSO / тестов)
       if (typeof data === 'string') {
         const newTokens: AuthTokens = { access: data, refresh: data };
         setUser(userData || null);
@@ -200,7 +199,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('auth_user', JSON.stringify(response.user));
       router.push('/profile');
     } catch (error) {
-      console.error('Ошибка входа:', error);
       throw error;
     }
   };
@@ -214,7 +212,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('auth_user', JSON.stringify(response.user));
       router.push('/profile');
     } catch (error) {
-      console.error('Ошибка регистрации:', error);
       throw error;
     }
   };
@@ -227,20 +224,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     router.push('/');
   };
 
+  // ==================== USER UPDATE ====================
+
   const updateUser = (userData: Partial<User>) => {
-    if (user) {
-      const updatedUser = { ...user, ...userData };
-      setUser(updatedUser);
-      localStorage.setItem('auth_user', JSON.stringify(updatedUser));
-    }
+    if (!user) return;
+    const updatedUser = { ...user, ...userData };
+    setUser(updatedUser);
+    localStorage.setItem('auth_user', JSON.stringify(updatedUser));
   };
 
   const updateAvatar = (avatarUrl: string | null) => {
-    if (user) {
-      const updatedUser = { ...user, avatar: avatarUrl || undefined };
-      setUser(updatedUser);
-      localStorage.setItem('auth_user', JSON.stringify(updatedUser));
-    }
+    if (!user) return;
+    // ✅ Обновляем avatar_url (URL из Яндекс бакета для отображения)
+    // avatar (write-only) не трогаем
+    const updatedUser: User = {
+      ...user,
+      avatar_url: avatarUrl,
+    };
+    setUser(updatedUser);
+    localStorage.setItem('auth_user', JSON.stringify(updatedUser));
   };
 
   return (
@@ -248,7 +250,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user, tokens, isAuthenticated, token, loading,
       login, register, logout,
       updateUser, updateAvatar, fetchProfile,
-      refreshToken, // ✅
+      refreshToken,
     }}>
       {children}
     </AuthContext.Provider>
