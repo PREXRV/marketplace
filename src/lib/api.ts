@@ -805,8 +805,8 @@ export const api = {
 
   getDeliveryMethods: async (orderAmount?: number): Promise<DeliveryMethod[]> => {
     const url = orderAmount
-      ? `${API_URL}/delivery-methods/?order_amount=${orderAmount}`
-      : `${API_URL}/delivery-methods/`;
+      ? `${API_BASE_URL}products/delivery-methods/?order_amount=${orderAmount}`
+      : `${API_BASE_URL}products/delivery-methods/`;
     const response = await fetch(url);
     if (!response.ok) throw new Error('Ошибка загрузки способов доставки');
     const data = await response.json();
@@ -814,7 +814,7 @@ export const api = {
   },
 
   getPaymentMethods: async (): Promise<PaymentMethod[]> => {
-    const response = await fetch(`${API_URL}/payment-methods/`);
+    const response = await fetch(`${API_BASE_URL}products/payment-methods/`);
     if (!response.ok) throw new Error('Ошибка загрузки способов оплаты');
     const data = await response.json();
     return Array.isArray(data) ? data : data.results || [];
@@ -843,57 +843,57 @@ export const api = {
       });
     }
     const url = params.toString()
-      ? `${API_URL}/products/?${params.toString()}`
-      : `${API_URL}/products/`;
+      ? `${API_BASE_URL}products/products/?${params.toString()}`
+      : `${API_BASE_URL}products/products/`;
     const response = await axios.get(url);
     return response.data.results || response.data;
   },
 
   getProduct: async (id: number): Promise<Product> => {
-    const response = await axios.get(`${API_URL}/products/${id}/`);
+    const response = await axios.get(`${API_BASE_URL}products/products/${id}/`);
     return response.data;
   },
 
   getProductsByCategory: async (categoryId: number): Promise<Product[]> => {
-    const response = await axios.get(`${API_URL}/products/?category=${categoryId}`);
+    const response = await axios.get(`${API_BASE_URL}products/products/?category=${categoryId}`);
     return response.data.results || response.data;
   },
 
   searchProducts: async (query: string): Promise<Product[]> => {
-    const response = await axios.get(`${API_URL}/products/?search=${encodeURIComponent(query)}`);
+    const response = await axios.get(`${API_BASE_URL}products/products/?search=${encodeURIComponent(query)}`);
     return response.data.results || response.data;
   },
 
   getFeaturedProducts: async (): Promise<Product[]> => {
-    const response = await axios.get(`${API_URL}/products/?is_featured=true`);
+    const response = await axios.get(`${API_BASE_URL}products/products/?is_featured=true`);
     return response.data.results || response.data;
   },
 
   getNewProducts: async (): Promise<Product[]> => {
-    const response = await axios.get(`${API_URL}/products/?is_new=true`);
+    const response = await axios.get(`${API_BASE_URL}products/products/?is_new=true`);
     return response.data.results || response.data;
   },
 
   // ==================== CATEGORIES ====================
 
   getCategories: async (): Promise<Category[]> => {
-    const response = await axios.get(`${API_URL}/categories/`);
+    const response = await axios.get(`${API_BASE_URL}products/categories/`);
     return response.data.results || response.data;
   },
 
   getCategory: async (id: number): Promise<Category> => {
-    const response = await axios.get(`${API_URL}/categories/${id}/`);
+    const response = await axios.get(`${API_BASE_URL}products/categories/${id}/`);
     return response.data;
   },
 
   getCategoryBySlug: async (slug: string): Promise<Category> => {
-    const response = await axios.get(`${API_URL}/categories/?slug=${slug}`);
+    const response = await axios.get(`${API_BASE_URL}products/categories/?slug=${slug}`);
     const data = response.data.results || response.data;
     return Array.isArray(data) ? data[0] : data;
   },
 
   getMyAllTags: async (token: string): Promise<AllUserTags> => {
-    const response = await fetch(`${API_URL}/my-all-tags/`, {
+    const response = await fetch(`${API_BASE_URL}products/my-all-tags/`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Failed to fetch all tags');
@@ -904,8 +904,8 @@ export const api = {
 
   getAttributes: async (categorySlug?: string): Promise<Attribute[]> => {
     const url = categorySlug
-      ? `${API_URL}/attributes/?category_slug=${categorySlug}`
-      : `${API_URL}/attributes/`;
+      ? `${API_BASE_URL}products/attributes/?category_slug=${categorySlug}`
+      : `${API_BASE_URL}products/attributes/`;
     const response = await axios.get(url);
     return response.data.results || response.data;
   },
@@ -913,7 +913,7 @@ export const api = {
   // ==================== AUTH ====================
 
   register: async (data: RegisterData): Promise<AuthResponse> => {
-    const response = await fetch(`${API_URL}/auth/register/`, {
+    const response = await fetch(`${API_BASE_URL}products/auth/register/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -939,7 +939,7 @@ export const api = {
   },
 
   refreshToken: async (refreshToken: string): Promise<{ access: string }> => {
-    const response = await fetch(`${API_URL}/auth/token/refresh/`, {
+    const response = await fetch(`${API_BASE_URL}products/auth/token/refresh/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refresh: refreshToken }),
@@ -951,7 +951,7 @@ export const api = {
   // ==================== USER PROFILE ====================
 
   getProfile: async (token: string): Promise<User> => {
-    const response = await fetch(`${API_URL}/profile/`, {
+    const response = await fetch(`${API_BASE_URL}products/profile/`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Не удалось загрузить профиль');
@@ -959,7 +959,7 @@ export const api = {
   },
 
   updateProfile: async (token: string, data: Partial<User>): Promise<{ success: boolean; user: User }> => {
-    const response = await fetch(`${API_URL}/profile/update/`, {
+    const response = await fetch(`${API_BASE_URL}products/profile/update/`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -979,7 +979,7 @@ export const api = {
     new_password: string;
     new_password2: string;
   }) => {
-    const response = await fetch(`${API_URL}/profile/change-password/`, {
+    const response = await fetch(`${API_BASE_URL}products/profile/change-password/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -997,7 +997,7 @@ export const api = {
   uploadAvatar: async (token: string, file: File) => {
     const formData = new FormData();
     formData.append('avatar', file);
-    const response = await fetch(`${API_URL}/profile/upload-avatar/`, {
+    const response = await fetch(`${API_BASE_URL}products/profile/upload-avatar/`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` },
       body: formData,
@@ -1011,7 +1011,7 @@ export const api = {
   },
 
   deleteAvatar: async (token: string) => {
-    const response = await fetch(`${API_URL}/profile/delete-avatar/`, {
+    const response = await fetch(`${API_BASE_URL}products/profile/delete-avatar/`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` },
     });
@@ -1023,7 +1023,7 @@ export const api = {
   },
 
   setActiveTag: async (token: string, tagId: number | null): Promise<any> => {
-    const response = await fetch(`${API_URL}/profile/set-active-tag/`, {
+    const response = await fetch(`${API_BASE_URL}products/profile/set-active-tag/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -1039,7 +1039,7 @@ export const api = {
   },
 
   getUserOrders: async (token: string): Promise<Order[]> => {
-    const response = await fetch(`${API_URL}/orders/`, {
+    const response = await fetch(`${API_BASE_URL}products/orders/`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Не удалось загрузить заказы');
@@ -1095,14 +1095,14 @@ export const api = {
   // ==================== REVIEWS ====================
 
   getReviews: async (productId: number): Promise<Review[]> => {
-    const response = await fetch(`${API_URL}/reviews/?product=${productId}`);
+    const response = await fetch(`${API_BASE_URL}products/reviews/?product=${productId}`);
     if (!response.ok) throw new Error('Ошибка загрузки отзывов');
     const data = await response.json();
     return Array.isArray(data) ? data : (data.results || []);
   },
 
   getMyReviews: async (token: string): Promise<Review[]> => {
-    const response = await fetch(`${API_URL}/reviews/my/`, {
+    const response = await fetch(`${API_BASE_URL}products/reviews/my/`, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -1116,7 +1116,7 @@ export const api = {
   },
 
   updateMyReview: async (token: string, reviewId: number, data: Partial<Review>) => {
-    const response = await fetch(`${API_URL}/reviews/${reviewId}/update_my_review/`, {
+    const response = await fetch(`${API_BASE_URL}products/reviews/${reviewId}/update_my_review/`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -1132,7 +1132,7 @@ export const api = {
   },
 
   addReviewReply: async (token: string, reviewId: number, text: string) => {
-    const response = await fetch(`${API_URL}/reviews/${reviewId}/add_reply/`, {
+    const response = await fetch(`${API_BASE_URL}products/reviews/${reviewId}/add_reply/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -1148,7 +1148,7 @@ export const api = {
   },
 
   getReviewStats: async (productId: number): Promise<ReviewStats> => {
-    const response = await axios.get(`${API_URL}/reviews/stats/?product=${productId}`);
+    const response = await axios.get(`${API_BASE_URL}products/reviews/stats/?product=${productId}`);
     return response.data;
   },
 
@@ -1168,29 +1168,29 @@ export const api = {
     }
     const headers: Record<string, string> = {};
     if (token) headers['Authorization'] = `Bearer ${token}`;
-    const response = await axios.post(`${API_URL}/reviews/`, formData, { headers });
+    const response = await axios.post(`${API_BASE_URL}products/reviews/`, formData, { headers });
     return response.data;
   },
 
   markReviewHelpful: async (reviewId: number) => {
-    const response = await axios.post(`${API_URL}/reviews/${reviewId}/helpful/`);
+    const response = await axios.post(`${API_BASE_URL}products/reviews/${reviewId}/helpful/`);
     return response.data;
   },
 
   markReviewNotHelpful: async (reviewId: number) => {
-    const response = await axios.post(`${API_URL}/reviews/${reviewId}/not_helpful/`);
+    const response = await axios.post(`${API_BASE_URL}products/reviews/${reviewId}/not_helpful/`);
     return response.data;
   },
 
   getMediaGallery: async (productId: number): Promise<MediaGalleryItem[]> => {
-    const response = await axios.get(`${API_URL}/media-gallery/${productId}/`);
+    const response = await axios.get(`${API_BASE_URL}products/media-gallery/${productId}/`);
     return response.data;
   },
 
   // ==================== ORDERS ====================
 
   createOrder: async (orderData: any): Promise<any> => {
-    const response = await fetch(`${API_URL}/orders/create/`, {
+    const response = await fetch(`${API_BASE_URL}products/orders/create/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(orderData),
@@ -1203,12 +1203,12 @@ export const api = {
   },
 
   getOrders: async () => {
-    const response = await axios.get(`${API_URL}/orders/`);
+    const response = await axios.get(`${API_BASE_URL}products/orders/`);
     return response.data.results || response.data;
   },
 
   getOrder: async (id: number) => {
-    const response = await axios.get(`${API_URL}/orders/${id}/`);
+    const response = await axios.get(`${API_BASE_URL}products/orders/${id}/`);
     return response.data;
   },
 
@@ -1216,7 +1216,7 @@ export const api = {
 
   getFavorites: async (token: string) => {
     try {
-      const response = await fetch(`${API_URL}/favorites/`, {
+      const response = await fetch(`${API_BASE_URL}products/favorites/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -1230,7 +1230,7 @@ export const api = {
   },
 
   toggleFavorite: async (token: string, productId: number) => {
-    const response = await fetch(`${API_URL}/favorites/toggle/`, {
+    const response = await fetch(`${API_BASE_URL}products/favorites/toggle/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -1243,7 +1243,7 @@ export const api = {
   },
 
   addToFavorites: async (token: string, productId: number) => {
-    const response = await fetch(`${API_URL}/favorites/`, {
+    const response = await fetch(`${API_BASE_URL}products/favorites/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -1259,7 +1259,7 @@ export const api = {
   },
 
   removeFromFavorites: async (token: string, productId: number) => {
-    const response = await fetch(`${API_URL}/favorites/${productId}/`, {
+    const response = await fetch(`${API_BASE_URL}products/favorites/${productId}/`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` },
     });
@@ -1272,7 +1272,7 @@ export const api = {
 
   checkFavorite: async (token: string, productId: number): Promise<boolean> => {
     try {
-      const favorites = await fetch(`${API_URL}/favorites/`, {
+      const favorites = await fetch(`${API_BASE_URL}products/favorites/`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (!favorites.ok) return false;
@@ -1287,7 +1287,7 @@ export const api = {
 
   getNotifications: async (token: string): Promise<Notification[]> => {
     try {
-      const response = await fetch(`${API_URL}/notifications/`, {
+      const response = await fetch(`${API_BASE_URL}products/notifications/`, {
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       if (!response.ok) return [];
@@ -1298,7 +1298,7 @@ export const api = {
 
   getUnreadNotifications: async (token: string): Promise<NotificationResponse> => {
     try {
-      const response = await fetch(`${API_URL}/notifications/unread/`, {
+      const response = await fetch(`${API_BASE_URL}products/notifications/unread/`, {
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       if (!response.ok) return { count: 0, notifications: [] };
@@ -1308,7 +1308,7 @@ export const api = {
 
   getAllNotifications: async (token: string): Promise<Notification[]> => {
     try {
-      const response = await fetch(`${API_URL}/notifications/`, {
+      const response = await fetch(`${API_BASE_URL}products/notifications/`, {
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       if (!response.ok) return [];
@@ -1319,7 +1319,7 @@ export const api = {
 
   getUnreadCount: async (token: string): Promise<{ count: number }> => {
     try {
-      const response = await fetch(`${API_URL}/notifications/unread_count/`, {
+      const response = await fetch(`${API_BASE_URL}products/notifications/unread_count/`, {
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       if (!response.ok) return { count: 0 };
@@ -1329,7 +1329,7 @@ export const api = {
 
   markNotificationAsRead: async (token: string, notificationId: number) => {
     try {
-      const response = await fetch(`${API_URL}/notifications/${notificationId}/mark_as_read/`, {
+      const response = await fetch(`${API_BASE_URL}products/notifications/${notificationId}/mark_as_read/`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
@@ -1340,7 +1340,7 @@ export const api = {
 
   markAllNotificationsAsRead: async (token: string) => {
     try {
-      const response = await fetch(`${API_URL}/notifications/mark_all_as_read/`, {
+      const response = await fetch(`${API_BASE_URL}products/notifications/mark_all_as_read/`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
@@ -1351,7 +1351,7 @@ export const api = {
 
   deleteNotification: async (token: string, notificationId: number) => {
     try {
-      const response = await fetch(`${API_URL}/notifications/${notificationId}/delete_notification/`, {
+      const response = await fetch(`${API_BASE_URL}products/notifications/${notificationId}/delete_notification/`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
@@ -1362,7 +1362,7 @@ export const api = {
 
   getOrderStatusHistory: async (token: string, orderId: number) => {
     try {
-      const response = await fetch(`${API_URL}/orders/${orderId}/history/`, {
+      const response = await fetch(`${API_BASE_URL}products/orders/${orderId}/history/`, {
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       if (!response.ok) return [];
@@ -1559,7 +1559,7 @@ export const api = {
   // ==================== PROMO CODES ====================
 
   validatePromoCode: async (code: string, orderAmount?: number) => {
-    const response = await fetch(`${API_URL}/promo-codes/validate/`, {
+    const response = await fetch(`${API_BASE_URL}products/promo-codes/validate/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code: code.toUpperCase().trim(), order_amount: orderAmount || 0 }),
@@ -1572,7 +1572,7 @@ export const api = {
   },
 
   applyPromoCode: async (code: string, orderTotal: number) => {
-    const response = await fetch(`${API_URL}/promo-codes/validate/`, {
+    const response = await fetch(`${API_BASE_URL}products/promo-codes/validate/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code: code.toUpperCase().trim(), order_amount: orderTotal }),
@@ -1633,7 +1633,7 @@ export const api = {
     } | null;
   }> => {
     try {
-      const response = await fetch(`${API_URL}/homepage/public/`);
+      const response = await fetch(`${API_BASE_URL}products/homepage/public/`);
       if (!response.ok) throw new Error('Failed to load homepage');
       return response.json();
     } catch {
@@ -1652,7 +1652,7 @@ export const api = {
   },
 
   createPayment: async (orderId: number): Promise<PaymentResponse> => {
-    const res = await fetch(`${API_URL}/orders/payment/create/`, {
+    const res = await fetch(`${API_BASE_URL}products/orders/payment/create/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ order_id: orderId }),
@@ -1661,7 +1661,7 @@ export const api = {
   },
 
   checkPaymentStatus: async (orderId: number): Promise<PaymentStatus> => {
-    const res = await fetch(`${API_URL}/orders/payment/status/${orderId}/`);
+    const res = await fetch(`${API_BASE_URL}products/orders/payment/status/${orderId}/`);
     return res.json();
   },
 };
