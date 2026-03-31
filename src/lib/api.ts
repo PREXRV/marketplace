@@ -950,26 +950,26 @@ export const api = {
 
   // ==================== USER PROFILE ====================
 
-  getProfile: async (token: string) => {
+  getProfile: async (token: string): Promise<User> => {
     const response = await fetch(`${API_BASE_URL}products/profile/`, {
-      headers: { 'Authorization': `Bearer ${token}` },
+      headers: { 'Authorization': `Bearer ${token}` }
     });
-    if (!response.ok) throw new Error('Не удалось загрузить профиль');
+    if (!response.ok) throw new Error('Failed to fetch profile');
     return response.json();
   },
 
-  updateProfile: async (token: string, data: Partial<User>): Promise<{ success: boolean; user: User }> => {
+  updateProfile: async (token: string, data: Partial<User>): Promise<{success: boolean, user: User}> => {
     const response = await fetch(`${API_BASE_URL}products/profile/update/`, {
       method: 'PATCH',
-      headers: {
+      headers: { 
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify(data),
     });
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.errors ? JSON.stringify(error.errors) : 'Ошибка обновления профиля');
+      throw new Error(error.errors ? JSON.stringify(error.errors) : 'Update failed');
     }
     return response.json();
   },
