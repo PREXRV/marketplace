@@ -1,8 +1,10 @@
 import axios from 'axios';
 
-const API_ROOT = process.env.NEXT_PUBLIC_API_URL || 'https://fulfilling-success-production-3288.up.railway.app/api';
-const PRODUCTS_ROOT = `${API_ROOT}/products`;
-const PARTNERSHIP_ROOT = `${API_ROOT}/partnership`;
+// ✅ Все запросы идут через /api/ → Next.js proxy → бэкенд
+// Никаких прямых URL к Railway/localhost — CORS убит навсегда
+const API_ROOT = 'https://fulfilling-success-production-3288.up.railway.app/api/';
+const PRODUCTS_API = `${API_ROOT}products/`;
+
 // ==================== ИНТЕРФЕЙСЫ ====================
 
 export interface AttributeValue {
