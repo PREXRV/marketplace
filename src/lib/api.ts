@@ -950,7 +950,7 @@ export const api = {
 
   // ==================== USER PROFILE ====================
 
-  getProfile: async (token: string): Promise<User> => {
+  getProfile: async (token: string) => {
     const response = await fetch(`${API_BASE_URL}products/profile/`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
@@ -1004,20 +1004,19 @@ export const api = {
     });
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Ошибка загрузки аватарки');
+      throw new Error(error.error);
     }
     return response.json();
-    // ✅ response содержит { avatar_url, user } — используй data.avatar_url для отображения
   },
 
   deleteAvatar: async (token: string) => {
     const response = await fetch(`${API_BASE_URL}products/profile/delete-avatar/`, {
       method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` },
+      headers: { 'Authorization': `Bearer ${token}` }
     });
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || 'Ошибка удаления аватарки');
+      throw new Error(error.error);
     }
     return response.json();
   },
