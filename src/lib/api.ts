@@ -2,8 +2,6 @@ import axios from 'axios';
 
 // ✅ Все запросы идут через /api/ → Next.js proxy → бэкенд
 // Никаких прямых URL к Railway/localhost — CORS убит навсегда
-const API_URL = 'https://fulfilling-success-production-3288.up.railway.app/api';
-const API_BASE_URL = 'https://fulfilling-success-production-3288.up.railway.app/api/';
 const API_ROOT = 'https://fulfilling-success-production-3288.up.railway.app/api/';
 const PRODUCTS_API = `${API_ROOT}products/`;
 
@@ -823,7 +821,7 @@ export const api = {
   },
 
   replyReturn: async (token: string, returnId: number, data: FormData) => {
-    const response = await fetch(`${API_BASE_URL}/returns/${returnId}/reply/`, {
+    const response = await fetch(`${PRODUCTS_API}returns/${returnId}/reply/`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` },
       body: data,
@@ -1050,7 +1048,7 @@ export const api = {
   // ==================== ADDRESSES ====================
 
   getAddresses: async (token: string): Promise<Address[]> => {
-    const response = await fetch(`${API_BASE_URL}/addresses/`, {
+    const response = await fetch(`${PRODUCTS_API}addresses/`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Ошибка загрузки адресов');
@@ -1058,7 +1056,7 @@ export const api = {
   },
 
   createAddress: async (token: string, data: Omit<Address, 'id' | 'created_at'>): Promise<Address> => {
-    const response = await fetch(`${API_BASE_URL}/addresses/`, {
+    const response = await fetch(`${PRODUCTS_API}addresses/`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -1072,7 +1070,7 @@ export const api = {
   },
 
   updateAddress: async (token: string, id: number, data: Partial<Address>): Promise<Address> => {
-    const response = await fetch(`${API_BASE_URL}/addresses/${id}/`, {
+    const response = await fetch(`${PRODUCTS_API}addresses/${id}/`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -1086,7 +1084,7 @@ export const api = {
   },
 
   deleteAddress: async (token: string, id: number): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/addresses/${id}/`, {
+    const response = await fetch(`${PRODUCTS_API}addresses/${id}/`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${token}` },
     });
@@ -1588,7 +1586,7 @@ export const api = {
   // ==================== RETURNS ====================
 
   createReturn: async (token: string, data: FormData) => {
-    const response = await fetch(`${API_BASE_URL}/returns/create/`, {
+    const response = await fetch(`${PRODUCTS_API}returns/create/`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` },
       body: data,
@@ -1601,7 +1599,7 @@ export const api = {
   },
 
   getUserReturns: async (token: string): Promise<Return[]> => {
-    const response = await fetch(`${API_BASE_URL}/returns/`, {
+    const response = await fetch(`${PRODUCTS_API}returns/`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Ошибка загрузки возвратов');
@@ -1609,7 +1607,7 @@ export const api = {
   },
 
   getReturnDetail: async (token: string, returnId: number): Promise<Return> => {
-    const response = await fetch(`${API_BASE_URL}/returns/${returnId}/`, {
+    const response = await fetch(`${PRODUCTS_API}returns/${returnId}/`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Ошибка загрузки возврата');
@@ -1644,7 +1642,7 @@ export const api = {
 
   getMyReferralLink: async (token: string): Promise<ReferralLink | null> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/referral/my-link/`, {
+      const response = await fetch(`${PRODUCTS_API}referral/my-link/`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (!response.ok) return null;
