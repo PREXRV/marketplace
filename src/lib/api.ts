@@ -3,7 +3,7 @@ import axios from 'axios';
 // ✅ Все запросы идут через /api/ → Next.js proxy → бэкенд
 // Никаких прямых URL к Railway/localhost — CORS убит навсегда
 const API_URL = 'https://fulfilling-success-production-3288.up.railway.app/api';
-const API_BASE_URL = 'https://fulfilling-success-production-3288.up.railway.app/api';
+const API_BASE_URL = 'https://fulfilling-success-production-3288.up.railway.app/api/';
 
 // ==================== ИНТЕРФЕЙСЫ ====================
 
@@ -926,7 +926,7 @@ export const api = {
   },
 
   login: async (data: LoginData): Promise<AuthResponse> => {
-    const response = await fetch(`${API_URL}/auth/login/`, {
+    const response = await fetch(`${API_BASE_URL}products/auth/login/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
