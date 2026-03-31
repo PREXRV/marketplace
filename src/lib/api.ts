@@ -1373,7 +1373,7 @@ export const api = {
   // ==================== GAMIFICATION ====================
 
   getGamificationProfile: async (token: string): Promise<GamificationProfile> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/stats/profile/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/stats/profile/`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Failed to fetch gamification profile');
@@ -1383,7 +1383,7 @@ export const api = {
   },
 
   getGamificationStats: async (token: string): Promise<GamificationStats> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/stats/stats/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/stats/stats/`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Failed to fetch gamification stats');
@@ -1391,7 +1391,7 @@ export const api = {
   },
 
   getMyLevel: async (token: string): Promise<UserLevel> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/stats/my_level/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/stats/my_level/`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Failed to fetch user level');
@@ -1399,7 +1399,7 @@ export const api = {
   },
 
   getQuests: async (token: string): Promise<Quest[]> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/quests/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/quests/`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Failed to fetch quests');
@@ -1407,7 +1407,7 @@ export const api = {
   },
 
   getMyQuests: async (token: string): Promise<UserQuest[]> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/quests/my_quests/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/quests/my_quests/`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Failed to fetch user quests');
@@ -1415,7 +1415,7 @@ export const api = {
   },
 
   startQuest: async (questId: number, token: string): Promise<UserQuest> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/quests/${questId}/start/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/quests/${questId}/start/`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
     });
@@ -1424,7 +1424,7 @@ export const api = {
   },
 
   claimQuestReward: async (questId: number, token: string): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/quests/${questId}/claim_reward/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/quests/${questId}/claim_reward/`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
     });
@@ -1433,7 +1433,7 @@ export const api = {
   },
 
   getRewards: async (token: string): Promise<RewardItem[]> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/rewards/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/rewards/`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Failed to fetch rewards');
@@ -1442,7 +1442,7 @@ export const api = {
   },
 
   purchaseReward: async (rewardId: number, token: string): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/rewards/${rewardId}/purchase/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/rewards/${rewardId}/purchase/`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
     });
@@ -1454,7 +1454,7 @@ export const api = {
   },
 
   getMyPurchases: async (token: string): Promise<RewardPurchase[]> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/rewards/my_purchases/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/rewards/my_purchases/`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Failed to fetch purchases');
@@ -1463,7 +1463,7 @@ export const api = {
 
   // ✅ Исправлен захардкоженный localhost
   clickQuest: async (questId: number, token: string): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/quests/${questId}/click/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/quests/${questId}/click/`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
     });
@@ -1473,7 +1473,7 @@ export const api = {
   },
 
   toggleBadge: async (token: string, badgeId: number): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/badges/${badgeId}/toggle/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/badges/${badgeId}/toggle/`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
     });
@@ -1489,7 +1489,7 @@ export const api = {
     purchaseId: number,
     token: string
   ): Promise<{ success: boolean; message: string; product_slug?: string }> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/rewards/add_free_to_cart/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/rewards/add_free_to_cart/`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ product_id: productId, purchase_id: purchaseId }),
@@ -1502,7 +1502,7 @@ export const api = {
   },
 
   useRewardPurchase: async (purchaseId: number, token: string): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/rewards/${purchaseId}/use/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/rewards/${purchaseId}/use/`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
     });
@@ -1517,19 +1517,19 @@ export const api = {
     const params = new URLSearchParams();
     if (year)  params.append('year', year.toString());
     if (month) params.append('month', month.toString());
-    const response = await fetch(`${API_BASE_URL}/gamification/leaderboard/?${params}`);
+    const response = await fetch(`${API_BASE_URL}gamification/leaderboard/?${params}`);
     if (!response.ok) throw new Error('Failed to fetch leaderboard');
     return response.json();
   },
 
   getTopPlayers: async (): Promise<UserLevel[]> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/leaderboard/top_players/`);
+    const response = await fetch(`${API_BASE_URL}gamification/leaderboard/top_players/`);
     if (!response.ok) throw new Error('Failed to fetch top players');
     return response.json();
   },
 
   getMyRank: async (token: string): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/leaderboard/my_rank/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/leaderboard/my_rank/`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Failed to fetch rank');
@@ -1537,7 +1537,7 @@ export const api = {
   },
 
   claimDailyBonus: async (token: string): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/daily-bonus/claim/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/daily-bonus/claim/`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
     });
@@ -1549,7 +1549,7 @@ export const api = {
   },
 
   getDailyBonusStatus: async (token: string): Promise<DailyBonus> => {
-    const response = await fetch(`${API_BASE_URL}/gamification/daily-bonus/status/`, {
+    const response = await fetch(`${API_BASE_URL}gamification/daily-bonus/status/`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Failed to fetch daily bonus status');
