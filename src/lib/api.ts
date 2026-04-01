@@ -1652,7 +1652,7 @@ export const api = {
   },
 
   createPayment: async (orderId: number): Promise<PaymentResponse> => {
-    const res = await fetch(`${orders_API}payment/create/`, {
+    const res = await fetch(`${orders_API}orders/payment/create/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ order_id: orderId }),
@@ -1661,7 +1661,7 @@ export const api = {
   },
 
   checkPaymentStatus: async (orderId: number): Promise<PaymentStatus> => {
-    const res = await fetch(`${orders_API}payment/status/${orderId}/`);
+    const res = await fetch(`${orders_API}orders/payment/status/${orderId}/`);
     return res.json();
   },
 };
