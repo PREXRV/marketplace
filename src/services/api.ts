@@ -102,7 +102,7 @@ export const partnershipAPI = {
 
   getMyApplication: async () => {
     try {
-      return await api.get('/partnership/applications/my_application/');
+      return await api.get(`${PARTNERSHIP_API}/partnership/applications/my_application/`);
     } catch (error: any) {
       if (error.response?.status === 404) return { data: null };
       throw error;
@@ -112,7 +112,7 @@ export const partnershipAPI = {
   // Партнёр
   getPartnerProfile: async () => {
     try {
-      return await api.get('/partnership/partners/me/');
+      return await api.get(`${PARTNERSHIP_API}/partnership/partners/me/`);
     } catch (error: any) {
       if (error.response?.status === 404 || error.response?.status === 403) return { data: null };
       throw error;
@@ -121,7 +121,7 @@ export const partnershipAPI = {
 
   getPartnerDashboard: async () => {
     try {
-      return await api.get('/partnership/partners/dashboard/');
+      return await api.get(`${PARTNERSHIP_API}/partnership/partners/dashboard/`);
     } catch (error: any) {
       if (error.response?.status === 404) return { data: null };
       throw error;
@@ -131,19 +131,19 @@ export const partnershipAPI = {
   // Соцсети
   getSocialAccounts: async () => {
     try {
-      return await api.get('/partnership/social-accounts/');
+      return await api.get(`${PARTNERSHIP_API}/partnership/social-accounts/`);
     } catch (error: any) {
       if (error.response?.status === 404) return { data: [] };
       throw error;
     }
   },
-  addSocialAccount: (data: any) => api.post('/partnership/social-accounts/', data),
-  deleteSocialAccount: (id: number) => api.delete(`/partnership/social-accounts/${id}/`),
+  addSocialAccount: (data: any) => api.post(`${PARTNERSHIP_API}/partnership/social-accounts/`, data),
+  deleteSocialAccount: (id: number) => api.delete(`${PARTNERSHIP_API}/partnership/social-accounts/${id}/`),
 
   // Аналитика
   getAnalytics: async (days = 30) => {
     try {
-      return await api.get(`/partnership/analytics/?days=${days}`);
+      return await api.get(`${PARTNERSHIP_API}/partnership/analytics/?days=${days}`);
     } catch (error: any) {
       if (error.response?.status === 404) return { data: null };
       throw error;
@@ -153,7 +153,7 @@ export const partnershipAPI = {
   // Рефералы
   getReferrals: async () => {
     try {
-      return await api.get('/partnership/referrals/');
+      return await api.get(`${PARTNERSHIP_API}/partnership/referrals/`);
     } catch (error: any) {
       if (error.response?.status === 404) return {
         data: { referrals: [], total_referrals: 0, total_earnings: 0, referral_code: '', referral_link: '', recent_rewards: [] }
@@ -165,17 +165,17 @@ export const partnershipAPI = {
   // Запросы товаров
   getProductRequests: async () => {
     try {
-      return await api.get('/partnership/product-requests/');
+      return await api.get(`${PARTNERSHIP_API}/partnership/product-requests/`);
     } catch (error: any) {
       if (error.response?.status === 404) return { data: [] };
       throw error;
     }
   },
-  createProductRequest: (data: any) => api.post('/partnership/product-requests/', data),
+  createProductRequest: (data: any) => api.post(`${PARTNERSHIP_API}/partnership/product-requests/`, data),
   uploadContract: (requestId: number, file: File) => {
     const formData = new FormData();
     formData.append('contract_file', file);
-    return api.post(`/partnership/product-requests/${requestId}/upload_contract/`, formData, {
+    return api.post(`${PARTNERSHIP_API}/partnership/product-requests/${requestId}/upload_contract/`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
@@ -183,30 +183,30 @@ export const partnershipAPI = {
   // Видео
   getVideos: async () => {
     try {
-      return await api.get('/partnership/videos/');
+      return await api.get(`${PARTNERSHIP_API}/partnership/videos/`);
     } catch (error: any) {
       if (error.response?.status === 404) return { data: [] };
       throw error;
     }
   },
-  uploadVideo: (data: any) => api.post('/partnership/videos/', data),
-  deleteVideo: (id: number) => api.delete(`/partnership/videos/${id}/`),
+  uploadVideo: (data: any) => api.post(`${PARTNERSHIP_API}/partnership/videos/`, data),
+  deleteVideo: (id: number) => api.delete(`${PARTNERSHIP_API}/partnership/videos/${id}/`),
 
   // Возвраты
   getRefunds: async () => {
     try {
-      return await api.get('/partnership/refunds/');
+      return await api.get(`${PARTNERSHIP_API}/partnership/refunds/`);
     } catch (error: any) {
       if (error.response?.status === 404) return { data: [] };
       throw error;
     }
   },
-  createRefund: (data: any) => api.post('/partnership/refunds/', data),
+  createRefund: (data: any) => api.post(`${PARTNERSHIP_API}/partnership/refunds/`, data),
 
   // Мои товары
   getMyProducts: async () => {
     try {
-      return await api.get('/partnership/my-products/');
+      return await api.get(`${PARTNERSHIP_API}/partnership/my-products/`);
     } catch (error: any) {
       if (error.response?.status === 404) return { data: [] };
       throw error;
@@ -215,16 +215,16 @@ export const partnershipAPI = {
 
   // ✅ Трекинг
   trackRefView: (ref_token: string) =>
-    api.post('/partnership/track-ref-view/', { ref_token }),
+    api.post(`${PARTNERSHIP_API}/partnership/track-ref-view/`, { ref_token }),
 
   trackCartAdd: (ref_token: string) =>
-    api.post('/partnership/track-cart-add/', { ref_token }),
+    api.post(`${PARTNERSHIP_API}/partnership/track-cart-add/`, { ref_token }),
 
   trackSkuSearch: (customSku: string) =>
-    api.post('/partnership/track-sku-search/', { custom_sku: customSku }),
+    api.post(`${PARTNERSHIP_API}/partnership/track-sku-search/`, { custom_sku: customSku }),
 
   trackPurchase: (refToken: string) =>
-    api.post('/partnership/track-purchase/', { ref_token: refToken }),
+    api.post(`${PARTNERSHIP_API}/partnership/track-purchase/`, { ref_token: refToken }),
 };
 
 export const chatAPI = {
