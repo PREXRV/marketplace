@@ -81,6 +81,12 @@ export default function ProductCard({ product }: ProductCardProps) {
     (oldPriceValue !== null && oldPriceValue > displayPrice) ||
     discountPercentage > 0;
 
+  const strikethroughPrice = hasDiscount
+    ? (oldPriceValue !== null && oldPriceValue > displayPrice
+        ? oldPriceValue
+        : parseFloat(String(product.price)))
+    : null;
+    
   const hasActiveTimedSale =
     product.is_on_sale ||
     (product.sale_end_date && new Date(product.sale_end_date) > new Date());
