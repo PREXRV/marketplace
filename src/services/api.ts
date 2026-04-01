@@ -100,14 +100,14 @@ export const partnershipAPI = {
     }
   },
 
-  getMyApplication: async () => {
+/*  getMyApplication: async () => {
     try {
       return await api.get(`${PARTNERSHIP_API}/partnership/applications/my_application/`);
     } catch (error: any) {
       if (error.response?.status === 404) return { data: null };
       throw error;
     }
-  },
+  },*/
 
   // Партнёр
   getPartnerProfile: async () => {
