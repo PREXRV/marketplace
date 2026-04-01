@@ -70,8 +70,17 @@ export default function ProductCard({ product }: ProductCardProps) {
   const displayPrice = product.final_price
     ? parseFloat(product.final_price)
     : parseFloat(product.price);
-  const hasDiscount = product.old_price || (product.discount_percentage ?? 0) > 0;
+
+  const oldPriceValue = product.old_price
+    ? parseFloat(String(product.old_price))
+    : null;
+    
   const discountPercentage = product.discount_percentage || 0;
+
+  const hasDiscount =
+    (oldPriceValue !== null && oldPriceValue > displayPrice) ||
+    discountPercentage > 0;
+
   const hasActiveTimedSale =
     product.is_on_sale ||
     (product.sale_end_date && new Date(product.sale_end_date) > new Date());
@@ -260,9 +269,9 @@ export default function ProductCard({ product }: ProductCardProps) {
                 <span className={`text-2xl font-bold ${hasActiveTimedSale ? 'text-red-600' : 'text-primary'}`}>
                   {formatPrice(displayPrice)} ₽
                 </span>
-                {hasDiscount && (
+                {hasDiscount && strikethroughPrice && (
                   <span className="text-base text-gray-400 line-through">
-                    {formatPrice(parseFloat(product.price || '0'))} ₽
+                    {formatPrice(strikethroughPrice)} ₽
                   </span>
                 )}
               </div>
@@ -272,7 +281,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                     <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
                     </svg>
-                    Экономия {formatPrice(parseFloat(product.price || '0') - displayPrice)} ₽
+                    Экономия {formatPrice(strikethroughPrice! - displayPrice)} ₽
                   </div>
                 )}
               </div>
