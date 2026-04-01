@@ -74,7 +74,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const oldPriceValue = product.old_price
     ? parseFloat(String(product.old_price))
     : null;
-    
+
   const discountPercentage = product.discount_percentage || 0;
 
   const hasDiscount =
@@ -260,7 +260,7 @@ export default function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
 
-          {/* ─── НИЖНИЙ БЛОК ──────────────────────────────────── */}
+          {/* ─── НИЖНИЙ БЛОК ───────────────────────────────── */}
           <div className="mt-auto">
 
             {/* Цена */}
