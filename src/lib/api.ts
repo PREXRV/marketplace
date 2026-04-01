@@ -4,6 +4,7 @@ import axios from 'axios';
 // Никаких прямых URL к Railway/localhost — CORS убит навсегда
 const API_ROOT = 'https://fulfilling-success-production-3288.up.railway.app/api/';
 const PRODUCTS_API = `${API_ROOT}products/`;
+const orders_API = `${API_ROOT}orders/`;
 
 // ==================== ИНТЕРФЕЙСЫ ====================
 
@@ -805,8 +806,8 @@ export const api = {
 
   getDeliveryMethods: async (orderAmount?: number): Promise<DeliveryMethod[]> => {
     const url = orderAmount
-      ? `${PRODUCTS_API}delivery-methods/?order_amount=${orderAmount}`
-      : `${PRODUCTS_API}delivery-methods/`;
+      ? `${orders_API}delivery-methods/?order_amount=${orderAmount}`
+      : `${orders_API}delivery-methods/`;
     const response = await fetch(url);
     if (!response.ok) throw new Error('Ошибка загрузки способов доставки');
     const data = await response.json();
@@ -814,7 +815,7 @@ export const api = {
   },
 
   getPaymentMethods: async (): Promise<PaymentMethod[]> => {
-    const response = await fetch(`${PRODUCTS_API}payment-methods/`);
+    const response = await fetch(`${orders_API}payment-methods/`);
     if (!response.ok) throw new Error('Ошибка загрузки способов оплаты');
     const data = await response.json();
     return Array.isArray(data) ? data : data.results || [];
