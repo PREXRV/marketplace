@@ -276,11 +276,17 @@ export const addressAPI = {
 };
 
 export const createChatWebSocket = (roomId: number) => {
-  const token = typeof window !== 'undefined' 
-    ? JSON.parse(localStorage.getItem('auth_tokens') || '{}')?.access 
-    : null;
-  return new WebSocket(`${API_URL.replace(/^http/, 'ws')}chat/rooms/${roomId}/ws/`, 
-    token ? [`Bearer ${token}`] : []);
+  const token =
+    typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem('auth_tokens') || '{}')?.access
+      : null;
+
+  const wsBase = API_ROOT.replace(/^http/, 'ws').replace(/\/$/, '');
+
+  return new WebSocket(
+    `${wsBase}/chat/rooms/${roomId}/ws/`,
+    token ? [`Bearer ${token}`] : []
+  );
 };
 
 export default api;
