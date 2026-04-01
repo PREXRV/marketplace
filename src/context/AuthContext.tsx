@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const parsed: AuthTokens = JSON.parse(storedTokens);
       if (!parsed.refresh) return null;
 
-      const res = await fetch(`${API_URL}/auth/token/refresh/`, {
+      const res = await fetch(`${API_URL}/api/auth/token/refresh/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh: parsed.refresh }),
@@ -137,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             localStorage.setItem('auth_user', JSON.stringify(freshUser));
           } catch {
             // Access истёк — пробуем refresh
-            const res = await fetch(`${API_URL}/auth/token/refresh/`, {
+            const res = await fetch(`${API_URL}/api/auth/token/refresh/`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ refresh: parsedTokens.refresh }),

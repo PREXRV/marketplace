@@ -1,21 +1,46 @@
-'use client'; // Для client-side
+'use client';
 
-import { createContext, useContext, ReactNode, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 
-interface AuthContextType {
-  user: any | null;
-  login: (user: any) => void;
-  logout: () => void;
-}
+const AuthContext = createContext(undefined);
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  
-  const login = (userData: any) => setUser(userData);
-  const logout = () => setUser(null);
-  
+  const [loading, setLoading] = useState(true); // ← пока читаем localStorage
+
+  // При загрузке — восстанавливаем сессию
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    const savedUser = localStorage.getItem('user');
+    
+    if (token && savedUser) {
+      setUser(JSON.parse(savedUser));
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+    setLoading(false);
+  }, []);
+
+  const login = (userData, tokens) => {
+    // tokens = { access, refresh }
+    localStorage.setItem('access_token', tokens.access);
+    localStorage.setItem('refresh_token', tokens.refresh);
+    localStorage.setItem('user', JSON.stringify(userData));
+    axios.defaults.headers.common['Authorization'] = `Bearer ${tokens.access}`;
+    setUser(userData);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    delete axios.defaults.headers.common['Authorization'];
+    setUser(null);
+  };
+
+  // Не рендерим детей пока не прочитали localStorage
+  if (loading) return null;
+
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
       {children}

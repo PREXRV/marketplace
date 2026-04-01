@@ -103,7 +103,7 @@ export default function HeroBanner({ banners }: { banners: Banner[] }) {
     if (b.media_url) return b.media_url;
     if (b.media_file) {
       if (b.media_file.startsWith('http')) return b.media_file;
-      return `http://localhost:8000${b.media_file}`;
+      return `${process.env.NEXT_PUBLIC_API_URL}${b.media_file}`;
     }
     return null;
   };
