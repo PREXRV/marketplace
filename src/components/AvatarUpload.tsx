@@ -4,9 +4,11 @@ import { useAuth } from '@/context/AuthContext';
 import { useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 
+const API_BASE = 'https://fulfilling-success-production-3288.up.railway.app/api/products';
+
 interface AvatarUploadProps {
-  size?: number;         // Размер аватара в px (default: 150)
-  showDelete?: boolean;  // Показывать кнопку удаления (default: true)
+  size?: number;
+  showDelete?: boolean;
   onSuccess?: (avatarUrl: string | null) => void;
 }
 
@@ -20,15 +22,10 @@ export default function AvatarUpload({
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Валидация файла
   const validateFile = (file: File): string | null => {
     const allowed = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
-    if (!allowed.includes(file.type)) {
-      return 'Формат не поддерживается. Используйте JPEG, PNG или WebP';
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      return 'Размер файла не должен превышать 5MB';
-    }
+    if (!allowed.includes(file.type)) return 'Формат не поддерживается. Используйте JPEG, PNG или WebP';
+    if (file.size > 5 * 1024 * 1024) return 'Размер файла не должен превышать 5MB';
     return null;
   };
 
@@ -36,33 +33,25 @@ export default function AvatarUpload({
     if (!tokens?.access) return;
 
     const error = validateFile(file);
-    if (error) {
-      alert(error);
-      return;
-    }
+    if (error) { alert(error); return; }
 
     setUploading(true);
     const formData = new FormData();
     formData.append('avatar', file);
 
     try {
-      const res = await fetch(`/api/products/profile/upload-avatar/`, {
+      const res = await fetch(`${API_BASE}/profile/upload-avatar/`, {
         method: 'POST',
         headers: {
-          // ✅ Bearer — как в остальных запросах проекта
           Authorization: `Bearer ${tokens.access}`,
+          // ❌ Content-Type не ставим — браузер сам добавит multipart/form-data с boundary
         },
         body: formData,
       });
 
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Ошибка загрузки');
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Ошибка загрузки');
-      }
-
-      // ✅ data.avatar_url — прямой URL из Яндекс бакета
-      // data.user содержит полный обновлённый объект пользователя
       updateUser(data.user);
       onSuccess?.(data.avatar_url);
     } catch (err: any) {
@@ -78,7 +67,6 @@ export default function AvatarUpload({
     if (file) uploadFile(file);
   };
 
-  // Drag & Drop
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
@@ -91,7 +79,7 @@ export default function AvatarUpload({
 
     setUploading(true);
     try {
-      const res = await fetch(`/api/products/profile/delete-avatar/`, {
+      const res = await fetch(`${API_BASE}/profile/delete-avatar/`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${tokens.access}` },
       });
@@ -101,7 +89,6 @@ export default function AvatarUpload({
         throw new Error(data.error || 'Ошибка удаления');
       }
 
-      // ✅ Обнуляем аватар в контексте
       updateUser({ ...user!, avatar: null, avatar_url: null } as any);
       onSuccess?.(null);
     } catch (err: any) {
@@ -111,12 +98,10 @@ export default function AvatarUpload({
     }
   };
 
-  // ✅ Берём avatar_url напрямую — это уже полная ссылка на бакет
   const avatarSrc = (user as any)?.avatar_url || user?.avatar || null;
 
   return (
     <div className="flex flex-col items-center gap-5">
-      {/* Аватар с drag & drop */}
       <div
         className={`relative rounded-full overflow-hidden border-4 transition-all duration-200 cursor-pointer
           ${dragOver
@@ -137,8 +122,8 @@ export default function AvatarUpload({
             width={size}
             height={size}
             className="object-cover w-full h-full"
-            unoptimized  // ✅ Для внешних URL (storage.yandexcloud.net)
-            key={avatarSrc}  // Принудительное обновление при смене URL
+            unoptimized
+            key={avatarSrc}
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
@@ -149,12 +134,8 @@ export default function AvatarUpload({
           </div>
         )}
 
-        {/* Оверлей при загрузке / hover */}
         <div className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-200
-          ${uploading
-            ? 'bg-black/60'
-            : 'bg-black/0 hover:bg-black/40'
-          }`}>
+          ${uploading ? 'bg-black/60' : 'bg-black/0 hover:bg-black/40'}`}>
           {uploading ? (
             <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin" />
           ) : (
@@ -165,7 +146,6 @@ export default function AvatarUpload({
         </div>
       </div>
 
-      {/* Подсказка drag & drop */}
       {!uploading && (
         <p className="text-xs text-gray-400 text-center">
           Нажмите или перетащите фото<br />
@@ -173,7 +153,6 @@ export default function AvatarUpload({
         </p>
       )}
 
-      {/* Кнопки */}
       <div className="flex gap-3">
         <label
           className={`px-5 py-2 bg-blue-600 text-white rounded-lg font-medium cursor-pointer
