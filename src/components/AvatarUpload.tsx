@@ -4,8 +4,6 @@ import { useAuth } from '@/context/AuthContext';
 import { useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
 interface AvatarUploadProps {
   size?: number;         // Размер аватара в px (default: 150)
   showDelete?: boolean;  // Показывать кнопку удаления (default: true)
@@ -48,7 +46,7 @@ export default function AvatarUpload({
     formData.append('avatar', file);
 
     try {
-      const res = await fetch(`${API_URL}/api/profile/upload-avatar/`, {
+      const res = await fetch(`/api/products/profile/upload-avatar/`, {
         method: 'POST',
         headers: {
           // ✅ Bearer — как в остальных запросах проекта
@@ -93,7 +91,7 @@ export default function AvatarUpload({
 
     setUploading(true);
     try {
-      const res = await fetch(`${API_URL}/api/profile/delete-avatar/`, {
+      const res = await fetch(`/api/products/profile/delete-avatar/`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${tokens.access}` },
       });
