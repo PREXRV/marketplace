@@ -1,5 +1,7 @@
 import DocPage from '../_components/DocPage';
-
+export const metadata: Metadata = {
+  title: 'Условия возврата и обмена',
+};
 export default function ReturnsPage() {
   return (
     <DocPage

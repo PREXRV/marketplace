@@ -26,7 +26,7 @@ export default function PromoCodeInput({ orderAmount, onApply }: PromoCodeInputP
 
     try {
       // ✅ ИСПРАВЛЕНО: правильный URL
-      const response = await fetch('http://127.0.0.1:8000/api/promo-codes/validate/', {
+      const response = await fetch('https://fulfilling-success-production-3288.up.railway.app/api/promo-codes/validate/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

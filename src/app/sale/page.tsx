@@ -11,7 +11,7 @@ export default function SalePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/products/on-sale/')
+    fetch('https://fulfilling-success-production-3288.up.railway.app/api/products/on-sale/')
       .then(r => r.json())
       .then(data => {
         setProducts(data);
