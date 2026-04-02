@@ -3,8 +3,8 @@ import './globals.css'
 import { CartProvider } from '@/context/CartContext'
 
 export const metadata: Metadata = {
-  title: 'Маркетплейс - Главная',
-  description: 'Интернет-магазин с широким ассортиментом товаров',
+  title: 'Aki-Oka: Главная страница',
+  description: 'Интернет-магазин Aki-Oka, с различными товарами ручной работы от фигурок до аксессуаров',
 }
 
 export default function RootLayout({
