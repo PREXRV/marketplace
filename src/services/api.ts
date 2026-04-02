@@ -6,6 +6,7 @@ const PRODUCTS_API = `${API_ROOT}/products`;
 const PARTNERSHIP_API = `${API_ROOT}/partnership`;
 const CHAT_API = `${API_ROOT}/chat`;
 const NOTIFICATIONS_API = `${API_ROOT}/notifications`;
+const ORDERS_API = `${API_ROOT}orders/`;
 
 export const api = axios.create({
   baseURL: API_ROOT,
@@ -55,8 +56,8 @@ export const affiliateAPI = {
 export const deliveryAPI = {
   getMethods: async (orderAmount?: number): Promise<any[]> => {
     const url = orderAmount
-      ? `${PRODUCTS_API}/delivery-methods/?order_amount=${orderAmount}`
-      : `${PRODUCTS_API}/delivery-methods/`;
+      ? `${ORDERS_API}/delivery-methods/?order_amount=${orderAmount}`
+      : `${ORDERS_API}/delivery-methods/`;
     const res = await api.get(url);
     const data = res.data;
     return Array.isArray(data) ? data : data.results || [];
