@@ -6,7 +6,7 @@ const PRODUCTS_API = `${API_ROOT}/products`;
 const PARTNERSHIP_API = `${API_ROOT}/partnership`;
 const CHAT_API = `${API_ROOT}/chat`;
 const NOTIFICATIONS_API = `${API_ROOT}/notifications`;
-const ORDERS_API = `${API_ROOT}orders/`;
+const ORDERS_API = `${API_ROOT}/orders`;
 
 export const api = axios.create({
   baseURL: API_ROOT,
