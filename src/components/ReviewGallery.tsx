@@ -125,11 +125,9 @@ export default function ReviewGallery({ productId }: ReviewGalleryProps) {
 
   // ✅ ФУНКЦИЯ ПОЛУЧЕНИЯ АКТУАЛЬНОГО АВАТАРА
   const getActualAvatar = (item: MediaGalleryItem): string => {
-    // Если это отзыв текущего пользователя - берем аватар из контекста
     if (user && item.author_username === user.username) {
-      return user.avatar || '/default-avatar.png';
+      return user.avatar_url || user.avatar || '/default-avatar.png';
     }
-    // Иначе - берем из данных отзыва
     return item.author_avatar || '/default-avatar.png';
   };
 

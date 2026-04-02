@@ -29,7 +29,7 @@ export default function Header() {
   };
 
   // ✅ URL аватарки
-  const avatarUrl = user?.avatar ? getImageUrl(user.avatar) : null;
+  const avatarUrl = user?.avatar_url || (user?.avatar ? getImageUrl(user.avatar) : null);
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">

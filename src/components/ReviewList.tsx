@@ -36,7 +36,7 @@ export default function ReviewList({ productId }: ReviewListProps) {
   // ✅ ФУНКЦИЯ ПОЛУЧЕНИЯ АКТУАЛЬНОГО АВАТАРА
   const getActualAvatar = (authorUsername?: string, authorAvatar?: string): string => {
     if (user && authorUsername === user.username) {
-      return user.avatar || '/default-avatar.png';
+      return user.avatar_url || user.avatar || '/default-avatar.png';
     }
     return authorAvatar || '/default-avatar.png';
   };

@@ -19,8 +19,9 @@ export default function ReviewCard({ review }: { review: Review }) {
 
   // ✅ Если это отзыв текущего пользователя - берем аватар из контекста (актуальный!)
   const avatarUrl = review.user_id === user?.id 
-    ? (user.avatar || '/default-avatar.png')
+    ? (user.avatar_url || user.avatar || '/default-avatar.png')
     : (review.user_avatar || '/default-avatar.png');
+  
 
   return (
     <div className="bg-white rounded-lg shadow p-4 mb-4">
