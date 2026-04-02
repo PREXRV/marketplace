@@ -1,8 +1,6 @@
 import axios from 'axios';
 
-const API_ROOT =
-  process.env.NEXT_PUBLIC_API_URL ||
-  'https://fulfilling-success-production-3288.up.railway.app/api';
+const API_ROOT = 'https://fulfilling-success-production-3288.up.railway.app/api';
 
 const PRODUCTS_API = `${API_ROOT}/products`;
 const PARTNERSHIP_API = `${API_ROOT}/partnership`;
