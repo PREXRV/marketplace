@@ -10,8 +10,8 @@ import { GamificationProvider } from '@/context/GamificationContext';
 const inter = Inter({ subsets: ['latin', 'cyrillic'] });
 
 export const metadata: Metadata = {
-  title: 'Маркетплейс - Интернет-магазин',
-  description: 'Лучшие товары по выгодным ценам',
+  title: 'Aki-Oka | Главная страница',
+  description: 'Интернет-магазин ручной работы от фигурок по играм,аниме,фильмам до аксессуаров',
 };
 
 export default function RootLayout({
