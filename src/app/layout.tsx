@@ -10,7 +10,7 @@ import { GamificationProvider } from '@/context/GamificationContext';
 const inter = Inter({ subsets: ['latin', 'cyrillic'] });
 
 export const metadata: Metadata = {
-  title: 'Aki-Oka | Главная страница',
+  title: 'Aki-Oka',
   description: 'Интернет-магазин ручной работы от фигурок по играм,аниме,фильмам до аксессуаров',
 };
 
