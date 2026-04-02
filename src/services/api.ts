@@ -205,16 +205,16 @@ export const partnershipAPI = {
 
   // ✅ Трекинг
   trackRefView: (ref_token: string) =>
-    api.post(`${PARTNERSHIP_API}/track-ref-view/`, { ref_token }),
+    api.post(`${PARTNERSHIP_API}/track_ref_view/`, { ref_token }),
 
   trackCartAdd: (ref_token: string) =>
-    api.post(`${PARTNERSHIP_API}/track-cart-add/`, { ref_token }),
+    api.post(`${PARTNERSHIP_API}/track_cart_add/`, { ref_token }),
 
   trackSkuSearch: (customSku: string) =>
-    api.post(`${PARTNERSHIP_API}/track-sku-search/`, { custom_sku: customSku }),
+    api.post(`${PARTNERSHIP_API}/track_sku_search/`, { custom_sku: customSku }),
 
   trackPurchase: (refToken: string) =>
-    api.post(`${PARTNERSHIP_API}/track-purchase/`, { ref_token: refToken }),
+    api.post(`${PARTNERSHIP_API}/track_purchase/`, { ref_token: refToken }),
 };
 
 export const chatAPI = {
