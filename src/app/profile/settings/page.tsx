@@ -51,7 +51,7 @@ export default function SettingsPage() {
       setLoading(true);
       setMessage(null);
 
-      const response = await fetch('http://127.0.0.1:8000/api/profile/', {
+      const response = await fetch('https://fulfilling-success-production-3288.up.railway.app/api/profile/', {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${tokens.access}`,
@@ -113,7 +113,7 @@ export default function SettingsPage() {
       setLoading(true);
       setMessage(null);
 
-      const response = await fetch('http://127.0.0.1:8000/api/change-password/', {
+      const response = await fetch('https://fulfilling-success-production-3288.up.railway.app/api/change-password/', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${tokens.access}`,
