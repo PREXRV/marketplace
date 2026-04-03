@@ -19,7 +19,7 @@ function getAvailabilityBadge(product: Product) {
 
   if (s === 'made_to_order') {
     return {
-      label: label || 'Готов к заказу',
+      label: label || 'Под заказ',
       cls: 'bg-blue-50 text-blue-700 border-blue-200',
       dot: 'bg-blue-500',
       canBuy: true,
@@ -33,6 +33,16 @@ function getAvailabilityBadge(product: Product) {
       canBuy: true,
     };
   }
+  // ✅ out_of_stock — явный статус "нет в наличии"
+  if (s === 'out_of_stock') {
+    return {
+      label: 'Нет в наличии',
+      cls: 'bg-red-50 text-red-600 border-red-200',
+      dot: 'bg-red-400',
+      canBuy: false,
+    };
+  }
+  // ✅ in_stock — проверяем stock
   if (product.stock > 0) {
     return {
       label: `В наличии (${product.stock} шт.)`,
@@ -41,11 +51,12 @@ function getAvailabilityBadge(product: Product) {
       canBuy: true,
     };
   }
+  // ✅ in_stock но stock=0 — всё равно canBuy: true (статус приоритетнее stock)
   return {
-    label: 'Нет в наличии',
-    cls: 'bg-red-50 text-red-600 border-red-200',
-    dot: 'bg-red-400',
-    canBuy: false,
+    label: 'В наличии',
+    cls: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    dot: 'bg-emerald-500',
+    canBuy: true,
   };
 }
 
