@@ -99,9 +99,10 @@ export default function ProductCard({ product }: ProductCardProps) {
     : null;
     
   const hasActiveTimedSale =
+    !!product.active_sale ||
     product.is_on_sale ||
     (product.sale_end_date && new Date(product.sale_end_date) > new Date());
-
+    
   const avail = getAvailabilityBadge(product);
   const hasMultipleImages = allImages.length > 1;
 
