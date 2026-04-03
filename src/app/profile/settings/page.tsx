@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
-
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
 export default function SettingsPage() {
   const { user, tokens, updateUser, isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -51,7 +51,7 @@ export default function SettingsPage() {
       setLoading(true);
       setMessage(null);
 
-      const response = await fetch('https://fulfilling-success-production-3288.up.railway.app/api/profile/', {
+      const response = await fetch('${API_BASE}/api/profile/', {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${tokens.access}`,
@@ -113,7 +113,7 @@ export default function SettingsPage() {
       setLoading(true);
       setMessage(null);
 
-      const response = await fetch('https://fulfilling-success-production-3288.up.railway.app/api/change-password/', {
+      const response = await fetch('${API_BASE}/api/change-password/', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${tokens.access}`,
