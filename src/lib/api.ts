@@ -1298,7 +1298,7 @@ export const api = {
 
   getUnreadNotifications: async (token: string): Promise<NotificationResponse> => {
     try {
-      const response = await fetch(`${PRODUCTS_API}notifications/unread/`, {
+      const response = await fetch(`${PRODUCTS_API}notifications/`, {
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       if (!response.ok) return { count: 0, notifications: [] };
@@ -1319,7 +1319,7 @@ export const api = {
 
   getUnreadCount: async (token: string): Promise<{ count: number }> => {
     try {
-      const response = await fetch(`${PRODUCTS_API}notifications/unread_count/`, {
+      const response = await fetch(`${PRODUCTS_API}notifications/unread/`, {
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       if (!response.ok) return { count: 0 };

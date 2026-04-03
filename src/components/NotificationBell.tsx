@@ -20,8 +20,8 @@ export default function NotificationBell() {
     if (tokens) {
       loadUnreadCount();
       
-      // Обновляем счетчик каждые 30 секунд
-      const interval = setInterval(loadUnreadCount, 30000);
+      // Обновляем счетчик каждые 600 секунд
+      const interval = setInterval(loadUnreadCount, 600000);
       return () => clearInterval(interval);
     }
   }, [tokens]);
