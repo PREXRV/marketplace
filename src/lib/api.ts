@@ -340,7 +340,7 @@ export interface Product {
   sale_end_date?: string | null;
   rating_distribution: { [key: number]: number };
   is_on_sale?: boolean;
-  availability_status?: 'in_stock' | 'made_to_order' | 'can_order';
+  availability_status: 'in_stock' | 'out_of_stock' | 'made_to_order' | 'can_order';
   availability_status_display?: string;
   availability_label?: string;
   make_time_days_min?: number | null;
