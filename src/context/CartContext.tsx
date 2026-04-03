@@ -189,7 +189,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const applyPromoCode = async (code: string): Promise<{ success: boolean; message: string }> => {
     try {
       const cartTotal = getTotalPrice();
-      const response = await fetch('http://127.0.0.1:8000/api/promo-codes/validate/', {
+      const response = await fetch('https://fulfilling-success-production-3288.up.railway.app/api/promo-codes/validate/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ code: code.trim().toUpperCase(), order_amount: cartTotal }),
@@ -236,7 +236,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (promoCode && cart.length > 0) {
       const cartTotal = getTotalPrice();
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/promo-codes/validate/', {
+        const response = await fetch('https://fulfilling-success-production-3288.up.railway.app/api/promo-codes/validate/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code: promoCode.code, order_amount: cartTotal }),
