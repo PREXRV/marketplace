@@ -51,7 +51,7 @@ export default function NotificationBell() {
     
     try {
       const data = await api.getUnreadCount(tokens.access);
-      setUnreadCount(data.count);
+      setUnreadCount(data?.count ?? 0); // ✅ защита
     } catch (error) {
       console.error('Ошибка загрузки счетчика уведомлений:', error);
     }
@@ -63,9 +63,11 @@ export default function NotificationBell() {
     try {
       setLoading(true);
       const data = await api.getUnreadNotifications(tokens.access);
-      setNotifications(data.notifications);
+      // ✅ защита от любого формата ответа
+      setNotifications(data?.notifications ?? (Array.isArray(data) ? data : []));
     } catch (error) {
       console.error('Ошибка загрузки уведомлений:', error);
+      setNotifications([]); // ✅ при ошибке не падаем
     } finally {
       setLoading(false);
     }
