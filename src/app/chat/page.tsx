@@ -1,92 +1,385 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { MessageCircle, Users, TrendingUp } from 'lucide-react';
-import { chatAPI } from '@/services/api';
-import { useAuth } from '@/context/AuthContext';
-import ChatWelcome from '@/components/chat/ChatWelcome';
+import { useState, useEffect, useRef } from 'react';
+import { partnershipAPI } from '@/services/api';
+import { usePartnerChat } from '@/hooks/usePartnerChat';
+import {
+  Send, Wifi, WifiOff, MessageCircle,
+  Smile, Paperclip, X, File, Download,
+} from 'lucide-react';
 
-export default function ChatPage() {
-  const router = useRouter();
-  const { isAuthenticated, user } = useAuth();
-  const [rooms, setRooms] = useState([]);
-  const [showWelcome, setShowWelcome] = useState(!isAuthenticated);
+const EMOJIS = [
+  '😊','😂','❤️','👍','🔥','✅','🎉','🙏','😍','🤔',
+  '👋','💪','😅','🥳','😎','💯','🚀','⭐','💬','📦',
+  '📸','🎁','💰','📊','🛒','✨','😢','😡','🤝','👀',
+];
 
+// ✅ Исправлен regex — одинарный слэш
+const isImage = (name?: string | null) =>
+  !!name?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+
+export default function PartnerChatPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  // slug доступен если нужен: params.slug
+  const [partner,   setPartner]   = useState<any>(null);
+  const [input,     setInput]     = useState('');
+  const [showEmoji, setShowEmoji] = useState(false);
+  const [files,     setFiles]     = useState<File[]>([]);
+  const [sending,   setSending]   = useState(false);
+
+  const messagesRef  = useRef<HTMLDivElement>(null);
+  const isFirstLoad  = useRef(true);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const emojiRef     = useRef<HTMLDivElement>(null);
+
+  // ── Загружаем профиль партнёра ──────────────────────────────────────────────
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchRooms();
-    }
-  }, [isAuthenticated]);
+    partnershipAPI.getPartnerProfile()
+      .then(res => setPartner(res.data))
+      .catch(() => setPartner(null));
+  }, []);
 
-  const fetchRooms = async () => {
+  // ── WebSocket хук ───────────────────────────────────────────────────────────
+  const { messages, connected, loading, sendMessage, markRead, addMessage } =
+    usePartnerChat(partner?.id ?? null);
+
+  // ── Помечаем прочитанными при подключении / новых сообщениях ───────────────
+  useEffect(() => {
+    if (!connected) return;
+    partnershipAPI.chatMarkRead().catch(() => {});
+    markRead();
+  }, [connected, messages.length]);
+
+  // ── Скролл только внутри контейнера ────────────────────────────────────────
+  useEffect(() => {
+    if (messages.length === 0) return;
+    const container = messagesRef.current;
+    if (!container) return;
+    if (isFirstLoad.current) {
+      container.scrollTop = container.scrollHeight;
+      isFirstLoad.current = false;
+    } else {
+      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+    }
+  }, [messages]);
+
+  // ── Закрываем эмодзи при клике вне ─────────────────────────────────────────
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (emojiRef.current && !emojiRef.current.contains(e.target as Node)) {
+        setShowEmoji(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  // ── Отправка ────────────────────────────────────────────────────────────────
+  const handleSend = async () => {
+    const text = input.trim();
+    if ((!text && files.length === 0) || !connected || sending) return;
+
+    setSending(true);
     try {
-      const response = await chatAPI.getRooms();
-      setRooms(response.data);
-    } catch (error) {
-      console.error('Error fetching rooms:', error);
+      if (files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+          const res = await partnershipAPI.chatUpload(files[i], i === 0 ? text : '');
+          if (res.data) {
+            addMessage({
+              id:         res.data.id,
+              sender:     'partner',
+              text:       res.data.text      || '',
+              file:       res.data.file      || null,
+              file_name:  res.data.file_name || '',
+              is_read:    false,
+              created_at: res.data.created_at,
+            });
+          }
+        }
+      } else {
+        sendMessage(text);
+      }
+      setInput('');
+      setFiles([]);
+      setShowEmoji(false);
+    } catch (err) {
+      console.error('Ошибка отправки:', err);
+    } finally {
+      setSending(false);
     }
   };
 
-  const joinRoom = (roomSlug: string) => {
-    if (!isAuthenticated) {
-      setShowWelcome(true);
-      return;
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
-    router.push(`/chat/${roomSlug}`);
   };
 
-  if (showWelcome && !isAuthenticated) {
-    return <ChatWelcome onClose={() => setShowWelcome(false)} />;
-  }
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(e.target.files || []);
+    setFiles(prev => [...prev, ...selected].slice(0, 5));
+    e.target.value = '';
+  };
 
+  const insertEmoji = (emoji: string) => setInput(prev => prev + emoji);
+
+  // ── Форматирование ──────────────────────────────────────────────────────────
+  const formatTime = (iso: string) =>
+    new Date(iso).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+
+  const grouped = messages.reduce((acc, msg) => {
+    const date = formatDate(msg.created_at);
+    if (!acc[date]) acc[date] = [];
+    acc[date].push(msg);
+    return acc;
+  }, {} as Record<string, typeof messages>);
+
+  // ── Render ──────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 py-12 px-4">
-      <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-            💬 Чат покупателей
-          </h1>
-          <p className="text-xl text-gray-600">
-            Общайтесь с другими покупателями, делитесь опытом и получайте советы
-          </p>
-        </motion.div>
+    <div
+      className="flex flex-col bg-white rounded-2xl shadow-sm overflow-hidden"
+      style={{ height: 'calc(100vh - 180px)' }}
+    >
+      {/* ── Шапка ─────────────────────────────────────────────────────────── */}
+      <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
+            <MessageCircle className="w-5 h-5 text-purple-600" />
+          </div>
+          <div>
+            <p className="font-semibold text-gray-800">Поддержка</p>
+            <p className="text-xs text-gray-400">Администрация магазина</p>
+          </div>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {rooms.map((room: any, index) => (
-            <motion.div
-              key={room.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.02 }}
-              onClick={() => joinRoom(room.slug)}
-              className="bg-white rounded-2xl p-6 shadow-lg cursor-pointer hover:shadow-xl transition-all"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center">
-                  <MessageCircle className="w-8 h-8 text-white" />
-                </div>
-                <div className="flex items-center gap-2 text-green-500">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-semibold">{room.online_count} онлайн</span>
-                </div>
+        <div className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1 rounded-full ${
+          connected ? 'bg-green-50 text-green-600' : 'bg-gray-100 text-gray-400'
+        }`}>
+          {connected
+            ? <><Wifi className="w-3 h-3" /> Онлайн</>
+            : <><WifiOff className="w-3 h-3" /> Офлайн</>
+          }
+        </div>
+      </div>
+
+      {/* ── Сообщения ─────────────────────────────────────────────────────── */}
+      <div
+        ref={messagesRef}
+        className="flex-1 overflow-y-auto px-6 py-4"
+        style={{ minHeight: 0 }}
+      >
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
+          </div>
+
+        ) : messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-3">
+            <MessageCircle className="w-12 h-12 opacity-20" />
+            <p className="text-sm">Напишите нам — мы всегда на связи</p>
+          </div>
+
+        ) : (
+          Object.entries(grouped).map(([date, msgs]) => (
+            <div key={date}>
+              <div className="flex items-center gap-3 my-4">
+                <div className="flex-1 h-px bg-gray-100" />
+                <span className="text-xs text-gray-400 font-medium">{date}</span>
+                <div className="flex-1 h-px bg-gray-100" />
               </div>
 
-              <h3 className="text-xl font-bold mb-2 text-gray-800">{room.name}</h3>
-              <p className="text-gray-600 mb-4">{room.description}</p>
+              {msgs.map((msg) => {
+                const isPartner = msg.sender === 'partner';
+                return (
+                  <div
+                    key={msg.id}
+                    className={`flex mb-3 ${isPartner ? 'justify-end' : 'justify-start'}`}
+                  >
+                    {!isPartner && (
+                      <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs font-bold mr-2 flex-shrink-0 self-end">
+                        A
+                      </div>
+                    )}
 
-              <button className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-xl font-semibold hover:shadow-lg transition-all">
-                Присоединиться
-              </button>
-            </motion.div>
-          ))}
+                    <div className={`max-w-[70%] flex flex-col ${isPartner ? 'items-end' : 'items-start'}`}>
+                      <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                        isPartner
+                          ? 'bg-purple-600 text-white rounded-br-sm'
+                          : 'bg-gray-100 text-gray-800 rounded-bl-sm'
+                      }`}>
+                        {msg.text && <p>{msg.text}</p>}
+
+                        {msg.file && isImage(msg.file_name) && (
+                          <a href={msg.file} target="_blank" rel="noopener noreferrer">
+                            <img
+                              src={msg.file}
+                              alt={msg.file_name || 'Изображение'}
+                              width={220}
+                              height={220}
+                              className="mt-2 max-w-[220px] rounded-xl cursor-pointer hover:opacity-90 transition object-cover"
+                              loading="lazy"
+                            />
+                          </a>
+                        )}
+
+                        {msg.file && !isImage(msg.file_name) && (
+                          <a
+                            href={msg.file}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download={msg.file_name}
+                            className={`flex items-center gap-2 mt-2 px-3 py-2 rounded-xl text-xs font-medium transition ${
+                              isPartner
+                                ? 'bg-white/20 hover:bg-white/30 text-white'
+                                : 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-200'
+                            }`}
+                          >
+                            <File className="w-4 h-4 flex-shrink-0" />
+                            <span className="truncate max-w-[160px]">
+                              {msg.file_name || 'Файл'}
+                            </span>
+                            <Download className="w-3 h-3 ml-auto flex-shrink-0 opacity-60" />
+                          </a>
+                        )}
+                      </div>
+
+                      <div className={`flex items-center gap-1 mt-1 ${
+                        isPartner ? 'flex-row-reverse' : ''
+                      }`}>
+                        <span className="text-xs text-gray-400">
+                          {formatTime(msg.created_at)}
+                        </span>
+                        {isPartner && (
+                          <span className={`text-xs ${
+                            msg.is_read ? 'text-purple-500' : 'text-gray-300'
+                          }`}>
+                            {msg.is_read ? '✓✓' : '✓'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* ── Поле ввода ────────────────────────────────────────────────────── */}
+      <div className="flex-shrink-0 px-6 py-4 border-t border-gray-100">
+
+        {files.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-3">
+            {files.map((file, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-1.5 bg-purple-50 border border-purple-200 rounded-lg px-3 py-1.5 text-xs text-purple-700"
+              >
+                {isImage(file.name) ? (
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt=""
+                    className="w-8 h-8 rounded object-cover"
+                  />
+                ) : (
+                  <File className="w-3 h-3 flex-shrink-0" />
+                )}
+                <span className="max-w-[120px] truncate">{file.name}</span>
+                <button
+                  onClick={() => setFiles(prev => prev.filter((_, j) => j !== i))}
+                  className="ml-1 hover:text-red-500 transition"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="flex items-end gap-2">
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-xl transition flex-shrink-0"
+            aria-label="Прикрепить файл"
+          >
+            <Paperclip className="w-5 h-5" />
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/*,.pdf,.doc,.docx,.txt,.zip,.rar"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+
+          <textarea
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Написать сообщение... (Enter — отправить)"
+            rows={1}
+            className="flex-1 resize-none px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl
+              text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent
+              transition max-h-32"
+            style={{ minHeight: 44 }}
+          />
+
+          <div className="relative flex-shrink-0" ref={emojiRef}>
+            <button
+              onClick={() => setShowEmoji(prev => !prev)}
+              className={`w-10 h-10 flex items-center justify-center rounded-xl transition ${
+                showEmoji
+                  ? 'bg-purple-100 text-purple-600'
+                  : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'
+              }`}
+              aria-label="Эмодзи"
+            >
+              <Smile className="w-5 h-5" />
+            </button>
+
+            {showEmoji && (
+              <div className="absolute bottom-12 right-0 bg-white border border-gray-200
+                rounded-2xl shadow-xl p-3 w-64 z-50">
+                <div className="grid grid-cols-10 gap-1">
+                  {EMOJIS.map(emoji => (
+                    <button
+                      key={emoji}
+                      onClick={() => insertEmoji(emoji)}
+                      className="w-7 h-7 flex items-center justify-center text-lg hover:bg-purple-50 rounded-lg transition"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={handleSend}
+            disabled={(!input.trim() && files.length === 0) || !connected || sending}
+            className="w-11 h-11 bg-purple-600 hover:bg-purple-700 disabled:opacity-40
+              disabled:cursor-not-allowed text-white rounded-xl flex items-center justify-center
+              transition flex-shrink-0"
+            aria-label="Отправить"
+          >
+            {sending
+              ? <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              : <Send className="w-4 h-4" />
+            }
+          </button>
         </div>
+
+        <p className="text-xs text-gray-400 mt-1.5 ml-1">Shift+Enter — новая строка</p>
       </div>
     </div>
   );

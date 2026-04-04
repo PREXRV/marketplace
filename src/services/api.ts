@@ -2,32 +2,33 @@ import axios from 'axios';
 
 const API_ROOT = 'https://fulfilling-success-production-3288.up.railway.app/api';
 
-const PRODUCTS_API = `${API_ROOT}/products`;
 const PARTNERSHIP_API = `${API_ROOT}/partnership`;
-const CHAT_API = `${API_ROOT}/chat`;
+const CHAT_API        = `${API_ROOT}/chat`;
 const NOTIFICATIONS_API = `${API_ROOT}/notifications`;
-const ORDERS_API = `${API_ROOT}/orders`;
+const ORDERS_API      = `${API_ROOT}/orders`;
+const PRODUCTS_API    = `${API_ROOT}/products`;
+
+// ── Axios instance ────────────────────────────────────────────────────────────
 
 export const api = axios.create({
   baseURL: API_ROOT,
   headers: { 'Content-Type': 'application/json' },
 });
 
+function getAccessToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const tokens = localStorage.getItem('auth_tokens');
+    return tokens ? JSON.parse(tokens)?.access ?? null : null;
+  } catch {
+    return null;
+  }
+}
+
 api.interceptors.request.use(
   (config) => {
-    if (typeof window !== 'undefined') {
-      const tokens = localStorage.getItem('auth_tokens');
-      if (tokens) {
-        try {
-          const parsedTokens = JSON.parse(tokens);
-          if (parsedTokens.access) {
-            config.headers.Authorization = `Bearer ${parsedTokens.access}`;
-          }
-        } catch (error) {
-          console.error('Ошибка парсинга токена:', error);
-        }
-      }
-    }
+    const token = getAccessToken();
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
   (error) => Promise.reject(error)
@@ -37,32 +38,71 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      console.log('Токен истек или недействителен');
+      console.warn('Токен истёк или недействителен');
     }
     return Promise.reject(error);
   }
 );
 
+// ── WebSocket factory ─────────────────────────────────────────────────────────
+// Токен передаём через query-параметр ?token=...
+// На бэке нужен TokenAuthMiddleware (см. ниже)
+
+export function createPartnerChatWS(partnerId: number): WebSocket {
+  const token   = getAccessToken();
+  const wsRoot  = API_ROOT
+    .replace(/^https/, 'wss')
+    .replace(/^http/, 'ws')
+    .replace(/\/api\/?$/, '');           // убираем /api — WS на корне
+
+  const url = token
+    ? `${wsRoot}/ws/partner-chat/${partnerId}/?token=${token}`
+    : `${wsRoot}/ws/partner-chat/${partnerId}/`;
+
+  return new WebSocket(url);
+}
+
+export function createChatWebSocket(roomId: number): WebSocket {
+  const token  = getAccessToken();
+  const wsRoot = API_ROOT
+    .replace(/^https/, 'wss')
+    .replace(/^http/, 'ws')
+    .replace(/\/api\/?$/, '');
+
+  const url = token
+    ? `${wsRoot}/ws/chat/rooms/${roomId}/?token=${token}`
+    : `${wsRoot}/ws/chat/rooms/${roomId}/`;
+
+  return new WebSocket(url);
+}
+
+// ── Affiliates ────────────────────────────────────────────────────────────────
+
 export const affiliateAPI = {
-  getTiers: () => api.get('/affiliates/programs/'),
-  register: (data: any) => api.post('/affiliates/list/register/', data),
-  getDashboard: () => api.get('/affiliates/list/dashboard/'),
-  getMe: () => api.get('/affiliates/list/me/'),
-  getMaterials: () => api.get('/affiliates/materials/'),
+  getTiers:         ()           => api.get('/affiliates/programs/'),
+  register:         (data: any)  => api.post('/affiliates/list/register/', data),
+  getDashboard:     ()           => api.get('/affiliates/list/dashboard/'),
+  getMe:            ()           => api.get('/affiliates/list/me/'),
+  getMaterials:     ()           => api.get('/affiliates/materials/'),
   downloadMaterial: (id: number) => api.post(`/affiliates/materials/${id}/download/`),
-  requestPayout: (amount: number) => api.post('/affiliates/list/request_payout/', { amount }),
+  requestPayout:    (amount: number) =>
+    api.post('/affiliates/list/request_payout/', { amount }),
 };
+
+// ── Delivery ──────────────────────────────────────────────────────────────────
 
 export const deliveryAPI = {
   getMethods: async (orderAmount?: number): Promise<any[]> => {
     const url = orderAmount
       ? `${ORDERS_API}/delivery-methods/?order_amount=${orderAmount}`
       : `${ORDERS_API}/delivery-methods/`;
-    const res = await api.get(url);
+    const res  = await api.get(url);
     const data = res.data;
     return Array.isArray(data) ? data : data.results || [];
   },
 };
+
+// ── Partnership ───────────────────────────────────────────────────────────────
 
 export const partnershipAPI = {
   applyForPartnership: (data: any) =>
@@ -72,39 +112,18 @@ export const partnershipAPI = {
     try {
       return await api.get(`${PARTNERSHIP_API}/profile/`);
     } catch (error: any) {
-      if (error.response?.status === 403 || error.response?.status === 404) return { data: null };
+      if (error.response?.status === 403 || error.response?.status === 404)
+        return { data: null };
       throw error;
     }
   },
 
-  getChatHistory: () => api.get(`${PARTNERSHIP_API}/chat/`),
-  chatSend: (text: string) => api.post(`${PARTNERSHIP_API}/chat/`, { text }),
-  chatMarkRead: () => api.post(`${PARTNERSHIP_API}/chat/read/`),
-
-  chatUpload: (file: File, text = '') => {
-    const formData = new FormData();
-    formData.append('file', file);
-    if (text) formData.append('text', text);
-    return api.post(`${PARTNERSHIP_API}/chat/upload/`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-  },
-
-  getMyApplication: async () => {
-    try {
-      return await api.get(`${PARTNERSHIP_API}/applications/my_application/`);
-    } catch (error: any) {
-      if (error.response?.status === 404) return { data: null };
-      throw error;
-    }
-  },
-
-  // Партнёр
   getPartnerProfile: async () => {
     try {
       return await api.get(`${PARTNERSHIP_API}/partners/me/`);
     } catch (error: any) {
-      if (error.response?.status === 404 || error.response?.status === 403) return { data: null };
+      if (error.response?.status === 404 || error.response?.status === 403)
+        return { data: null };
       throw error;
     }
   },
@@ -118,6 +137,34 @@ export const partnershipAPI = {
     }
   },
 
+  getMyApplication: async () => {
+    try {
+      return await api.get(`${PARTNERSHIP_API}/applications/my_application/`);
+    } catch (error: any) {
+      if (error.response?.status === 404) return { data: null };
+      throw error;
+    }
+  },
+
+  // Чат (REST — только для загрузки файлов и истории как fallback)
+  getChatHistory: () =>
+    api.get(`${PARTNERSHIP_API}/chat/`),
+
+  chatSend: (text: string) =>
+    api.post(`${PARTNERSHIP_API}/chat/`, { text }),
+
+  chatMarkRead: () =>
+    api.post(`${PARTNERSHIP_API}/chat/read/`),
+
+  chatUpload: (file: File, text = '') => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (text) formData.append('text', text);
+    return api.post(`${PARTNERSHIP_API}/chat/upload/`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+
   // Соцсети
   getSocialAccounts: async () => {
     try {
@@ -127,7 +174,7 @@ export const partnershipAPI = {
       throw error;
     }
   },
-  addSocialAccount: (data: any) => api.post(`${PARTNERSHIP_API}/social-accounts/`, data),
+  addSocialAccount:    (data: any)  => api.post(`${PARTNERSHIP_API}/social-accounts/`, data),
   deleteSocialAccount: (id: number) => api.delete(`${PARTNERSHIP_API}/social-accounts/${id}/`),
 
   // Аналитика
@@ -145,9 +192,9 @@ export const partnershipAPI = {
     try {
       return await api.get(`${PARTNERSHIP_API}/referrals/`);
     } catch (error: any) {
-      if (error.response?.status === 404) return {
-        data: { referrals: [], total_referrals: 0, total_earnings: 0, referral_code: '', referral_link: '', recent_rewards: [] }
-      };
+      if (error.response?.status === 404)
+        return { data: { referrals: [], total_referrals: 0, total_earnings: 0,
+          referral_code: '', referral_link: '', recent_rewards: [] } };
       throw error;
     }
   },
@@ -161,13 +208,17 @@ export const partnershipAPI = {
       throw error;
     }
   },
-  createProductRequest: (data: any) => api.post(`${PARTNERSHIP_API}/product-requests/`, data),
+  createProductRequest: (data: any) =>
+    api.post(`${PARTNERSHIP_API}/product-requests/`, data),
+
   uploadContract: (requestId: number, file: File) => {
     const formData = new FormData();
     formData.append('contract_file', file);
-    return api.post(`${PARTNERSHIP_API}/product-requests/${requestId}/upload_contract/`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    return api.post(
+      `${PARTNERSHIP_API}/product-requests/${requestId}/upload_contract/`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
   },
 
   // Видео
@@ -179,7 +230,7 @@ export const partnershipAPI = {
       throw error;
     }
   },
-  uploadVideo: (data: any) => api.post(`${PARTNERSHIP_API}/videos/`, data),
+  uploadVideo: (data: any)  => api.post(`${PARTNERSHIP_API}/videos/`, data),
   deleteVideo: (id: number) => api.delete(`${PARTNERSHIP_API}/videos/${id}/`),
 
   // Возвраты
@@ -203,80 +254,60 @@ export const partnershipAPI = {
     }
   },
 
-  // ✅ Трекинг
-  trackRefView: (ref_token: string) =>
-    api.post(`${PARTNERSHIP_API}/track-ref-view/`, { ref_token }),
-
-  trackCartAdd: (ref_token: string) =>
-    api.post(`${PARTNERSHIP_API}/track-cart-add/`, { ref_token }),
-
-  trackSkuSearch: (customSku: string) =>
-    api.post(`${PARTNERSHIP_API}/track-sku-search/`, { custom_sku: customSku }),
-
-  trackPurchase: (refToken: string) =>
-    api.post(`${PARTNERSHIP_API}/track-purchase/`, { ref_token: refToken }),
+  // Трекинг
+  trackRefView:   (ref_token: string)  => api.post(`${PARTNERSHIP_API}/track-ref-view/`,  { ref_token }),
+  trackCartAdd:   (ref_token: string)  => api.post(`${PARTNERSHIP_API}/track-cart-add/`,  { ref_token }),
+  trackSkuSearch: (customSku: string)  => api.post(`${PARTNERSHIP_API}/track-sku-search/`,{ custom_sku: customSku }),
+  trackPurchase:  (refToken: string)   => api.post(`${PARTNERSHIP_API}/track-purchase/`,  { ref_token: refToken }),
 };
+
+// ── Chat (general rooms) ──────────────────────────────────────────────────────
 
 export const chatAPI = {
-  getRooms: () => api.get(`${CHAT_API}/rooms/`),
-  getMessages: (roomId: number) => api.get(`${CHAT_API}/rooms/${roomId}/messages/`),
-  sendMessage: (roomId: number, message: string) =>
-    api.post(`${CHAT_API}/rooms/${roomId}/messages/`, { message }),
-  createRoom: (data: any) => api.post(`${CHAT_API}/rooms/`, data),
+  getRooms:    ()                                 => api.get(`${CHAT_API}/rooms/`),
+  getMessages: (roomId: number)                   => api.get(`${CHAT_API}/rooms/${roomId}/messages/`),
+  sendMessage: (roomId: number, message: string)  => api.post(`${CHAT_API}/rooms/${roomId}/messages/`, { message }),
+  createRoom:  (data: any)                        => api.post(`${CHAT_API}/rooms/`, data),
 };
+
+// ── Notifications ─────────────────────────────────────────────────────────────
 
 export const notificationsAPI = {
   getAll: async () => {
-    try {
-      return await api.get(`${NOTIFICATIONS_API}/`);
-    } catch (error: any) {
-      if (error.response?.status === 404) return { data: [] };
-      throw error;
-    }
+    try { return await api.get(`${NOTIFICATIONS_API}/`); }
+    catch (e: any) { if (e.response?.status === 404) return { data: [] }; throw e; }
   },
   getUnread: async () => {
-    try {
-      return await api.get(`${NOTIFICATIONS_API}/unread/`);
-    } catch (error: any) {
-      if (error.response?.status === 404) return { data: [] };
-      throw error;
-    }
+    try { return await api.get(`${NOTIFICATIONS_API}/unread/`); }
+    catch (e: any) { if (e.response?.status === 404) return { data: [] }; throw e; }
   },
-  markAsRead: (id: number) => api.post(`${NOTIFICATIONS_API}/${id}/mark_as_read/`),
-  markAllAsRead: () => api.post(`${NOTIFICATIONS_API}/mark_all_as_read/`),
+  markAsRead:    (id: number) => api.post(`${NOTIFICATIONS_API}/${id}/mark_as_read/`),
+  markAllAsRead: ()           => api.post(`${NOTIFICATIONS_API}/mark_all_as_read/`),
 };
+
+// ── Gamification ──────────────────────────────────────────────────────────────
 
 export const gamificationAPI = {
   getAchievements: () => api.get('/gamification/achievements/'),
-  getBadges: () => api.get('/gamification/badges/'),
-  getLeaderboard: () => api.get('/gamification/leaderboard/'),
+  getBadges:       () => api.get('/gamification/badges/'),
+  getLeaderboard:  () => api.get('/gamification/leaderboard/'),
 };
+
+// ── Products ──────────────────────────────────────────────────────────────────
 
 export const productsAPI = {
-  getProducts: (params?: any) => api.get(`${PRODUCTS_API}/products/`, { params }),
-  getProduct: (id: number) => api.get(`${PRODUCTS_API}/products/${id}/`),
-  getCategories: () => api.get(`${PRODUCTS_API}/categories/`),
+  getProducts:  (params?: any) => api.get(`${PRODUCTS_API}/products/`, { params }),
+  getProduct:   (id: number)   => api.get(`${PRODUCTS_API}/products/${id}/`),
+  getCategories: ()            => api.get(`${PRODUCTS_API}/categories/`),
 };
+
+// ── Addresses ─────────────────────────────────────────────────────────────────
 
 export const addressAPI = {
-  getAll: () => api.get(`${PRODUCTS_API}/addresses/`),
-  create: (data: any) => api.post(`${PRODUCTS_API}/addresses/`, data),
-  update: (id: number, data: any) => api.patch(`${PRODUCTS_API}/addresses/${id}/`, data),
-  delete: (id: number) => api.delete(`${PRODUCTS_API}/addresses/${id}/`),
-};
-
-export const createChatWebSocket = (roomId: number) => {
-  const token =
-    typeof window !== 'undefined'
-      ? JSON.parse(localStorage.getItem('auth_tokens') || '{}')?.access
-      : null;
-
-  const wsBase = API_ROOT.replace(/^http/, 'ws').replace(/\/$/, '');
-
-  return new WebSocket(
-    `${wsBase}/chat/rooms/${roomId}/ws/`,
-    token ? [`Bearer ${token}`] : []
-  );
+  getAll:  ()                      => api.get(`${PRODUCTS_API}/addresses/`),
+  create:  (data: any)             => api.post(`${PRODUCTS_API}/addresses/`, data),
+  update:  (id: number, data: any) => api.patch(`${PRODUCTS_API}/addresses/${id}/`, data),
+  delete:  (id: number)            => api.delete(`${PRODUCTS_API}/addresses/${id}/`),
 };
 
 export default api;
