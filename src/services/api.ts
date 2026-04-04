@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_ROOT = 'https://fulfilling-success-production-3288.up.railway.app/api';
 
-const PARTNERSHIP_API = `${API_ROOT}/partnership`;
+const PARTNERSHIP_API = `${API_ROOT}/partnerships`;
 const CHAT_API        = `${API_ROOT}/chat`;
 const NOTIFICATIONS_API = `${API_ROOT}/notifications`;
 const ORDERS_API      = `${API_ROOT}/orders`;
