@@ -28,7 +28,7 @@ export default function RootLayout({
             <CartProvider>
               <GamificationProvider>
                 {children}
-                <PublicChatWidget />
+               {/* <PublicChatWidget />*/}
                 <Toaster
                   position="top-right"
                   toastOptions={{

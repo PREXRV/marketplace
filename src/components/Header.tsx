@@ -64,9 +64,9 @@ export default function Header() {
             <Link href="/catalog" className="hover:text-primary transition">
               Каталог
             </Link>
-            <Link href="/community-chat"className="text-sm font-medium text-white hover:text-purple-300 transition-colors">
+            {/*<Link href="/community-chat"className="text-sm font-medium text-white hover:text-purple-300 transition-colors">
               Общий чат
-            </Link>
+            </Link>*/}
           </nav>
 
           <div className="flex items-center gap-4">
