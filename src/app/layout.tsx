@@ -6,6 +6,7 @@ import { CartProvider } from '@/context/CartContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { FavoritesProvider } from '@/context/FavoritesContext';
 import { GamificationProvider } from '@/context/GamificationContext';
+import PublicChatWidget from '@/components/chat/PublicChatWidget';
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] });
 
@@ -21,6 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
+      <PublicChatWidget />
       <body className={inter.className}>
         <AuthProvider>
           <FavoritesProvider>

@@ -369,4 +369,36 @@ export const addressAPI = {
     api.delete(`${PRODUCTS_API}/addresses/${id}/`),
 };
 
+export function createPublicChatWebSocket(slug: string, accessToken?: string): WebSocket {
+  const token = accessToken || getAccessToken();
+  const apiUrl = new URL(API_ROOT);
+  const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+  const baseUrl = `${protocol}://${apiUrl.host}`;
+
+  const url = token
+    ? `${baseUrl}/ws/public-chat/${slug}/?token=${encodeURIComponent(token)}`
+    : `${baseUrl}/ws/public-chat/${slug}/`;
+
+  return new WebSocket(url);
+}
+
+export const publicChatAPI = {
+  getChannels: () => api.get('/chat/channels/'),
+  getMessages: (slug: string) => api.get(`/chat/channels/${slug}/messages/`),
+  sendMessage: (slug: string, text: string) => api.post(`/chat/channels/${slug}/send/`, { text }),
+  uploadMessage: (slug: string, file: File, text = '') => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (text) formData.append('text', text);
+
+    return api.post(`/chat/channels/${slug}/upload/`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+  getModerationQueue: () => api.get('/chat/moderation_queue/'),
+  approveMessage: (queueId: number) => api.post(`/chat/moderation/approve/${queueId}/`),
+  rejectMessage: (queueId: number) => api.post(`/chat/moderation/reject/${queueId}/`),
+  deleteMessage: (slug: string, messageId: number) =>
+    api.post(`/chat/channels/${slug}/delete/${messageId}/`),
+};
 export default api;
