@@ -87,7 +87,7 @@ export default function ProductFilters({ categorySlug }: ProductFiltersProps) {
         level: 0,
       });
     });
-    
+
     categories.forEach((category) => {
       const node = map.get(category.id);
       if (!node) return;
@@ -361,7 +361,7 @@ export default function ProductFilters({ categorySlug }: ProductFiltersProps) {
           </div>
         </div>
 
-        <div className="pb-6 border-b border-gray-200">
+        {/*<div className="pb-6 border-b border-gray-200">
           <h4 className="font-semibold mb-3 text-gray-900">Статус товара</h4>
           <div className="space-y-2">
             {[
@@ -389,7 +389,7 @@ export default function ProductFilters({ categorySlug }: ProductFiltersProps) {
               );
             })}
           </div>
-        </div>
+        </div>*/}
 
         {Array.isArray(attributes) &&
           attributes.length > 0 &&
