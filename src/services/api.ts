@@ -28,8 +28,7 @@ function getAccessToken(): string | null {
 api.interceptors.request.use(
   (config) => {
     const token = getAccessToken();
-    if (token) {
-      config.headers = config.headers ?? {};
+    if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
