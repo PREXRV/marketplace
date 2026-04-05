@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Smile, Paperclip, X, Reply, Trash2 } from 'lucide-react';
+import { Send, Smile, Paperclip, X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { createChatWebSocket } from '@/services/api';
 import ChatSidebar from './ChatSidebar';
@@ -12,19 +12,12 @@ import { toast } from 'react-hot-toast';
 
 interface Message {
   id: number;
-  user: {
-    id: number;
-    username: string;
-    nickname: string;
-    avatar_color: string;
-  };
-  content: string;
+  sender: 'admin' | 'partner';
+  text: string;
+  file?: string | null;
+  file_name?: string;
+  is_read?: boolean;
   created_at: string;
-  reply_to?: {
-    id: number;
-    content: string;
-    user: string;
-  };
 }
 
 interface ChatRoomProps {
@@ -34,24 +27,21 @@ interface ChatRoomProps {
 export default function ChatRoom({ roomSlug }: ChatRoomProps) {
   const { user, tokens } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
   const [messageInput, setMessageInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [replyTo, setReplyTo] = useState<Message | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [ws, setWs] = useState<WebSocket | null>(null);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const messageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!user || !tokens?.access) return;
-    const websocket = createChatWebSocket(Number(roomSlug));
+
+    const websocket = createChatWebSocket(Number(roomSlug), tokens.access);
 
     websocket.onopen = () => {
-      console.log('WebSocket connected');
       toast.success('Подключено к чату');
     };
 
@@ -60,13 +50,11 @@ export default function ChatRoom({ roomSlug }: ChatRoomProps) {
       handleWebSocketMessage(data);
     };
 
-    websocket.onerror = (error) => {
-      console.error('WebSocket error:', error);
+    websocket.onerror = () => {
       toast.error('Ошибка подключения к чату');
     };
 
     websocket.onclose = () => {
-      console.log('WebSocket disconnected');
       toast.error('Отключено от чата');
     };
 
@@ -83,42 +71,30 @@ export default function ChatRoom({ roomSlug }: ChatRoomProps) {
 
   const handleWebSocketMessage = (data: any) => {
     switch (data.type) {
-      case 'message_history':
-        setMessages(data.messages);
+      case 'history':
+        setMessages(data.messages || []);
         break;
-      
-      case 'chat_message':
-        setMessages((prev) => [...prev, data.message]);
+      case 'message':
+        setMessages((prev) => [...prev, data]);
         break;
-      
       case 'user_list':
-        setOnlineUsers(data.users);
+        setOnlineUsers(data.users || []);
         break;
-      
-      case 'user_join':
-        toast.success(`${data.user.nickname} присоединился`);
-        break;
-      
-      case 'user_leave':
-        toast(`${data.user.username} вышел`, { icon: '👋' });
-        break;
-      
-      case 'user_typing':
-        if (data.is_typing) {
-          setTypingUsers((prev) => [...prev, data.user.username]);
-        } else {
-          setTypingUsers((prev) => prev.filter((u) => u !== data.user.username));
-        }
-        break;
-      
       case 'message_deleted':
         setMessages((prev) => prev.filter((m) => m.id !== data.message_id));
+        break;
+      case 'messages_read':
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.sender === 'partner' ? { ...m, is_read: true } : m
+          )
+        );
         break;
     }
   };
 
   const sendMessage = () => {
-    if (!messageInput.trim() || !ws) return;
+    if ((!messageInput.trim() && !replyTo) || !ws) return;
 
     const messageData = {
       type: 'chat_message',
@@ -130,34 +106,10 @@ export default function ChatRoom({ roomSlug }: ChatRoomProps) {
     setMessageInput('');
     setReplyTo(null);
     setShowEmojiPicker(false);
-    
-    // Останавливаем индикатор печати
-    stopTyping();
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessageInput(e.target.value);
-    
-    if (!isTyping && ws) {
-      setIsTyping(true);
-      ws.send(JSON.stringify({ type: 'typing_start' }));
-    }
-
-    // Сброс таймера печати
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-
-    typingTimeoutRef.current = setTimeout(() => {
-      stopTyping();
-    }, 2000);
-  };
-
-  const stopTyping = () => {
-    if (isTyping && ws) {
-      setIsTyping(false);
-      ws.send(JSON.stringify({ type: 'typing_stop' }));
-    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -193,12 +145,9 @@ export default function ChatRoom({ roomSlug }: ChatRoomProps) {
 
   return (
     <div className="h-screen flex bg-gradient-to-br from-purple-50 via-white to-blue-50">
-      {/* Sidebar */}
       <ChatSidebar users={onlineUsers} roomSlug={roomSlug} />
 
-      {/* Main Chat */}
       <div className="flex-1 flex flex-col bg-white">
-        {/* Header */}
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-6 shadow-lg">
           <div className="flex justify-between items-center">
             <div>
@@ -210,41 +159,22 @@ export default function ChatRoom({ roomSlug }: ChatRoomProps) {
           </div>
         </div>
 
-        {/* Messages */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
           <AnimatePresence>
             {messages.map((message) => (
               <ChatMessage
                 key={message.id}
                 message={message}
-                isOwn={message.user.id === user?.id}
+                isOwn={message.sender === 'partner' && message.sender !== 'admin'}
                 onReply={handleReply}
                 onDelete={handleDeleteMessage}
               />
             ))}
           </AnimatePresence>
 
-          {/* Typing Indicator */}
-          {typingUsers.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="text-sm text-gray-500 italic ml-14"
-            >
-              {typingUsers[0]} печатает
-              <span className="inline-flex ml-1">
-                <span className="animate-bounce">.</span>
-                <span className="animate-bounce delay-100">.</span>
-                <span className="animate-bounce delay-200">.</span>
-              </span>
-            </motion.div>
-          )}
-
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Reply Preview */}
         <AnimatePresence>
           {replyTo && (
             <motion.div
@@ -255,9 +185,9 @@ export default function ChatRoom({ roomSlug }: ChatRoomProps) {
             >
               <div>
                 <p className="text-sm font-semibold text-purple-600">
-                  Ответ на {replyTo.user.nickname}
+                  Ответ на {replyTo.sender}
                 </p>
-                <p className="text-sm text-gray-600 truncate">{replyTo.content}</p>
+                <p className="text-sm text-gray-600 truncate">{replyTo.text}</p>
               </div>
               <button
                 onClick={() => setReplyTo(null)}
@@ -269,10 +199,8 @@ export default function ChatRoom({ roomSlug }: ChatRoomProps) {
           )}
         </AnimatePresence>
 
-        {/* Input */}
         <div className="p-6 bg-white border-t-2 border-gray-100">
           <div className="flex items-center gap-3">
-            {/* Emoji Picker */}
             <div className="relative">
               <button
                 onClick={() => setShowEmojiPicker(!showEmojiPicker)}
@@ -280,24 +208,22 @@ export default function ChatRoom({ roomSlug }: ChatRoomProps) {
               >
                 <Smile className="w-6 h-6 text-purple-600" />
               </button>
-              
+
               {showEmojiPicker && (
                 <EmojiPicker onSelect={insertEmoji} onClose={() => setShowEmojiPicker(false)} />
               )}
             </div>
 
-            {/* Message Input */}
             <input
               ref={messageInputRef}
               type="text"
               value={messageInput}
               onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyPress}
               placeholder="Напишите сообщение..."
               className="flex-1 px-6 py-3 border-2 border-gray-200 rounded-full focus:outline-none focus:border-purple-500 transition-colors"
             />
 
-            {/* Send Button */}
             <button
               onClick={sendMessage}
               disabled={!messageInput.trim()}

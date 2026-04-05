@@ -3,10 +3,10 @@ import axios from 'axios';
 const API_ROOT = 'https://fulfilling-success-production-3288.up.railway.app/api';
 
 const PARTNERSHIP_API = `${API_ROOT}/partnerships`;
-const CHAT_API        = `${API_ROOT}/chat`;
+const CHAT_API = `${API_ROOT}/chat`;
 const NOTIFICATIONS_API = `${API_ROOT}/notifications`;
-const ORDERS_API      = `${API_ROOT}/orders`;
-const PRODUCTS_API    = `${API_ROOT}/products`;
+const ORDERS_API = `${API_ROOT}/orders`;
+const PRODUCTS_API = `${API_ROOT}/products`;
 
 // ── Axios instance ────────────────────────────────────────────────────────────
 
@@ -28,7 +28,10 @@ function getAccessToken(): string | null {
 api.interceptors.request.use(
   (config) => {
     const token = getAccessToken();
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+    if (token) {
+      config.headers = config.headers ?? {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => Promise.reject(error)
@@ -45,33 +48,29 @@ api.interceptors.response.use(
 );
 
 // ── WebSocket factory ─────────────────────────────────────────────────────────
-// Токен передаём через query-параметр ?token=...
-// На бэке нужен TokenAuthMiddleware (см. ниже)
+
+function getWsRoot(): string {
+  const apiUrl = new URL(API_ROOT);
+  const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+  return `${protocol}://${apiUrl.host}`;
+}
 
 export function createPartnerChatWS(partnerId: number): WebSocket {
-  const token   = getAccessToken();
-  const wsRoot  = API_ROOT
-    .replace(/^https/, 'wss')
-    .replace(/^http/, 'ws')
-    .replace(/\/api\/?$/, '');           // убираем /api — WS на корне
+  const token = getAccessToken();
 
   const url = token
-    ? `${wsRoot}/ws/partner-chat/${partnerId}/?token=${token}`
-    : `${wsRoot}/ws/partner-chat/${partnerId}/`;
+    ? `${getWsRoot()}/ws/partner-chat/${partnerId}/?token=${encodeURIComponent(token)}`
+    : `${getWsRoot()}/ws/partner-chat/${partnerId}/`;
 
   return new WebSocket(url);
 }
 
-export function createChatWebSocket(roomId: number): WebSocket {
-  const token  = getAccessToken();
-  const wsRoot = API_ROOT
-    .replace(/^https/, 'wss')
-    .replace(/^http/, 'ws')
-    .replace(/\/api\/?$/, '');
+export function createChatWebSocket(roomId: number, accessToken?: string): WebSocket {
+  const token = accessToken || getAccessToken();
 
   const url = token
-    ? `${wsRoot}/ws/chat/rooms/${roomId}/?token=${token}`
-    : `${wsRoot}/ws/chat/rooms/${roomId}/`;
+    ? `${getWsRoot()}/ws/chat/rooms/${roomId}/?token=${encodeURIComponent(token)}`
+    : `${getWsRoot()}/ws/chat/rooms/${roomId}/`;
 
   return new WebSocket(url);
 }
@@ -79,13 +78,13 @@ export function createChatWebSocket(roomId: number): WebSocket {
 // ── Affiliates ────────────────────────────────────────────────────────────────
 
 export const affiliateAPI = {
-  getTiers:         ()           => api.get('/affiliates/programs/'),
-  register:         (data: any)  => api.post('/affiliates/list/register/', data),
-  getDashboard:     ()           => api.get('/affiliates/list/dashboard/'),
-  getMe:            ()           => api.get('/affiliates/list/me/'),
-  getMaterials:     ()           => api.get('/affiliates/materials/'),
+  getTiers: () => api.get('/affiliates/programs/'),
+  register: (data: any) => api.post('/affiliates/list/register/', data),
+  getDashboard: () => api.get('/affiliates/list/dashboard/'),
+  getMe: () => api.get('/affiliates/list/me/'),
+  getMaterials: () => api.get('/affiliates/materials/'),
   downloadMaterial: (id: number) => api.post(`/affiliates/materials/${id}/download/`),
-  requestPayout:    (amount: number) =>
+  requestPayout: (amount: number) =>
     api.post('/affiliates/list/request_payout/', { amount }),
 };
 
@@ -96,7 +95,7 @@ export const deliveryAPI = {
     const url = orderAmount
       ? `${ORDERS_API}/delivery-methods/?order_amount=${orderAmount}`
       : `${ORDERS_API}/delivery-methods/`;
-    const res  = await api.get(url);
+    const res = await api.get(url);
     const data = res.data;
     return Array.isArray(data) ? data : data.results || [];
   },
@@ -112,8 +111,9 @@ export const partnershipAPI = {
     try {
       return await api.get(`${PARTNERSHIP_API}/profile/`);
     } catch (error: any) {
-      if (error.response?.status === 403 || error.response?.status === 404)
+      if (error.response?.status === 403 || error.response?.status === 404) {
         return { data: null };
+      }
       throw error;
     }
   },
@@ -122,8 +122,9 @@ export const partnershipAPI = {
     try {
       return await api.get(`${PARTNERSHIP_API}/partners/me/`);
     } catch (error: any) {
-      if (error.response?.status === 404 || error.response?.status === 403)
+      if (error.response?.status === 404 || error.response?.status === 403) {
         return { data: null };
+      }
       throw error;
     }
   },
@@ -146,9 +147,8 @@ export const partnershipAPI = {
     }
   },
 
-  // Чат (REST — только для загрузки файлов и истории как fallback)
-  getChatHistory: () =>
-    api.get(`${PARTNERSHIP_API}/chat/`),
+  // Чат партнёра
+  getChatHistory: () => api.get(`${PARTNERSHIP_API}/chat/`),
 
   chatSend: (text: string) =>
     api.post(`${PARTNERSHIP_API}/chat/`, { text }),
@@ -160,6 +160,7 @@ export const partnershipAPI = {
     const formData = new FormData();
     formData.append('file', file);
     if (text) formData.append('text', text);
+
     return api.post(`${PARTNERSHIP_API}/chat/upload/`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
@@ -174,8 +175,12 @@ export const partnershipAPI = {
       throw error;
     }
   },
-  addSocialAccount:    (data: any)  => api.post(`${PARTNERSHIP_API}/social-accounts/`, data),
-  deleteSocialAccount: (id: number) => api.delete(`${PARTNERSHIP_API}/social-accounts/${id}/`),
+
+  addSocialAccount: (data: any) =>
+    api.post(`${PARTNERSHIP_API}/social-accounts/`, data),
+
+  deleteSocialAccount: (id: number) =>
+    api.delete(`${PARTNERSHIP_API}/social-accounts/${id}/`),
 
   // Аналитика
   getAnalytics: async (days = 30) => {
@@ -192,9 +197,18 @@ export const partnershipAPI = {
     try {
       return await api.get(`${PARTNERSHIP_API}/referrals/`);
     } catch (error: any) {
-      if (error.response?.status === 404)
-        return { data: { referrals: [], total_referrals: 0, total_earnings: 0,
-          referral_code: '', referral_link: '', recent_rewards: [] } };
+      if (error.response?.status === 404) {
+        return {
+          data: {
+            referrals: [],
+            total_referrals: 0,
+            total_earnings: 0,
+            referral_code: '',
+            referral_link: '',
+            recent_rewards: [],
+          },
+        };
+      }
       throw error;
     }
   },
@@ -208,6 +222,7 @@ export const partnershipAPI = {
       throw error;
     }
   },
+
   createProductRequest: (data: any) =>
     api.post(`${PARTNERSHIP_API}/product-requests/`, data),
 
@@ -230,8 +245,12 @@ export const partnershipAPI = {
       throw error;
     }
   },
-  uploadVideo: (data: any)  => api.post(`${PARTNERSHIP_API}/videos/`, data),
-  deleteVideo: (id: number) => api.delete(`${PARTNERSHIP_API}/videos/${id}/`),
+
+  uploadVideo: (data: any) =>
+    api.post(`${PARTNERSHIP_API}/videos/`, data),
+
+  deleteVideo: (id: number) =>
+    api.delete(`${PARTNERSHIP_API}/videos/${id}/`),
 
   // Возвраты
   getRefunds: async () => {
@@ -242,7 +261,9 @@ export const partnershipAPI = {
       throw error;
     }
   },
-  createRefund: (data: any) => api.post(`${PARTNERSHIP_API}/refunds/`, data),
+
+  createRefund: (data: any) =>
+    api.post(`${PARTNERSHIP_API}/refunds/`, data),
 
   // Мои товары
   getMyProducts: async () => {
@@ -255,59 +276,98 @@ export const partnershipAPI = {
   },
 
   // Трекинг
-  trackRefView:   (ref_token: string)  => api.post(`${PARTNERSHIP_API}/track-ref-view/`,  { ref_token }),
-  trackCartAdd:   (ref_token: string)  => api.post(`${PARTNERSHIP_API}/track-cart-add/`,  { ref_token }),
-  trackSkuSearch: (customSku: string)  => api.post(`${PARTNERSHIP_API}/track-sku-search/`,{ custom_sku: customSku }),
-  trackPurchase:  (refToken: string)   => api.post(`${PARTNERSHIP_API}/track-purchase/`,  { ref_token: refToken }),
+  trackRefView: (ref_token: string) =>
+    api.post(`${PARTNERSHIP_API}/track-ref-view/`, { ref_token }),
+
+  trackCartAdd: (ref_token: string) =>
+    api.post(`${PARTNERSHIP_API}/track-cart-add/`, { ref_token }),
+
+  trackSkuSearch: (customSku: string) =>
+    api.post(`${PARTNERSHIP_API}/track-sku-search/`, { custom_sku: customSku }),
+
+  trackPurchase: (refToken: string) =>
+    api.post(`${PARTNERSHIP_API}/track-purchase/`, { ref_token: refToken }),
 };
 
 // ── Chat (general rooms) ──────────────────────────────────────────────────────
 
 export const chatAPI = {
-  getRooms:    ()                                 => api.get(`${CHAT_API}/rooms/`),
-  getMessages: (roomId: number)                   => api.get(`${CHAT_API}/rooms/${roomId}/messages/`),
-  sendMessage: (roomId: number, message: string)  => api.post(`${CHAT_API}/rooms/${roomId}/messages/`, { message }),
-  createRoom:  (data: any)                        => api.post(`${CHAT_API}/rooms/`, data),
+  getRooms: () =>
+    api.get(`${CHAT_API}/rooms/`),
+
+  getMessages: (roomId: number) =>
+    api.get(`${CHAT_API}/rooms/${roomId}/messages/`),
+
+  sendMessage: (roomId: number, message: string) =>
+    api.post(`${CHAT_API}/rooms/${roomId}/messages/`, { message }),
+
+  createRoom: (data: any) =>
+    api.post(`${CHAT_API}/rooms/`, data),
 };
 
 // ── Notifications ─────────────────────────────────────────────────────────────
 
 export const notificationsAPI = {
   getAll: async () => {
-    try { return await api.get(`${NOTIFICATIONS_API}/`); }
-    catch (e: any) { if (e.response?.status === 404) return { data: [] }; throw e; }
+    try {
+      return await api.get(`${NOTIFICATIONS_API}/`);
+    } catch (e: any) {
+      if (e.response?.status === 404) return { data: [] };
+      throw e;
+    }
   },
+
   getUnread: async () => {
-    try { return await api.get(`${NOTIFICATIONS_API}/unread/`); }
-    catch (e: any) { if (e.response?.status === 404) return { data: [] }; throw e; }
+    try {
+      return await api.get(`${NOTIFICATIONS_API}/unread/`);
+    } catch (e: any) {
+      if (e.response?.status === 404) return { data: [] };
+      throw e;
+    }
   },
-  markAsRead:    (id: number) => api.post(`${NOTIFICATIONS_API}/${id}/mark_as_read/`),
-  markAllAsRead: ()           => api.post(`${NOTIFICATIONS_API}/mark_all_as_read/`),
+
+  markAsRead: (id: number) =>
+    api.post(`${NOTIFICATIONS_API}/${id}/mark_as_read/`),
+
+  markAllAsRead: () =>
+    api.post(`${NOTIFICATIONS_API}/mark_all_as_read/`),
 };
 
 // ── Gamification ──────────────────────────────────────────────────────────────
 
 export const gamificationAPI = {
   getAchievements: () => api.get('/gamification/achievements/'),
-  getBadges:       () => api.get('/gamification/badges/'),
-  getLeaderboard:  () => api.get('/gamification/leaderboard/'),
+  getBadges: () => api.get('/gamification/badges/'),
+  getLeaderboard: () => api.get('/gamification/leaderboard/'),
 };
 
 // ── Products ──────────────────────────────────────────────────────────────────
 
 export const productsAPI = {
-  getProducts:  (params?: any) => api.get(`${PRODUCTS_API}/products/`, { params }),
-  getProduct:   (id: number)   => api.get(`${PRODUCTS_API}/products/${id}/`),
-  getCategories: ()            => api.get(`${PRODUCTS_API}/categories/`),
+  getProducts: (params?: any) =>
+    api.get(`${PRODUCTS_API}/products/`, { params }),
+
+  getProduct: (id: number) =>
+    api.get(`${PRODUCTS_API}/products/${id}/`),
+
+  getCategories: () =>
+    api.get(`${PRODUCTS_API}/categories/`),
 };
 
 // ── Addresses ─────────────────────────────────────────────────────────────────
 
 export const addressAPI = {
-  getAll:  ()                      => api.get(`${PRODUCTS_API}/addresses/`),
-  create:  (data: any)             => api.post(`${PRODUCTS_API}/addresses/`, data),
-  update:  (id: number, data: any) => api.patch(`${PRODUCTS_API}/addresses/${id}/`, data),
-  delete:  (id: number)            => api.delete(`${PRODUCTS_API}/addresses/${id}/`),
+  getAll: () =>
+    api.get(`${PRODUCTS_API}/addresses/`),
+
+  create: (data: any) =>
+    api.post(`${PRODUCTS_API}/addresses/`, data),
+
+  update: (id: number, data: any) =>
+    api.patch(`${PRODUCTS_API}/addresses/${id}/`, data),
+
+  delete: (id: number) =>
+    api.delete(`${PRODUCTS_API}/addresses/${id}/`),
 };
 
 export default api;

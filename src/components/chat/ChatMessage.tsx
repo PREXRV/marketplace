@@ -1,31 +1,24 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Reply, Trash2, MoreVertical } from 'lucide-react';
+import { Reply, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface Message {
   id: number;
-  user: {
-    id: number;
-    username: string;
-    nickname: string;
-    avatar_color: string;
-  };
-  content: string;
+  sender: 'admin' | 'partner';
+  text: string;
+  file?: string | null;
+  file_name?: string;
+  is_read?: boolean;
   created_at: string;
-  reply_to?: {
-    id: number;
-    content: string;
-    user: string;
-  };
 }
 
 interface ChatMessageProps {
   message: Message;
   isOwn: boolean;
-  onReply: (message: Message) => void;
-  onDelete: (messageId: number) => void;
+  onReply?: (message: Message) => void;
+  onDelete?: (messageId: number) => void;
 }
 
 export default function ChatMessage({ message, isOwn, onReply, onDelete }: ChatMessageProps) {
@@ -36,6 +29,9 @@ export default function ChatMessage({ message, isOwn, onReply, onDelete }: ChatM
     return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
   };
 
+  const isImage = (file?: string | null, fileName?: string) =>
+    /\.(jpg|jpeg|png|gif|webp)$/i.test(fileName || file || '');
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -45,29 +41,20 @@ export default function ChatMessage({ message, isOwn, onReply, onDelete }: ChatM
       onMouseLeave={() => setShowActions(false)}
     >
       <div className={`max-w-xl ${isOwn ? 'order-2' : 'order-1'}`}>
-        {/* User Info */}
-        {!isOwn && (
-          <div className="flex items-center gap-2 mb-2 ml-2">
-            <div
-              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
-              style={{ backgroundColor: message.user.avatar_color }}
-            >
-              {message.user.nickname.charAt(0).toUpperCase()}
-            </div>
-            <span className="font-semibold text-gray-800">{message.user.nickname}</span>
-            <span className="text-xs text-gray-500">{formatTime(message.created_at)}</span>
+        <div className="flex items-center gap-2 mb-2 ml-2">
+          <div
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold ${
+              isOwn ? 'bg-purple-600' : 'bg-gray-500'
+            }`}
+          >
+            {message.sender === 'admin' ? 'A' : 'P'}
           </div>
-        )}
+          <span className="font-semibold text-gray-800">
+            {message.sender === 'admin' ? 'Администрация' : 'Партнёр'}
+          </span>
+          <span className="text-xs text-gray-500">{formatTime(message.created_at)}</span>
+        </div>
 
-        {/* Reply Preview */}
-        {message.reply_to && (
-          <div className="mb-2 ml-12 p-2 bg-gray-100 rounded-lg border-l-4 border-purple-500">
-            <p className="text-xs font-semibold text-purple-600">{message.reply_to.user}</p>
-            <p className="text-sm text-gray-600 truncate">{message.reply_to.content}</p>
-          </div>
-        )}
-
-        {/* Message Content */}
         <div className="relative group">
           <div
             className={`px-4 py-3 rounded-2xl ${
@@ -76,7 +63,29 @@ export default function ChatMessage({ message, isOwn, onReply, onDelete }: ChatM
                 : 'bg-white shadow-md mr-12'
             }`}
           >
-            <p className="leading-relaxed break-words">{message.content}</p>
+            {message.text && <p className="leading-relaxed break-words">{message.text}</p>}
+
+            {message.file && isImage(message.file, message.file_name) && (
+              <a href={message.file} target="_blank" rel="noopener noreferrer">
+                <img
+                  src={message.file}
+                  alt={message.file_name || 'image'}
+                  className="mt-3 max-w-[240px] rounded-xl"
+                />
+              </a>
+            )}
+
+            {message.file && !isImage(message.file, message.file_name) && (
+              <a
+                href={message.file}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-2 rounded-xl bg-black/5 px-3 py-2 text-sm text-gray-700 hover:bg-black/10"
+              >
+                📎 {message.file_name || 'Файл'}
+              </a>
+            )}
+
             {isOwn && (
               <span className="text-xs opacity-75 mt-1 block text-right">
                 {formatTime(message.created_at)}
@@ -84,22 +93,23 @@ export default function ChatMessage({ message, isOwn, onReply, onDelete }: ChatM
             )}
           </div>
 
-          {/* Actions */}
-          {showActions && (
+          {(onReply || onDelete) && showActions && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               className={`absolute top-0 ${isOwn ? 'left-0' : 'right-0'} flex gap-1`}
             >
-              <button
-                onClick={() => onReply(message)}
-                className="p-2 bg-white rounded-full shadow-lg hover:bg-purple-50 transition-colors"
-                title="Ответить"
-              >
-                <Reply className="w-4 h-4 text-purple-600" />
-              </button>
-              
-              {isOwn && (
+              {onReply && (
+                <button
+                  onClick={() => onReply(message)}
+                  className="p-2 bg-white rounded-full shadow-lg hover:bg-purple-50 transition-colors"
+                  title="Ответить"
+                >
+                  <Reply className="w-4 h-4 text-purple-600" />
+                </button>
+              )}
+
+              {isOwn && onDelete && (
                 <button
                   onClick={() => onDelete(message.id)}
                   className="p-2 bg-white rounded-full shadow-lg hover:bg-red-50 transition-colors"
