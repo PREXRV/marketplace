@@ -22,15 +22,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ru">
-      <PublicChatWidget />
       <body className={inter.className}>
         <AuthProvider>
           <FavoritesProvider>
             <CartProvider>
-              <GamificationProvider>  {/* ✅ ДОБАВЛЕНО */}
+              <GamificationProvider>
                 {children}
-                {/* Добавляем Toaster для уведомлений */}
-                <Toaster 
+                <PublicChatWidget />
+                <Toaster
                   position="top-right"
                   toastOptions={{
                     duration: 4000,
@@ -52,7 +51,7 @@ export default function RootLayout({
                     },
                   }}
                 />
-              </GamificationProvider>  {/* ✅ ДОБАВЛЕНО */}
+              </GamificationProvider>
             </CartProvider>
           </FavoritesProvider>
         </AuthProvider>
