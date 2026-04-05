@@ -87,15 +87,24 @@ export default function ProductFilters({ categorySlug }: ProductFiltersProps) {
         level: 0,
       });
     });
-
+    
     categories.forEach((category) => {
       const node = map.get(category.id);
       if (!node) return;
 
-      const parentId =
-        typeof category.parent === 'object' && category.parent
-          ? category.parent.id
-          : (category.parent as number | null);
+      const parentValue = category.parent as unknown;
+      let parentId: number | null = null;
+
+      if (
+        parentValue &&
+        typeof parentValue === 'object' &&
+        'id' in parentValue &&
+        typeof (parentValue as { id: unknown }).id === 'number'
+      ) {
+        parentId = (parentValue as { id: number }).id;
+      } else if (typeof parentValue === 'number') {
+        parentId = parentValue;
+      }
 
       if (parentId && map.has(parentId)) {
         const parent = map.get(parentId)!;
