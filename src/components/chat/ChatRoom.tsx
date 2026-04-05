@@ -165,7 +165,7 @@ export default function ChatRoom({ roomSlug }: ChatRoomProps) {
               <ChatMessage
                 key={message.id}
                 message={message}
-                isOwn={message.sender === 'partner' && message.sender !== 'admin'}
+                isOwn={message.sender === 'partner'}
                 onReply={handleReply}
                 onDelete={handleDeleteMessage}
               />
