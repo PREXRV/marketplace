@@ -102,7 +102,7 @@ export default function HeroBanner({ banners }: { banners: Banner[] }) {
   if (!banner) return null;
 
   const height = isMobile
-    ? Math.max(200, banner.height_mobile || 480)
+    ? Math.max(200, banner.height_mobile || 200)
     : banner.height_desktop || 620;
 
   const getMediaUrl = (b: Banner) => {
