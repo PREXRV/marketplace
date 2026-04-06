@@ -171,7 +171,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
   if (product.category_name) {
     jsonLd.brand = {
       '@type': 'Brand',
-      name: product.category_name,
+      name: "Aki-Oka",
     };
   }
 
