@@ -347,25 +347,53 @@ export default function Header() {
                 <Link
                   href="/login"
                   className="mt-2 inline-flex items-center justify-center rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-600"
-                  onClick={closeMobilePanels}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeAllMobilePanels();
+                  }}
                 >
                   Войти в аккаунт
                 </Link>
               ) : (
                 <>
-                  <Link href="/profile" className="rounded-xl px-3 py-3 text-base font-medium text-gray-800 transition hover:bg-gray-50 hover:text-primary" onClick={closeMobilePanels}>
+                  <Link
+                    href="/profile"
+                    className="rounded-xl px-3 py-3 text-base font-medium text-gray-800 transition hover:bg-gray-50 hover:text-primary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      closeAllMobilePanels();
+                    }}
+                  >
                     Профиль
                   </Link>
-                  <Link href="/profile/orders" className="rounded-xl px-3 py-3 text-base font-medium text-gray-800 transition hover:bg-gray-50 hover:text-primary" onClick={closeMobilePanels}>
+
+                  <Link
+                    href="/profile/orders"
+                    className="rounded-xl px-3 py-3 text-base font-medium text-gray-800 transition hover:bg-gray-50 hover:text-primary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      closeAllMobilePanels();
+                    }}
+                  >
                     Мои заказы
                   </Link>
-                  <Link href="/profile/settings" className="rounded-xl px-3 py-3 text-base font-medium text-gray-800 transition hover:bg-gray-50 hover:text-primary" onClick={closeMobilePanels}>
+
+                  <Link
+                    href="/profile/settings"
+                    className="rounded-xl px-3 py-3 text-base font-medium text-gray-800 transition hover:bg-gray-50 hover:text-primary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      closeAllMobilePanels();
+                    }}
+                  >
                     Настройки
                   </Link>
+
                   <button
                     type="button"
-                    onClick={() => {
-                      closeMobilePanels();
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      closeAllMobilePanels();
                       logout();
                     }}
                     className="rounded-xl px-3 py-3 text-left text-base font-medium text-red-600 transition hover:bg-red-50"
