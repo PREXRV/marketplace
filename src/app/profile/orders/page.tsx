@@ -393,7 +393,6 @@ export default function OrdersPage() {
         ) : (
           <div className="space-y-6">
             {filteredOrders.map(order => {
-              console.log('Order payment_status:', order.order_number, (order as any).payment_status);
               const subtotal =
                 order.items?.reduce(
                   (sum, item) => sum + item.quantity * parseFloat((item as any).is_free_reward
