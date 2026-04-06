@@ -19,8 +19,6 @@ export default function NotificationBell() {
   useEffect(() => {
     if (tokens) {
       loadUnreadCount();
-      
-      // Обновляем счетчик каждые 600 секунд
       const interval = setInterval(loadUnreadCount, 600000);
       return () => clearInterval(interval);
     }
@@ -32,7 +30,6 @@ export default function NotificationBell() {
     }
   }, [isOpen, tokens]);
 
-  // Закрытие при клике вне
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -48,10 +45,9 @@ export default function NotificationBell() {
 
   const loadUnreadCount = async () => {
     if (!tokens) return;
-    
     try {
       const data = await api.getUnreadCount(tokens.access);
-      setUnreadCount(data?.count ?? 0); // ✅ защита
+      setUnreadCount(data?.count ?? 0);
     } catch (error) {
       console.error('Ошибка загрузки счетчика уведомлений:', error);
     }
@@ -59,15 +55,13 @@ export default function NotificationBell() {
 
   const loadNotifications = async () => {
     if (!tokens) return;
-    
     try {
       setLoading(true);
       const data = await api.getUnreadNotifications(tokens.access);
-      // ✅ защита от любого формата ответа
       setNotifications(data?.notifications ?? (Array.isArray(data) ? data : []));
     } catch (error) {
       console.error('Ошибка загрузки уведомлений:', error);
-      setNotifications([]); // ✅ при ошибке не падаем
+      setNotifications([]);
     } finally {
       setLoading(false);
     }
@@ -76,13 +70,11 @@ export default function NotificationBell() {
   const handleMarkAsRead = async (notificationId: number, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
     if (!tokens) return;
-    
     try {
       await api.markNotificationAsRead(tokens.access, notificationId);
-      setNotifications(prev => prev.filter(n => n.id !== notificationId));
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {
       console.error('Ошибка отметки уведомления:', error);
     }
@@ -90,7 +82,6 @@ export default function NotificationBell() {
 
   const handleMarkAllAsRead = async () => {
     if (!tokens) return;
-    
     try {
       await api.markAllNotificationsAsRead(tokens.access);
       setNotifications([]);
@@ -118,16 +109,13 @@ export default function NotificationBell() {
 
   const handleNotificationClick = async (notification: Notification) => {
     if (!tokens) return;
-    
-    // Отмечаем как прочитанное
     try {
       await api.markNotificationAsRead(tokens.access, notification.id);
-      setNotifications(prev => prev.filter(n => n.id !== notification.id));
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {
       console.error('Ошибка:', error);
     }
-    
     setIsOpen(false);
   };
 
@@ -135,31 +123,29 @@ export default function NotificationBell() {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* ✅ Иконка колокольчика - ТОЧНО КАК У КОРЗИНЫ */}
+      {/* ✅ Идентичная рамка как у корзины - h-10 w-10 rounded-xl border */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative py-4"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-700 hover:border-primary hover:text-primary hover:bg-gray-50 transition-all shrink-0"
+        aria-label="Уведомления"
+        aria-expanded={isOpen}
       >
-        <div className="flex items-center gap-2 text-gray-700 hover:text-primary transition">
-          <Bell className="w-6 h-6" />
-          {unreadCount > 0 && (
-            <span className="absolute -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-              {unreadCount}
-            </span>
-          )}
-        </div>
+        <Bell className="h-5 w-5" />
+        {unreadCount > 0 && (
+          <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[11px] font-bold text-white">
+            {unreadCount}
+          </span>
+        )}
       </button>
 
-      {/* Выпадающее меню */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-2xl border border-gray-200 z-50 max-h-[600px] flex flex-col">
-          {/* Заголовок */}
-          <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-primary to-blue-600 text-white rounded-t-lg">
+        <div className="absolute right-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 z-50 max-h-[600px] flex flex-col overflow-hidden">
+          <div className="flex items-center justify-between gap-2 border-b border-gray-100 p-4 bg-gradient-to-r from-primary/10 to-blue-600/10">
             <div className="flex items-center gap-2">
-              <Bell className="w-5 h-5" />
-              <h3 className="font-bold text-lg">Уведомления</h3>
+              <Bell className="h-5 w-5 text-primary" />
+              <h3 className="font-bold text-lg text-gray-900">Уведомления</h3>
               {unreadCount > 0 && (
-                <span className="bg-white text-primary text-xs px-2 py-0.5 rounded-full font-bold">
+                <span className="bg-primary text-white text-xs px-2 py-0.5 rounded-full font-bold">
                   {unreadCount}
                 </span>
               )}
@@ -167,18 +153,18 @@ export default function NotificationBell() {
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllAsRead}
-                className="text-xs hover:underline text-white/90 hover:text-white transition"
+                className="text-sm text-gray-600 hover:text-primary hover:underline font-medium transition"
               >
                 Прочитать все
               </button>
             )}
           </div>
 
-          {/* Список уведомлений */}
           <div className="overflow-y-auto flex-1">
             {loading ? (
               <div className="p-8 text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto" />
+                <p className="text-sm text-gray-500 mt-2">Загрузка...</p>
               </div>
             ) : notifications.length === 0 ? (
               <div className="p-8 text-center text-gray-500">
@@ -195,34 +181,24 @@ export default function NotificationBell() {
                     key={notification.id}
                     href={notification.link || '/profile'}
                     onClick={() => handleNotificationClick(notification)}
-                    className="block p-4 hover:bg-blue-50 transition group"
+                    className="block p-4 hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex gap-3">
-                      {/* Иконка */}
-                      <div className="flex-shrink-0 mt-1">
-                        {getNotificationIcon(notification.type)}
-                      </div>
-
-                      {/* Контент */}
+                      <div className="flex-shrink-0 mt-1">{getNotificationIcon(notification.type)}</div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2 mb-1">
-                          <h4 className="font-semibold text-gray-900 text-sm group-hover:text-primary transition">
+                          <h4 className="font-semibold text-gray-900 text-sm line-clamp-1">
                             {notification.title}
                           </h4>
                           <button
                             onClick={(e) => handleMarkAsRead(notification.id, e)}
-                            className="text-gray-400 hover:text-gray-600 transition flex-shrink-0"
+                            className="text-gray-400 hover:text-gray-600 transition flex-shrink-0 p-1 -m-1 rounded-full hover:bg-gray-200"
                             title="Отметить прочитанным"
                           >
                             <X className="w-4 h-4" />
                           </button>
                         </div>
-                        
-                        <p className="text-sm text-gray-600 line-clamp-2 mb-2">
-                          {notification.message}
-                        </p>
-
-                        {/* Изображение товара */}
+                        <p className="text-sm text-gray-600 line-clamp-2 mb-2">{notification.message}</p>
                         {notification.product_image && (
                           <img
                             src={notification.product_image}
@@ -230,17 +206,14 @@ export default function NotificationBell() {
                             className="w-16 h-16 object-cover rounded-lg mb-2"
                           />
                         )}
-
                         <div className="flex items-center justify-between">
                           <span className="text-xs text-gray-400">
                             {formatDistanceToNow(new Date(notification.created_at), {
                               addSuffix: true,
-                              locale: ru
+                              locale: ru,
                             })}
                           </span>
-                          <span className="text-xs text-primary font-medium opacity-0 group-hover:opacity-100 transition">
-                            Перейти →
-                          </span>
+                          <span className="text-xs text-primary font-medium">Перейти →</span>
                         </div>
                       </div>
                     </div>
@@ -250,13 +223,12 @@ export default function NotificationBell() {
             )}
           </div>
 
-          {/* Футер */}
           {notifications.length > 0 && (
-            <div className="p-3 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+            <div className="p-3 border-t border-gray-100 bg-gray-50">
               <Link
                 href="/profile/notifications"
                 onClick={() => setIsOpen(false)}
-                className="block text-center text-sm text-primary hover:text-blue-700 font-medium"
+                className="block text-center text-sm text-primary hover:text-blue-700 font-medium transition"
               >
                 Посмотреть все уведомления
               </Link>
