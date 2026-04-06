@@ -919,11 +919,11 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                             )}
                           </div>
 
-                          <span className={`text-sm font-medium ${
+                          {/*<span className={`text-sm font-medium ${
                             variant.stock > 0 ? 'text-green-600' : 'text-red-600'
                           }`}>
                             {variant.stock > 0 ? `${variant.stock} шт.` : 'Нет'}
-                          </span>
+                          </span>*/}
                         </div>
                       </button>
                     );
