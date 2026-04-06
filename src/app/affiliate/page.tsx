@@ -33,10 +33,8 @@ export default function AffiliatePage() {
     setCheckingAffiliate(true);
     try {
       const response = await affiliateAPI.getMe();
-      console.log('Affiliate status:', response.data);
       setIsAffiliate(true); // Пользователь уже партнер
     } catch (error: any) {
-      console.log('Not an affiliate:', error);
       setIsAffiliate(false); // Не партнер
     } finally {
       setCheckingAffiliate(false);
