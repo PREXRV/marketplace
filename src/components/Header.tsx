@@ -142,7 +142,7 @@ export default function Header() {
               <Link href="/" className="text-sm font-medium text-gray-700 transition hover:text-primary">
                 Главная
               </Link>
-              <Link href="/catalog" className="text-sm font-semibold text-primary transition hover:text-primary/80">
+              <Link href="/catalog" className="text-sm font-semibold text-gray-700 transition hover:text-primary/80">
                 Каталог
               </Link>
             </nav>
