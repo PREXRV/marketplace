@@ -16,18 +16,63 @@ import {
 type TabType = 'daily' | 'weekly' | 'special' | 'rewards' | 'purchases';
 
 const PlatformIcon = ({ platform }: { platform: string }) => {
-  const map: Record<string, { emoji: string; color: string }> = {
-    telegram:  { emoji: '✈️', color: 'from-blue-400 to-blue-600' },
-    youtube:   { emoji: '▶️', color: 'from-red-500 to-red-700' },
-    tiktok:    { emoji: '🎵', color: 'from-gray-800 to-black' },
-    vk:        { emoji: '💬', color: 'from-blue-500 to-blue-700' },
-    instagram: { emoji: '📸', color: 'from-pink-500 to-purple-600' },
-    other:     { emoji: '🌐', color: 'from-gray-400 to-gray-600' },
+  const icons: Record<string, { color: string; svg: JSX.Element }> = {
+    telegram: {
+      color: 'from-blue-400 to-blue-600',
+      svg: (
+        <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
+          <path d="M23.55 3.39a1.2 1.2 0 0 0-1.24-.17L2.8 11.05c-.5.2-.48.92.03 1.1l4.95 1.64 1.9 6.1c.15.5.8.64 1.14.24l2.76-3.25 4.98 3.66c.48.35 1.16.08 1.27-.5l3.84-15.4a1.2 1.2 0 0 0-.12-.95ZM9.03 13.2l9.67-6.1c.17-.1.35.13.2.27l-8 7.2a1.1 1.1 0 0 0-.34.6l-.3 2.27c-.03.2-.31.24-.39.05l-1.23-3.08a1.1 1.1 0 0 1 .39-1.21Z" />
+        </svg>
+      ),
+    },
+    youtube: {
+      color: 'from-red-500 to-red-700',
+      svg: (
+        <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
+          <path d="M23.5 6.2a3 3 0 0 0-2.1-2.12C19.5 3.55 12 3.55 12 3.55s-7.5 0-9.4.53A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.12c1.9.53 9.4.53 9.4.53s7.5 0 9.4-.53a3 3 0 0 0 2.1-2.12A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8ZM9.6 15.7V8.3l6.5 3.7-6.5 3.7Z" />
+        </svg>
+      ),
+    },
+    tiktok: {
+      color: 'from-gray-800 to-black',
+      svg: (
+        <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
+          <path d="M14.2 2h3.05c.22 1.18.9 2.33 1.86 3.16A5.38 5.38 0 0 0 22 6.42v3.02a8.58 8.58 0 0 1-4.75-1.43v6.2a6.2 6.2 0 1 1-6.2-6.2c.38 0 .76.04 1.12.1v3.1a3.08 3.08 0 1 0 2.03 2.9V2Z" />
+        </svg>
+      ),
+    },
+    vk: {
+      color: 'from-blue-500 to-blue-700',
+      svg: (
+        <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
+          <path d="M12.79 17.6h1.42s.43-.05.65-.28c.2-.22.2-.63.2-.63s-.03-1.92.86-2.2c.88-.28 2 1.86 3.2 2.68.9.6 1.58.47 1.58.47l3.17-.04s1.66-.1.87-1.4c-.06-.11-.44-.93-2.25-2.61-1.9-1.77-1.64-1.48.64-4.52 1.39-1.85 1.95-2.98 1.77-3.46-.17-.45-1.2-.33-1.2-.33l-3.57.02s-.27-.04-.47.08c-.19.12-.3.39-.3.39s-.57 1.52-1.34 2.82c-1.63 2.75-2.28 2.9-2.55 2.72-.62-.4-.46-1.62-.46-2.49 0-2.7.4-3.83-.78-4.12-.39-.1-.68-.16-1.69-.17-1.28-.01-2.36 0-2.98.3-.41.2-.73.63-.54.65.24.03.8.15 1.1.57.38.54.37 1.74.37 1.74s.21 3.18-.5 3.58c-.5.27-1.18-.28-2.64-2.76-.75-1.27-1.31-2.68-1.31-2.68s-.1-.25-.29-.38a1.33 1.33 0 0 0-.54-.21l-3.39.02s-.5.01-.68.24c-.16.21-.01.65-.01.65s2.65 6.17 5.65 9.28c2.74 2.84 5.85 2.65 5.85 2.65Z" />
+        </svg>
+      ),
+    },
+    instagram: {
+      color: 'from-pink-500 to-purple-600',
+      svg: (
+        <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
+          <path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2Zm0 1.8A3.95 3.95 0 0 0 3.8 7.75v8.5a3.95 3.95 0 0 0 3.95 3.95h8.5a3.95 3.95 0 0 0 3.95-3.95v-8.5a3.95 3.95 0 0 0-3.95-3.95h-8.5Zm8.95 1.35a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2ZM12 6.6A5.4 5.4 0 1 1 6.6 12 5.4 5.4 0 0 1 12 6.6Zm0 1.8A3.6 3.6 0 1 0 15.6 12 3.6 3.6 0 0 0 12 8.4Z" />
+        </svg>
+      ),
+    },
+    other: {
+      color: 'from-gray-400 to-gray-600',
+      svg: (
+        <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current stroke-[1.8]" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
+        </svg>
+      ),
+    },
   };
-  const p = map[platform] || map.other;
+
+  const current = icons[platform] || icons.other;
+
   return (
-    <div className={`w-6 h-6 bg-gradient-to-br ${p.color} rounded-md flex items-center justify-center text-xs shadow`}>
-      {p.emoji}
+    <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${current.color} text-white shadow-sm`}>
+      {current.svg}
     </div>
   );
 };
