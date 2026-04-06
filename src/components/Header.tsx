@@ -349,7 +349,7 @@ export default function Header() {
                   className="mt-2 inline-flex items-center justify-center rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-600"
                   onClick={(e) => {
                     e.stopPropagation();
-                    closeAllMobilePanels();
+                    closeMobilePanels();
                   }}
                 >
                   Войти в аккаунт
@@ -361,7 +361,7 @@ export default function Header() {
                     className="rounded-xl px-3 py-3 text-base font-medium text-gray-800 transition hover:bg-gray-50 hover:text-primary"
                     onClick={(e) => {
                       e.stopPropagation();
-                      closeAllMobilePanels();
+                      closeMobilePanels();
                     }}
                   >
                     Профиль
@@ -372,7 +372,7 @@ export default function Header() {
                     className="rounded-xl px-3 py-3 text-base font-medium text-gray-800 transition hover:bg-gray-50 hover:text-primary"
                     onClick={(e) => {
                       e.stopPropagation();
-                      closeAllMobilePanels();
+                      closeMobilePanels();
                     }}
                   >
                     Мои заказы
@@ -383,7 +383,7 @@ export default function Header() {
                     className="rounded-xl px-3 py-3 text-base font-medium text-gray-800 transition hover:bg-gray-50 hover:text-primary"
                     onClick={(e) => {
                       e.stopPropagation();
-                      closeAllMobilePanels();
+                      closeMobilePanels();
                     }}
                   >
                     Настройки
@@ -393,7 +393,7 @@ export default function Header() {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      closeAllMobilePanels();
+                      closeMobilePanels();
                       logout();
                     }}
                     className="rounded-xl px-3 py-3 text-left text-base font-medium text-red-600 transition hover:bg-red-50"
