@@ -71,7 +71,7 @@ const PlatformIcon = ({ platform }: { platform: string }) => {
   const current = icons[platform] || icons.other;
 
   return (
-    <div className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${current.color} text-white shadow-sm`}>
+    <div className={`flex h-5 w-5 items-center justify-center rounded-xl bg-gradient-to-br ${current.color} text-white shadow-sm`}>
       {current.svg}
     </div>
   );
