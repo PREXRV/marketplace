@@ -147,11 +147,6 @@ export default function ProductGrid({ products, title }: ProductGridProps) {
             </div>
           )}
         </div>
-
-        <div className="mt-4 text-center text-xs text-gray-500 sm:text-sm lg:hidden">
-          Проведите влево, чтобы увидеть больше
-        </div>
-
         <div className="mt-5 sm:hidden">
           <Link
             href="/catalog"
