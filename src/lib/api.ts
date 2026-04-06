@@ -345,6 +345,9 @@ export interface Product {
   availability_label?: string;
   make_time_days_min?: number | null;
   make_time_days_max?: number | null;
+  meta_title?: string;          // ✅ добавить
+  meta_description?: string;    // ✅ добавить
+  meta_keywords?: string; 
 }
 
 export interface Category {
