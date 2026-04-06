@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+const DOMAIN_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -7,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin/', '/api/', '/checkout/', '/profile/'],
     },
-    sitemap: 'https://ВАШ_ДОМЕН.ru/sitemap.xml',
+    sitemap: `${DOMAIN_URL}/sitemap.xml`,
   };
 }
