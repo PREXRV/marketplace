@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
 import { Product } from '@/lib/api';
 
@@ -21,19 +22,21 @@ interface SaleProductsProps {
 
 export default function SaleProducts({ products, saleInfo }: SaleProductsProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isMobile, setIsMobile] = useState(false);
   const [visibleCards, setVisibleCards] = useState(4);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const updateLayout = () => {
       const width = window.innerWidth;
       setIsMobile(width < 768);
-      if (width < 640)       setVisibleCards(1.2);
-      else if (width < 1024) setVisibleCards(2.5);
+
+      if (width < 640) setVisibleCards(1.15);
+      else if (width < 1024) setVisibleCards(2.2);
       else if (width < 1280) setVisibleCards(3);
-      else                   setVisibleCards(4);
+      else setVisibleCards(4);
     };
+
     updateLayout();
     window.addEventListener('resize', updateLayout);
     return () => window.removeEventListener('resize', updateLayout);
@@ -48,7 +51,12 @@ export default function SaleProducts({ products, saleInfo }: SaleProductsProps) 
     if (!scrollContainerRef.current) return;
     const container = scrollContainerRef.current;
     const cardWidth = container.scrollWidth / products.length;
-    container.scrollTo({ left: index * cardWidth, behavior: 'smooth' });
+
+    container.scrollTo({
+      left: index * cardWidth,
+      behavior: 'smooth',
+    });
+
     setCurrentIndex(index);
   };
 
@@ -58,64 +66,72 @@ export default function SaleProducts({ products, saleInfo }: SaleProductsProps) 
   useEffect(() => {
     if (!isMobile && products.length > visibleCards) {
       const interval = setInterval(() => {
-        setCurrentIndex(prev => {
+        setCurrentIndex((prev) => {
           const next = prev >= maxIndex ? 0 : prev + 1;
           scrollToIndex(next);
           return next;
         });
       }, 5000);
+
       return () => clearInterval(interval);
     }
-  }, [currentIndex, maxIndex, isMobile, products.length, visibleCards]);
+  }, [currentIndex, isMobile, maxIndex, products.length, visibleCards]);
 
   const formatEndDate = (dateString: string) =>
     new Date(dateString).toLocaleDateString('ru-RU', {
-      day: 'numeric', month: 'long', year: 'numeric'
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
     });
 
   return (
-    <section className="py-10 bg-gradient-to-br from-red-50 via-orange-50 to-pink-50">
-      <div className="container mx-auto px-8">
-
-        {/* Заголовок */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-3 bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 py-3 rounded-full mb-4 shadow-lg animate-pulse">
-            <span className="font-bold text-lg uppercase tracking-wide">АКЦИЯ</span>
+    <section className="bg-gradient-to-br from-red-50 via-orange-50 to-pink-50 py-10 sm:py-12 lg:py-16">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 text-center sm:mb-10 lg:mb-12">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-red-500 to-orange-500 px-4 py-2 text-white shadow-lg sm:px-6 sm:py-3">
+            <span className="text-sm font-bold uppercase tracking-wide sm:text-base lg:text-lg">
+              Акция
+            </span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-3 text-gray-900">
+
+          <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl lg:text-5xl">
             {saleInfo?.name || 'Товары по акции'}
           </h2>
+
           {saleInfo?.description && (
-            <p className="text-gray-600 text-lg md:text-xl max-w-2xl mx-auto mb-4">
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-gray-600 sm:text-base lg:text-lg">
               {saleInfo.description}
             </p>
           )}
+
           {saleInfo?.end_date && (
-            <div className="inline-flex items-center gap-2 text-red-600 font-semibold bg-white px-4 py-2 rounded-full shadow-md">
+            <div className="mt-4 inline-flex items-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-red-600 shadow-md">
               Акция до {formatEndDate(saleInfo.end_date)}
             </div>
           )}
         </div>
 
-        {/* Карусель — точно как ProductGrid */}
         <div className="relative group/carousel">
           {products.length > visibleCards && (
             <>
               <button
                 onClick={goPrev}
                 disabled={currentIndex === 0}
-                className="absolute -left-5 top-1/2 -translate-y-1/2 z-20 bg-white hover:bg-gray-50 shadow-xl border-2 border-gray-200 rounded-full p-3 transition-all duration-300 hover:scale-110 hover:shadow-2xl disabled:opacity-30 disabled:cursor-not-allowed opacity-0 group-hover/carousel:opacity-100 lg:flex hidden items-center justify-center"
+                className="absolute -left-4 top-1/2 z-20 hidden -translate-y-1/2 items-center justify-center rounded-full border-2 border-gray-200 bg-white p-3 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30 lg:flex lg:opacity-0 lg:group-hover/carousel:opacity-100"
+                aria-label="Предыдущие товары по акции"
               >
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                <svg className="h-5 w-5 text-gray-700" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
+
               <button
                 onClick={goNext}
                 disabled={currentIndex >= maxIndex}
-                className="absolute -right-5 top-1/2 -translate-y-1/2 z-20 bg-white hover:bg-gray-50 shadow-xl border-2 border-gray-200 rounded-full p-3 transition-all duration-300 hover:scale-110 hover:shadow-2xl disabled:opacity-30 disabled:cursor-not-allowed opacity-0 group-hover/carousel:opacity-100 lg:flex hidden items-center justify-center"
+                className="absolute -right-4 top-1/2 z-20 hidden -translate-y-1/2 items-center justify-center rounded-full border-2 border-gray-200 bg-white p-3 shadow-xl transition-all duration-300 hover:scale-105 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30 lg:flex lg:opacity-0 lg:group-hover/carousel:opacity-100"
+                aria-label="Следующие товары по акции"
               >
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                <svg className="h-5 w-5 text-gray-700" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -124,13 +140,13 @@ export default function SaleProducts({ products, saleInfo }: SaleProductsProps) 
 
           <div
             ref={scrollContainerRef}
-            className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-6 pb-8"
+            className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 scrollbar-hide sm:gap-5 sm:pb-6 lg:gap-6"
             style={{ scrollSnapType: 'x mandatory' }}
           >
             {products.map((product) => (
               <div
                 key={product.id}
-                className="flex-shrink-0 snap-center w-[calc(100%-2rem)] sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)]"
+                className="w-[84%] flex-shrink-0 snap-start sm:w-[calc(50%-10px)] lg:w-[calc(33.333%-16px)] xl:w-[calc(25%-18px)]"
               >
                 <ProductCard product={product} />
               </div>
@@ -138,37 +154,38 @@ export default function SaleProducts({ products, saleInfo }: SaleProductsProps) 
           </div>
 
           {totalPages > 1 && (
-            <div className="flex justify-center gap-2 mt-6">
+            <div className="mt-5 flex justify-center gap-2 sm:mt-6">
               {Array.from({ length: totalPages }, (_, i) => (
                 <button
                   key={i}
                   onClick={() => scrollToIndex(i)}
                   className={`h-2 rounded-full transition-all duration-300 ${
                     i === Math.floor(currentIndex / visibleCards)
-                      ? 'bg-primary w-8 shadow-md'
-                      : 'bg-gray-300 w-2 hover:bg-gray-400 hover:w-4'
+                      ? 'w-8 bg-primary shadow-md'
+                      : 'w-2 bg-gray-300 hover:w-4 hover:bg-gray-400'
                   }`}
+                  aria-label={`Страница ${i + 1}`}
                 />
               ))}
             </div>
           )}
         </div>
 
-        <div className="text-center mt-4 text-sm text-gray-500 lg:hidden">
-          👆 Проведите влево, чтобы увидеть больше
+        <div className="mt-4 text-center text-xs text-gray-500 sm:text-sm lg:hidden">
+          Проведите влево, чтобы увидеть больше
         </div>
 
         {products.length >= 8 && (
-          <div className="text-center mt-12">
-            <a
+          <div className="mt-8 text-center sm:mt-10 lg:mt-12">
+            <Link
               href="/sale"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-bold px-8 py-4 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="inline-flex min-h-[48px] items-center gap-2 rounded-full bg-gradient-to-r from-red-500 to-pink-500 px-5 py-3 text-sm font-bold text-white shadow-lg transition-all duration-300 hover:from-red-600 hover:to-pink-600 hover:shadow-xl sm:px-8 sm:py-4 sm:text-base"
             >
               Смотреть все товары на акции
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
-            </a>
+            </Link>
           </div>
         )}
       </div>
