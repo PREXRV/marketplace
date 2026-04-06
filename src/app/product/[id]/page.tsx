@@ -112,7 +112,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
     ...(product.images?.map((img: any) => img.image_url || img.image).filter(Boolean) || []),
   ];
   // Убираем дубли
-  const uniqueImages = [...new Set(schemaImages)];
+  const uniqueImages = schemaImages.filter((img: string, idx: number) => schemaImages.indexOf(img) === idx);
 
   const jsonLd: Record<string, any> = {
     '@context': 'https://schema.org/',
