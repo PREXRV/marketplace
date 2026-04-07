@@ -57,9 +57,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header 
-        <meta name="yandex-verification" content="216dd865d4686ad1" />
-      />
+      <Header />
       <main className="overflow-x-hidden">
         {data.banners.length > 0 && <HeroBanner banners={data.banners} />}
 
