@@ -8,7 +8,6 @@ import PartnershipSidebar from '@/components/partnership/PartnershipSidebar';
 import { Menu, X } from 'lucide-react';
 
 export default function PartnershipLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
@@ -50,7 +49,7 @@ export default function PartnershipLayout({ children }: { children: React.ReactN
                   </button>
                 </div>
                 <div className="p-4">
-                  <PartnershipSidebar onNavigate={() => setMobileSidebarOpen(false)} />
+                  <PartnershipSidebar />
                 </div>
               </div>
             </>
