@@ -19,7 +19,6 @@ const SendIcon = () => (
 
 export default function ReviewReplyForm({ reviewId, onSuccess, onCancel }: ReviewReplyFormProps) {
   const { tokens, user } = useAuth();
-
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -47,8 +46,10 @@ export default function ReviewReplyForm({ reviewId, onSuccess, onCancel }: Revie
       setText('');
 
       if (result.is_approved) {
+        // Staff — сразу публикуется, обновляем список
         onSuccess();
       } else {
+        // Обычный пользователь — показываем уведомление о модерации
         setPendingModeration(true);
       }
     } catch (err: any) {
@@ -58,22 +59,20 @@ export default function ReviewReplyForm({ reviewId, onSuccess, onCancel }: Revie
     }
   };
 
+  // ✅ Состояние ожидания модерации
   if (pendingModeration) {
     return (
       <div className="mt-4 border-t pt-4">
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3">
-          <span className="text-xl sm:text-2xl">⏳</span>
-          <div className="text-sm sm:text-base">
-            <p className="font-semibold text-amber-800 mb-1">
-              Ответ отправлен
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+          <span className="text-2xl">⏳</span>
+          <div>
+            <p className="font-semibold text-amber-800 mb-1">Ответ отправлен на модерацию</p>
+            <p className="text-sm text-amber-700">
+              Ваш ответ появится после проверки модератором. Обычно это занимает до 24 часов.
             </p>
-            <p className="text-amber-700 text-xs sm:text-sm">
-              После модерации он появится на сайте
-            </p>
-
             <button
               onClick={onCancel}
-              className="mt-3 text-xs sm:text-sm text-amber-600 underline"
+              className="mt-3 text-sm text-amber-600 hover:text-amber-800 underline transition"
             >
               Закрыть
             </button>
@@ -89,50 +88,46 @@ export default function ReviewReplyForm({ reviewId, onSuccess, onCancel }: Revie
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Ваш ответ
         </label>
-
         <textarea
           value={text}
           onChange={(e) => {
             setText(e.target.value);
             if (error) setError('');
           }}
-          placeholder="Напишите ответ..."
+          placeholder="Напишите ответ на отзыв..."
           rows={3}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
           disabled={loading}
-          className="w-full px-3 py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-primary focus:border-transparent"
         />
 
-        {/* Модерация */}
+        {/* ✅ Предупреждение о модерации для обычных пользователей */}
         {!(user as any)?.is_staff && (
           <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-            🛡️ Проверяется модератором
+            <span>🛡️</span> Ответ появится после проверки модератором
           </p>
         )}
 
-        {/* Ошибка */}
         {error && (
-          <p className="text-red-600 text-xs sm:text-sm mt-2 flex items-center gap-1">
-            ⚠️ {error}
+          <p className="text-red-600 text-sm mt-2 flex items-center gap-1">
+            <span>⚠️</span> {error}
           </p>
         )}
       </div>
 
-      {/* КНОПКИ */}
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+      <div className="flex gap-3">
         <button
           type="submit"
           disabled={loading || !text.trim()}
-          className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm sm:text-base bg-primary text-white rounded-lg disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           <SendIcon />
           {loading ? 'Отправка...' : 'Отправить'}
         </button>
-
         <button
           type="button"
           onClick={onCancel}
           disabled={loading}
-          className="px-4 py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg"
+          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
         >
           Отмена
         </button>
