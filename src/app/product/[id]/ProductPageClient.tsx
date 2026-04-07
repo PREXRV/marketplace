@@ -331,14 +331,16 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                   alt={mainImageAlt}
                   className="w-full h-64 sm:h-96 lg:h-[500px] object-contain transition-transform duration-500 group-hover:scale-105 cursor-pointer rounded-xl"
                   onClick={() => setLightboxOpen(true)}
-                  onError={e => { (e.currentTarget as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23ddd' width='400' height='400'/%3E%3Ctext fill='%23999' font-size='40' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3E📷%3C/text%3E%3C/svg%3E"; }}
+                  onError={e => {
+                    (e.currentTarget as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23ddd' width='400' height='400'/%3E%3Ctext fill='%23999' font-size='40' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3E📷%3C/text%3E%3C/svg%3E";
+                  }}
                 />
 
                 {selectedVariant && (
                   <div className="absolute top-2 left-2 sm:top-4 sm:left-4 bg-blue-500 text-white px-2 py-1 sm:px-3 rounded-lg text-xs sm:text-sm font-medium">{selectedVariant.name}</div>
                 )}
 
-                {/* Кнопка лупы — скрыта на мобайле (тап сам открывает) */}
+                {/* Кнопка лупы — скрыта на мобайле */}
                 <button
                   onClick={() => setLightboxOpen(true)}
                   className="hidden sm:flex absolute bottom-4 right-4 bg-black/50 hover:bg-opacity-70 text-white p-3 rounded-full transition opacity-0 group-hover:opacity-100"
@@ -375,7 +377,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </div>
             </div>
 
-            {/* МИНИАТЮРЫ — горизонтальный скролл на мобайле */}
+            {/* МИНИАТЮРЫ */}
             {normalizedGalleryImages.length > 1 && !selectedVariant && (
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-3 py-3 sm:px-8 sm:py-4 mb-3">
                 <div className="flex gap-2 sm:gap-4 overflow-x-auto scroll-smooth snap-x scrollbar-hide">
@@ -396,7 +398,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
             {/* ВИДЕО */}
             {product.videos && product.videos.length > 0 && (
               <div className="mt-3">
-                <div className="bg-white rounded-2xl p-3 sm:p-6 mb-3 shadow-lg relative group">
+                <div className="bg-white rounded-2xl p-3 sm:p-6 mb-3 shadow-lg">
                   <div className="relative overflow-hidden rounded-xl">
                     <video
                       key={selectedVideoIndex}
@@ -421,10 +423,16 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                         >
                           {video.thumbnail_url
                             ? <img src={getImageUrl(video.thumbnail_url)} alt={video.title || `Видео ${idx + 1}`} className="w-full h-full object-cover" />
-                            : <div className="w-full h-full bg-gray-200 flex items-center justify-center"><svg className="w-6 h-6 text-gray-400 fill-current" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" /></svg></div>
+                            : <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                <svg className="w-6 h-6 text-gray-400 fill-current" viewBox="0 0 20 20">
+                                  <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+                                </svg>
+                              </div>
                           }
-                          <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <svg className="w-6 h-6 text-white fill-current" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" /></svg>
+                          <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                            <svg className="w-6 h-6 text-white fill-current" viewBox="0 0 20 20">
+                              <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                            </svg>
                           </div>
                         </button>
                       ))}
@@ -492,7 +500,9 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                         <div key={attr.id} className="flex justify-between items-center py-1.5 px-2 hover:bg-blue-50 rounded-lg transition">
                           <span className="text-gray-600 text-sm">{attr.attribute_name}</span>
                           <span className="font-medium flex items-center gap-2 text-sm">
-                            {attr.color_code && <span className="w-5 h-5 rounded-full border-2 border-gray-300 inline-block shadow-sm" style={{ backgroundColor: attr.color_code }} title={attr.value} />}
+                            {attr.color_code && (
+                              <span className="w-5 h-5 rounded-full border-2 border-gray-300 inline-block shadow-sm" style={{ backgroundColor: attr.color_code }} title={attr.value} />
+                            )}
                             {attr.value}
                           </span>
                         </div>
@@ -574,7 +584,9 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                         className={`w-full flex items-center justify-between p-3 sm:p-4 border-2 rounded-lg transition-all gap-3 ${selectedVariant?.id === variant.id ? 'border-primary bg-blue-50 shadow-md' : 'border-gray-200 hover:border-primary'}`}
                       >
                         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                          {variantThumb && <img src={variantThumb} alt={variant.name} className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-lg border-2 border-gray-200 flex-shrink-0" />}
+                          {variantThumb && (
+                            <img src={variantThumb} alt={variant.name} className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-lg border-2 border-gray-200 flex-shrink-0" />
+                          )}
                           <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${selectedVariant?.id === variant.id ? 'bg-primary' : 'bg-gray-300'}`} />
                           <span className="font-medium text-sm sm:text-lg truncate">{variant.name}</span>
                         </div>
@@ -586,7 +598,9 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                         <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
                           <div className="text-right">
                             <span className="font-bold text-primary text-sm sm:text-lg">{formatPrice(variantFinalPrice)}</span>
-                            {variantDiscount > 0 && <div className="text-xs text-gray-400 line-through">{formatPrice(variantOriginalPrice)}</div>}
+                            {variantDiscount > 0 && (
+                              <div className="text-xs text-gray-400 line-through">{formatPrice(variantOriginalPrice)}</div>
+                            )}
                           </div>
                           <span className={`text-xs font-medium ${variant.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
                             {variant.stock > 0 ? `${variant.stock} шт.` : 'Нет'}
@@ -634,7 +648,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </div>
             )}
 
-            {/* КНОПКА ДОБАВИТЬ В КОРЗИНУ */}
+            {/* КНОПКА В КОРЗИНУ */}
             <div className="space-y-3 mb-4">
               <button
                 onClick={handleAddToCart}
@@ -664,7 +678,12 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
 
             {/* ССЫЛКИ */}
             <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 mt-3">
-              {[{ href: '/docs/returns', label: 'Возврат' }, { href: '/docs/delivery', label: 'Доставка' }, { href: '/docs/payment', label: 'Оплата' }, { href: '/docs/terms', label: 'Условия' }].map(({ href, label }) => (
+              {[
+                { href: '/docs/returns', label: 'Возврат' },
+                { href: '/docs/delivery', label: 'Доставка' },
+                { href: '/docs/payment', label: 'Оплата' },
+                { href: '/docs/terms', label: 'Условия' },
+              ].map(({ href, label }) => (
                 <Link key={href} href={href} target="_blank" className="text-xs text-gray-500 hover:text-primary hover:underline transition">{label}</Link>
               ))}
             </div>
@@ -745,11 +764,21 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
           </button>
           {!selectedVariant && normalizedGalleryImages.length > 1 && (
             <>
-              <button onClick={e => { e.stopPropagation(); setSelectedImage(p => (p - 1 + normalizedGalleryImages.length) % normalizedGalleryImages.length); }} className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-opacity-90 text-white p-2 sm:p-4 rounded-full transition z-10">
-                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+              <button
+                onClick={e => { e.stopPropagation(); setSelectedImage(p => (p - 1 + normalizedGalleryImages.length) % normalizedGalleryImages.length); }}
+                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-opacity-90 text-white p-2 sm:p-4 rounded-full transition z-10"
+              >
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
               </button>
-              <button onClick={e => { e.stopPropagation(); setSelectedImage(p => (p + 1) % normalizedGalleryImages.length); }} className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-opacity-90 text-white p-2 sm:p-4 rounded-full transition z-10">
-                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              <button
+                onClick={e => { e.stopPropagation(); setSelectedImage(p => (p + 1) % normalizedGalleryImages.length); }}
+                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-opacity-90 text-white p-2 sm:p-4 rounded-full transition z-10"
+              >
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </button>
             </>
           )}
