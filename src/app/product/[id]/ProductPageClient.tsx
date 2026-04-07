@@ -105,7 +105,7 @@ function uniqueBy<T>(items: T[], keyGetter: (item: T) => string | null | undefin
 }
 
 export default function ProductPageClient({ productId, initialProduct }: Props) {
-  // ✅ Защита от SSR: на сервере ничего не рендерим
+  // Защита от SSR: на сервере ничего не рендерим
   if (typeof window === 'undefined') {
     return null;
   }
@@ -384,12 +384,19 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
     );
   }
 
-  // Безопасное определение активной распродажи
+  // Исправленное определение активной распродажи — проверяем оба поля
   const hasActiveTimedSale = (() => {
-    if (!product.sale_end_date) return false;
-    const endDate = new Date(product.sale_end_date);
-    if (isNaN(endDate.getTime())) return false;
-    return endDate > new Date();
+    // Проверяем по product.sale_end_date
+    if (product.sale_end_date) {
+      const endDate = new Date(product.sale_end_date);
+      if (!isNaN(endDate.getTime()) && endDate > new Date()) return true;
+    }
+    // Проверяем по product.active_sale.end_date
+    if (product.active_sale?.end_date) {
+      const endDate = new Date(product.active_sale.end_date);
+      if (!isNaN(endDate.getTime()) && endDate > new Date()) return true;
+    }
+    return false;
   })();
 
   const discountPercentage = currentOldPrice
@@ -462,7 +469,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
           </div>
         )}
 
-        {hasActiveTimedSale && (
+        {hasActiveTimedSale && product.sale_end_date && (
           <div className="mb-8">
             <CountdownTimer endDate={product.sale_end_date!} />
           </div>
@@ -793,16 +800,16 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               )}
             </div>
 
-            {/* Блок цены и скидки (исправлена ошибка типа string > number) */}
+            {/* Блок цены и скидки — теперь всегда показывает старую цену при активной акции */}
             <div className="mb-6 p-4 md:p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
               {(() => {
                 let displayOldPrice = currentOldPrice && parseFloat(currentOldPrice) > parseFloat(currentPrice) ? currentOldPrice : null;
                 let displayDiscountPercent = discountPercentage;
                 let displaySavings = savingsAmount;
 
-                // Если нет старой цены, но есть активная акция – вычисляем по её проценту
-                if (!displayOldPrice && hasActiveTimedSale && product.active_sale?.discount_value) {
-                  // 🔧 ИСПРАВЛЕНИЕ: преобразуем discount_value в число
+                // Если нет старой цены, но есть активная акция (через active_sale или sale_end_date)
+                const isAnySaleActive = hasActiveTimedSale || (product.active_sale && product.active_sale.discount_value);
+                if (!displayOldPrice && isAnySaleActive && product.active_sale?.discount_value) {
                   const discountPercentFromSale = Number(product.active_sale.discount_value);
                   const currentPriceNum = parseFloat(currentPrice);
                   if (!isNaN(currentPriceNum) && !isNaN(discountPercentFromSale) && discountPercentFromSale > 0) {
