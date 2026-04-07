@@ -915,7 +915,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                             : 'border-gray-200 hover:border-primary'
                         }`}
                       >
-                        <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto">
+                        <div className="flex items-center gap-0 min-w-0 w-full sm:w-auto">
                           {variant.image_url && (
                             <img
                               src={variantThumb}
@@ -929,7 +929,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                           <span className="font-medium text-base md:text-lg truncate">{variant.name}</span>
                         </div>
 
-                        <div className="flex flex-wrap gap-2 justify-start sm:justify-center w-full sm:w-auto mt-2 sm:mt-0">
+                        {/*<div className="flex flex-wrap gap-2 justify-start sm:justify-center w-full sm:w-auto mt-2 sm:mt-0">
                           {variant.color && (
                             <span className="text-xs md:text-sm text-gray-600 bg-gray-100 px-2 py-1 md:px-3 md:py-1 rounded-full">
                               {variant.color}
@@ -940,7 +940,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                               {variant.size}
                             </span>
                           )}
-                        </div>
+                        </div>*/}
 
                         <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-between sm:justify-end mt-2 sm:mt-0">
                           <div className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
