@@ -15,32 +15,29 @@ interface Review {
 }
 
 export default function ReviewCard({ review }: { review: Review }) {
-  const { user } = useAuth(); // ✅ Берем текущего пользователя из контекста
+  const { user } = useAuth();
 
-  // ✅ Если это отзыв текущего пользователя - берем аватар из контекста (актуальный!)
   const avatarUrl = review.user_id === user?.id 
     ? (user.avatar_url || user.avatar || '/default-avatar.png')
     : (review.user_avatar || '/default-avatar.png');
-  
 
   return (
-    <div className="bg-white rounded-lg shadow p-4 mb-4">
-      <div className="flex items-start gap-4">
-        {/* ✅ АВАТАР - обновляется автоматически */}
+    <div className="bg-white rounded-lg shadow p-3 md:p-4 mb-3 md:mb-4">
+      <div className="flex items-start gap-3 md:gap-4">
+        {/* Аватар */}
         <Image
           src={avatarUrl}
           alt={review.user_name}
-          width={48}
-          height={48}
-          className="rounded-full object-cover"
+          width={40}
+          height={40}
+          className="rounded-full object-cover w-10 h-10 md:w-12 md:h-12"
           unoptimized
         />
         
-        <div className="flex-1">
-          {/* Имя и рейтинг */}
-          <div className="flex items-center justify-between mb-2">
-            <h4 className="font-semibold text-gray-900">{review.user_name}</h4>
-            <div className="flex items-center gap-1">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between mb-1 md:mb-2 flex-wrap gap-1">
+            <h4 className="font-semibold text-gray-900 text-sm md:text-base truncate">{review.user_name}</h4>
+            <div className="flex items-center gap-0.5">
               {[...Array(5)].map((_, i) => (
                 <span key={i} className={i < review.rating ? 'text-yellow-400' : 'text-gray-300'}>
                   ★
@@ -49,25 +46,22 @@ export default function ReviewCard({ review }: { review: Review }) {
             </div>
           </div>
           
-          {/* Комментарий */}
-          <p className="text-gray-700 mb-2">{review.comment}</p>
+          <p className="text-gray-700 mb-1 md:mb-2 text-sm md:text-base break-words">{review.comment}</p>
           
-          {/* Дата */}
-          <p className="text-sm text-gray-500">
+          <p className="text-xs md:text-sm text-gray-500">
             {new Date(review.created_at).toLocaleDateString('ru-RU')}
           </p>
           
-          {/* Изображения (если есть) */}
           {review.images && review.images.length > 0 && (
-            <div className="flex gap-2 mt-3">
+            <div className="flex gap-2 mt-3 flex-wrap">
               {review.images.map((img, idx) => (
                 <Image
                   key={idx}
                   src={img}
                   alt={`Review image ${idx + 1}`}
-                  width={100}
-                  height={100}
-                  className="rounded-lg object-cover"
+                  width={80}
+                  height={80}
+                  className="rounded-lg object-cover w-16 h-16 md:w-20 md:h-20"
                   unoptimized
                 />
               ))}
