@@ -21,7 +21,7 @@ export default function PartnershipLayout({ children }: { children: React.ReactN
           </aside>
 
           {/* Мобильная кнопка бургер */}
-          <div className="md:hidden sticky top-20 z-30 bg-white/80 backdrop-blur-sm p-2 rounded-lg">
+          <div className="inline-flex items-center md:hidden sticky top-20 z-30 bg-white/80 backdrop-blur-sm p-2 rounded-lg">
             <button
               onClick={() => setMobileSidebarOpen(true)}
               className="flex items-center gap-2 px-3 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium"
