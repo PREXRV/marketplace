@@ -410,7 +410,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
     <div className="min-h-screen bg-gray-50">
       <Header />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4 md:py-8">
         <div className="mb-6 text-sm text-gray-600 flex items-center gap-2 flex-wrap">
           <a href="/" className="hover:text-primary transition">Главная</a>
           <span>›</span>
@@ -459,21 +459,21 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
           {/* ===== ЛЕВАЯ КОЛОНКА: галерея ===== */}
           <div>
-            <div className="bg-white rounded-2xl p-6 mb-4 shadow-lg relative group">
+            <div className="bg-white rounded-2xl p-4 md:p-6 mb-4 shadow-lg relative group">
               <div className="relative">
                 <div className="absolute top-0 left-0 z-10 flex flex-col gap-2 items-start">
                   {product.is_new && (
-                    <div className="bg-green-500 text-white px-4 py-2 rounded-br-2xl rounded-tl-2xl font-bold text-lg shadow-lg">
+                    <div className="bg-green-500 text-white px-3 py-1 md:px-4 md:py-2 rounded-br-2xl rounded-tl-2xl font-bold text-sm md:text-lg shadow-lg">
                       NEW
                     </div>
                   )}
 
                   {discountPercentage > 0 && (
                     <div
-                      className={`px-4 py-2 rounded-lg font-bold text-lg shadow-lg ${
+                      className={`px-3 py-1 md:px-4 md:py-2 rounded-lg font-bold text-sm md:text-lg shadow-lg ${
                         hasActiveTimedSale
                           ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white animate-pulse'
                           : 'bg-red-500 text-white'
@@ -484,7 +484,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                   )}
                 </div>
 
-                <div className="absolute top-4 right-4 z-20" onClick={(e) => e.stopPropagation()}>
+                <div className="absolute top-2 right-2 md:top-4 md:right-4 z-20" onClick={(e) => e.stopPropagation()}>
                   <FavoriteButton productId={product.id} size="lg" />
                 </div>
 
@@ -492,7 +492,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                   <img
                     src={imageUrl}
                     alt={mainImageAlt}
-                    className="w-full h-[500px] object-contain transition-transform duration-500 group-hover:scale-110 cursor-pointer"
+                    className="w-full h-[300px] md:h-[500px] object-contain transition-transform duration-500 group-hover:scale-110 cursor-pointer"
                     onClick={() => setLightboxOpen(true)}
                     onError={(e) => {
                       e.currentTarget.src =
@@ -501,16 +501,16 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                   />
 
                   {selectedVariant && (
-                    <div className="absolute top-4 left-4 bg-blue-500 text-white px-3 py-1 rounded-lg text-sm font-medium">
+                    <div className="absolute top-4 left-4 bg-blue-500 text-white px-2 py-1 md:px-3 md:py-1 rounded-lg text-xs md:text-sm font-medium">
                       {selectedVariant.name}
                     </div>
                   )}
 
                   <button
                     onClick={() => setLightboxOpen(true)}
-                    className="absolute bottom-4 right-4 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition opacity-0 group-hover:opacity-100"
+                    className="absolute bottom-4 right-4 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 md:p-3 rounded-full transition opacity-0 group-hover:opacity-100"
                   >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                     </svg>
                   </button>
@@ -522,9 +522,9 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                           e.stopPropagation();
                           setSelectedImage((p) => (p - 1 + normalizedGalleryImages.length) % normalizedGalleryImages.length);
                         }}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition z-10"
+                        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 md:p-3 rounded-full transition z-10"
                       >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                       </button>
@@ -534,14 +534,14 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                           e.stopPropagation();
                           setSelectedImage((p) => (p + 1) % normalizedGalleryImages.length);
                         }}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition z-10"
+                        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 md:p-3 rounded-full transition z-10"
                       >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                         </svg>
                       </button>
 
-                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-full text-sm font-medium">
+                      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black bg-opacity-70 text-white px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium">
                         {selectedImage + 1} / {normalizedGalleryImages.length}
                       </div>
                     </>
@@ -551,13 +551,13 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
             </div>
 
             {normalizedGalleryImages.length > 1 && !selectedVariant && (
-              <div className="py-8 pl-8 pr-4 bg-white/80 backdrop-blur-sm rounded-2xl">
-                <div className="pl-4 flex gap-4 overflow-x-auto overflow-y-hidden scroll-smooth snap-x scrollbar-hide -my-2">
+              <div className="py-4 md:py-8 pl-2 pr-2 md:pl-8 md:pr-4 bg-white/80 backdrop-blur-sm rounded-2xl">
+                <div className="pl-2 md:pl-4 flex gap-3 md:gap-4 overflow-x-auto overflow-y-hidden scroll-smooth snap-x scrollbar-hide -my-2">
                   {normalizedGalleryImages.map((img, idx) => (
                     <button
                       key={idx}
                       onClick={() => setSelectedImage(idx)}
-                      className={`relative flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden border-4 shadow-md transition-all duration-300 snap-center group my-2 ${
+                      className={`relative flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-4 shadow-md transition-all duration-300 snap-center group my-2 ${
                         selectedImage === idx
                           ? 'border-primary scale-110 shadow-[0_2px_5px_rgba(0,0,0,0.25)]'
                           : 'border-gray-200 hover:border-primary hover:scale-105'
@@ -579,7 +579,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
 
             {product.videos && product.videos.length > 0 && (
               <div className="mt-4">
-                <div className="bg-white rounded-2xl p-6 mb-4 shadow-lg relative group">
+                <div className="bg-white rounded-2xl p-4 md:p-6 mb-4 shadow-lg relative group">
                   <div className="relative overflow-hidden rounded-xl">
                     <video
                       key={selectedVideoIndex}
@@ -589,14 +589,14 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                         ''
                       )}
                       controls
-                      className="w-full h-[500px] object-contain"
+                      className="w-full h-[300px] md:h-[500px] object-contain"
                       poster={(product.videos[selectedVideoIndex] as any)?.thumbnail_url || imageUrl}
                     >
                       Ваш браузер не поддерживает видео.
                     </video>
 
                     {(product.videos[selectedVideoIndex] as any)?.title && (
-                      <div className="absolute top-4 left-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-lg text-sm font-medium">
+                      <div className="absolute top-4 left-4 bg-black bg-opacity-50 text-white px-2 py-1 md:px-3 md:py-1 rounded-lg text-xs md:text-sm font-medium">
                         {(product.videos[selectedVideoIndex] as any).title}
                       </div>
                     )}
@@ -608,9 +608,9 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                             e.stopPropagation();
                             setSelectedVideoIndex((p) => (p - 1 + (product.videos?.length ?? 0)) % (product.videos?.length ?? 1));
                           }}
-                          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition z-10"
+                          className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 md:p-3 rounded-full transition z-10"
                         >
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                           </svg>
                         </button>
@@ -620,9 +620,9 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                             e.stopPropagation();
                             setSelectedVideoIndex((p) => (p + 1) % (product.videos?.length ?? 1));
                           }}
-                          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full transition z-10"
+                          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-2 md:p-3 rounded-full transition z-10"
                         >
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         </button>
@@ -632,13 +632,13 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                 </div>
 
                 {product.videos.length > 1 && (
-                  <div className="py-8 pl-8 pr-4 bg-white/80 backdrop-blur-sm rounded-2xl">
-                    <div className="pl-4 flex gap-4 overflow-x-auto overflow-y-hidden scroll-smooth snap-x scrollbar-hide -my-2">
+                  <div className="py-4 md:py-8 pl-2 pr-2 md:pl-8 md:pr-4 bg-white/80 backdrop-blur-sm rounded-2xl">
+                    <div className="pl-2 md:pl-4 flex gap-3 md:gap-4 overflow-x-auto overflow-y-hidden scroll-smooth snap-x scrollbar-hide -my-2">
                       {product.videos.map((video: any, idx: number) => (
                         <button
                           key={video.id || idx}
                           onClick={() => setSelectedVideoIndex(idx)}
-                          className={`relative flex-shrink-0 w-20 h-20 rounded-2xl overflow-hidden border-4 shadow-md transition-all duration-300 snap-center group my-2 ${
+                          className={`relative flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden border-4 shadow-md transition-all duration-300 snap-center group my-2 ${
                             selectedVideoIndex === idx
                               ? 'border-primary scale-110 shadow-[0_2px_5px_rgba(0,0,0,0.25)]'
                               : 'border-gray-200 hover:border-primary hover:scale-105'
@@ -652,14 +652,14 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                             />
                           ) : (
                             <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                              <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                              <svg className="w-6 h-6 md:w-8 md:h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
                               </svg>
                             </div>
                           )}
 
                           <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-6 h-6 md:w-8 md:h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
                               <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                             </svg>
                           </div>
@@ -680,35 +680,35 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
           <div>
             <div className="flex gap-2 mb-6 flex-wrap">
               {product.is_new && (
-                <span className="bg-green-500 text-white px-4 py-2 rounded-full text-sm font-bold">NEW</span>
+                <span className="bg-green-500 text-white px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold">NEW</span>
               )}
               {product.is_featured && (
-                <span className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-bold">ХИТ ПРОДАЖ</span>
+                <span className="bg-blue-500 text-white px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold">ХИТ ПРОДАЖ</span>
               )}
               {hasActiveTimedSale && (
-                <span className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 py-2 rounded-full text-sm font-bold animate-pulse">
+                <span className="bg-gradient-to-r from-red-500 to-orange-500 text-white px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold animate-pulse">
                   ⚡ АКЦИЯ
                 </span>
               )}
             </div>
 
-            <h1 className="text-4xl font-bold mb-6 text-gray-900">{product.name}</h1>
+            <h1 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6 text-gray-900">{product.name}</h1>
 
-            <div className="mb-6 p-6 bg-white rounded-xl shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Купить на маркетплейсах:</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="mb-6 p-4 md:p-6 bg-white rounded-xl shadow-sm">
+              <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Купить на маркетплейсах:</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
                 {product.wildberries_url ? (
                   <a
                     href={product.wildberries_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex flex-col items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 bg-purple-600 hover:bg-purple-700 text-white shadow-md hover:shadow-lg transform hover:scale-105"
+                    className="flex flex-col items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 bg-purple-600 hover:bg-purple-700 text-white shadow-md hover:shadow-lg transform hover:scale-105 text-sm md:text-base"
                   >
-                    <span className="text-sm">Wildberries</span>
+                    <span>Wildberries</span>
                   </a>
                 ) : (
-                  <div className="flex flex-col items-center gap-2 px-4 py-3 rounded-lg font-medium bg-gray-200 text-gray-400 cursor-not-allowed opacity-50">
-                    <span className="text-sm">Wildberries</span>
+                  <div className="flex flex-col items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium bg-gray-200 text-gray-400 cursor-not-allowed opacity-50 text-sm md:text-base">
+                    <span>Wildberries</span>
                   </div>
                 )}
 
@@ -717,31 +717,31 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                     href={(product as any).aliexpress_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex flex-col items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all duration-200 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white shadow-md hover:shadow-lg transform hover:scale-105"
+                    className="flex flex-col items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium transition-all duration-200 bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white shadow-md hover:shadow-lg transform hover:scale-105 text-sm md:text-base"
                   >
-                    <span className="text-sm">AliExpress</span>
+                    <span>AliExpress</span>
                   </a>
                 ) : (
-                  <div className="flex flex-col items-center gap-2 px-4 py-3 rounded-lg font-medium bg-gray-200 text-gray-400 cursor-not-allowed opacity-50">
-                    <span className="text-sm">AliExpress</span>
+                  <div className="flex flex-col items-center gap-2 px-3 py-2 md:px-4 md:py-3 rounded-lg font-medium bg-gray-200 text-gray-400 cursor-not-allowed opacity-50 text-sm md:text-base">
+                    <span>AliExpress</span>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="mb-6 p-6 bg-white rounded-xl shadow-sm">
-              <h3 className="border-b mb-4 pb-4 font-semibold text-lg flex items-center gap-2">
+            <div className="mb-6 p-4 md:p-6 bg-white rounded-xl shadow-sm">
+              <h3 className="border-b mb-3 md:mb-4 pb-3 md:pb-4 font-semibold text-base md:text-lg flex items-center gap-2">
                 Информация о товаре
               </h3>
 
-              <div className="space-y-3 mb-4 pb-4 text-sm border-b">
-                <div className="text-base pl-4 pr-4 flex justify-between items-center py-2 hover:bg-blue-50 rounded-lg transition">
+              <div className="space-y-2 md:space-y-3 mb-3 md:mb-4 pb-3 md:pb-4 text-sm border-b">
+                <div className="text-sm md:text-base pl-2 md:pl-4 pr-2 md:pr-4 flex justify-between items-center py-1 md:py-2 hover:bg-blue-50 rounded-lg transition">
                   <span className="text-gray-600">Артикул:</span>
                   <span className="font-medium">{selectedVariant?.sku || product.sku}</span>
                 </div>
 
                 {product.category_name && (
-                  <div className="text-base pl-4 pr-4 flex justify-between items-center py-2 hover:bg-blue-50 rounded-lg transition">
+                  <div className="text-sm md:text-base pl-2 md:pl-4 pr-2 md:pr-4 flex justify-between items-center py-1 md:py-2 hover:bg-blue-50 rounded-lg transition">
                     <span className="text-gray-600">Категория:</span>
                     <span className="font-medium">{product.category_name}</span>
                   </div>
@@ -749,9 +749,9 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </div>
 
               {product.description && (
-                <div className="mb-4 pb-4 border-b">
-                  <h4 className="font-semibold text-gray-800 mb-3">Описание</h4>
-                  <div className="pl-4 pr-4 py-2 hover:bg-blue-50 rounded-lg transition">
+                <div className="mb-3 md:mb-4 pb-3 md:pb-4 border-b">
+                  <h4 className="font-semibold text-gray-800 mb-2 md:mb-3">Описание</h4>
+                  <div className="pl-2 md:pl-4 pr-2 md:pr-4 py-1 md:py-2 hover:bg-blue-50 rounded-lg transition text-sm md:text-base">
                     {product.description}
                   </div>
                 </div>
@@ -759,18 +759,18 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
 
               {product.attributes && product.attributes.length > 0 && (
                 <div className="mb-4">
-                  <h4 className="font-semibold text-gray-800 mb-3">Характеристики</h4>
-                  <div className="space-y-3">
+                  <h4 className="font-semibold text-gray-800 mb-2 md:mb-3">Характеристики</h4>
+                  <div className="space-y-2 md:space-y-3">
                     {product.attributes.map((attr) => (
                       <div
                         key={attr.id}
-                        className="pl-4 pr-4 flex justify-between items-center py-2 hover:bg-blue-50 rounded-lg transition"
+                        className="pl-2 md:pl-4 pr-2 md:pr-4 flex justify-between items-center py-1 md:py-2 hover:bg-blue-50 rounded-lg transition text-sm md:text-base"
                       >
                         <span className="text-gray-600">{attr.attribute_name}:</span>
                         <span className="font-medium flex items-center gap-2">
                           {attr.color_code && (
                             <span
-                              className="w-6 h-6 rounded-full border-2 border-gray-300 inline-block shadow-sm"
+                              className="w-5 h-5 md:w-6 md:h-6 rounded-full border-2 border-gray-300 inline-block shadow-sm"
                               style={{ backgroundColor: attr.color_code }}
                               title={attr.value}
                             />
@@ -784,15 +784,15 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               )}
             </div>
 
-            <div className="mb-6 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
-              <div className="flex items-center gap-4 mb-3 flex-wrap">
-                <span className="text-5xl font-bold text-primary">{formatPrice(currentPrice)} ₽</span>
+            <div className="mb-6 p-4 md:p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
+              <div className="flex items-center gap-2 md:gap-4 mb-3 flex-wrap">
+                <span className="text-3xl md:text-5xl font-bold text-primary">{formatPrice(currentPrice)} ₽</span>
 
                 {currentOldPrice && parseFloat(currentOldPrice) > parseFloat(currentPrice) && (
                   <>
-                    <span className="text-2xl text-gray-400 line-through">{formatPrice(currentOldPrice)} ₽</span>
+                    <span className="text-xl md:text-2xl text-gray-400 line-through">{formatPrice(currentOldPrice)} ₽</span>
                     <span
-                      className={`px-4 py-2 rounded-full text-sm font-bold shadow-lg ${
+                      className={`px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold shadow-lg ${
                         hasActiveTimedSale
                           ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white animate-pulse'
                           : 'bg-red-500 text-white'
@@ -805,15 +805,15 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </div>
 
               {savingsAmount > 0 && (
-                <div className="bg-green-50 border-2 border-green-200 text-green-700 px-4 py-3 rounded-lg inline-flex items-center gap-2">
+                <div className="bg-green-50 border-2 border-green-200 text-green-700 px-3 py-2 md:px-4 md:py-3 rounded-lg inline-flex items-center gap-2 text-sm md:text-base">
                   <span className="font-semibold">Вы экономите {formatPrice(savingsAmount)} ₽</span>
                 </div>
               )}
             </div>
 
             {product.variants && product.variants.length > 0 && (
-              <div className="mb-6 bg-white p-6 rounded-xl shadow-sm">
-                <h3 className="font-semibold text-lg mb-4">Выберите вариант:</h3>
+              <div className="mb-6 bg-white p-4 md:p-6 rounded-xl shadow-sm">
+                <h3 className="font-semibold text-base md:text-lg mb-3 md:mb-4">Выберите вариант:</h3>
 
                 {colors.length > 0 && (
                   <div className="mb-4">
@@ -823,7 +823,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                         <button
                           key={`color-${variant.id}`}
                           onClick={() => handleVariantSelect(variant)}
-                          className={`px-4 py-2 rounded-lg border-2 transition-all ${
+                          className={`px-3 py-1 md:px-4 md:py-2 rounded-lg border-2 transition-all text-sm md:text-base ${
                             selectedVariant?.id === variant.id
                               ? 'border-primary bg-primary text-white shadow-lg scale-105'
                               : 'border-gray-300 hover:border-primary hover:scale-105'
@@ -844,7 +844,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                         <button
                           key={`size-${variant.id}`}
                           onClick={() => handleVariantSelect(variant)}
-                          className={`px-4 py-2 rounded-lg border-2 transition-all ${
+                          className={`px-3 py-1 md:px-4 md:py-2 rounded-lg border-2 transition-all text-sm md:text-base ${
                             selectedVariant?.id === variant.id
                               ? 'border-primary bg-primary text-white shadow-lg scale-105'
                               : 'border-gray-300 hover:border-primary hover:scale-105'
@@ -869,18 +869,18 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                       <button
                         key={variant.id}
                         onClick={() => handleVariantSelect(variant)}
-                        className={`w-full flex items-center justify-between p-4 border-2 rounded-lg transition-all gap-4 ${
+                        className={`w-full flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 md:p-4 border-2 rounded-lg transition-all gap-3 ${
                           selectedVariant?.id === variant.id
                             ? 'border-primary bg-blue-50 shadow-md'
                             : 'border-gray-200 hover:border-primary'
                         }`}
                       >
-                        <div className="flex items-center gap-3 min-w-0">
+                        <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto">
                           {variant.image_url && (
                             <img
                               src={variantThumb}
                               alt={variant.name}
-                              className="w-12 h-12 object-cover rounded-lg border-2 border-gray-200 flex-shrink-0"
+                              className="w-10 h-10 md:w-12 md:h-12 object-cover rounded-lg border-2 border-gray-200 flex-shrink-0"
                             />
                           )}
 
@@ -888,42 +888,36 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                             selectedVariant?.id === variant.id ? 'bg-primary' : 'bg-gray-300'
                           }`} />
 
-                          <span className="font-medium text-lg truncate">{variant.name}</span>
+                          <span className="font-medium text-base md:text-lg truncate">{variant.name}</span>
                         </div>
 
-                        <div className="flex gap-2 flex-wrap justify-center">
+                        <div className="flex flex-wrap gap-2 justify-start sm:justify-center w-full sm:w-auto mt-2 sm:mt-0">
                           {variant.color && (
-                            <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                            <span className="text-xs md:text-sm text-gray-600 bg-gray-100 px-2 py-1 md:px-3 md:py-1 rounded-full">
                               {variant.color}
                             </span>
                           )}
                           {variant.size && (
-                            <span className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                            <span className="text-xs md:text-sm text-gray-600 bg-gray-100 px-2 py-1 md:px-3 md:py-1 rounded-full">
                               {variant.size}
                             </span>
                           )}
                           {variantDiscount > 0 && (
-                            <span className="text-sm bg-red-500 text-white px-3 py-1 rounded-full font-bold">
+                            <span className="text-xs md:text-sm bg-red-500 text-white px-2 py-1 md:px-3 md:py-1 rounded-full font-bold">
                               -{variantDiscount}%
                             </span>
                           )}
                         </div>
 
-                        <div className="flex items-center gap-4 flex-shrink-0">
+                        <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-between sm:justify-end mt-2 sm:mt-0">
                           <div className="flex items-center gap-2 flex-wrap justify-end">
-                            <span className="font-bold text-primary text-lg">{formatPrice(variantFinalPrice)} ₽</span>
+                            <span className="font-bold text-primary text-base md:text-lg">{formatPrice(variantFinalPrice)} ₽</span>
                             {variantDiscount > 0 && (
-                              <span className="text-sm text-gray-400 line-through">
+                              <span className="text-xs md:text-sm text-gray-400 line-through">
                                 {formatPrice(variantOriginalPrice)} ₽
                               </span>
                             )}
                           </div>
-
-                          {/*<span className={`text-sm font-medium ${
-                            variant.stock > 0 ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            {variant.stock > 0 ? `${variant.stock} шт.` : 'Нет'}
-                          </span>*/}
                         </div>
                       </button>
                     );
@@ -933,15 +927,15 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
             )}
 
             {selectedVariant && (
-              <div className="mb-6 p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
+              <div className="mb-6 p-3 md:p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
                 <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span className="font-medium flex-shrink-0">Выбрано:</span>
-                    <span className="font-bold text-primary truncate">{selectedVariant.name}</span>
+                  <div className="flex items-center gap-2 md:gap-3 min-w-0">
+                    <span className="font-medium flex-shrink-0 text-sm md:text-base">Выбрано:</span>
+                    <span className="font-bold text-primary truncate text-sm md:text-base">{selectedVariant.name}</span>
                   </div>
                   <button
                     onClick={handleResetVariant}
-                    className="text-sm text-gray-600 hover:text-red-600 transition flex-shrink-0"
+                    className="text-xs md:text-sm text-gray-600 hover:text-red-600 transition flex-shrink-0"
                   >
                     Сбросить
                   </button>
@@ -949,38 +943,38 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </div>
             )}
 
-            <div className={`mb-6 p-4 border-2 rounded-xl flex items-start gap-4 ${avail.wrapCls}`}>
-              <span className="text-2xl mt-0.5">{avail.icon}</span>
+            <div className={`mb-6 p-3 md:p-4 border-2 rounded-xl flex items-start gap-3 md:gap-4 ${avail.wrapCls}`}>
+              <span className="text-xl md:text-2xl mt-0.5">{avail.icon}</span>
               <div>
-                <p className={`font-bold text-lg ${avail.titleCls}`}>{avail.title}</p>
-                <p className={`text-sm mt-0.5 ${avail.subtitleCls}`}>{avail.subtitle}</p>
+                <p className={`font-bold text-base md:text-lg ${avail.titleCls}`}>{avail.title}</p>
+                <p className={`text-xs md:text-sm mt-0.5 ${avail.subtitleCls}`}>{avail.subtitle}</p>
               </div>
             </div>
 
             {avail.canBuy && (
               <div className="mb-6">
-                <label className="block text-base font-medium text-gray-700 mb-2">Количество</label>
+                <label className="block text-sm md:text-base font-medium text-gray-700 mb-2">Количество</label>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={decrementQuantity}
-                    className="w-12 h-12 border-2 border-gray-300 rounded-lg hover:bg-gray-100 transition font-bold text-xl disabled:opacity-50"
+                    className="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 rounded-lg hover:bg-gray-100 transition font-bold text-lg md:text-xl disabled:opacity-50"
                     disabled={quantity <= 1}
                   >
                     -
                   </button>
 
-                  <span className="text-2xl font-bold w-16 text-center">{quantity}</span>
+                  <span className="text-xl md:text-2xl font-bold w-12 md:w-16 text-center">{quantity}</span>
 
                   <button
                     onClick={incrementQuantity}
-                    className="w-12 h-12 border-2 border-gray-300 rounded-lg hover:bg-gray-100 transition font-bold text-xl disabled:opacity-50"
+                    className="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 rounded-lg hover:bg-gray-100 transition font-bold text-lg md:text-xl disabled:opacity-50"
                     disabled={!isOrderType && quantity >= currentStock}
                   >
                     +
                   </button>
 
                   {!isOrderType && (
-                    <span className="text-base text-gray-600 ml-2">{currentStock} шт.</span>
+                    <span className="text-sm md:text-base text-gray-600 ml-2">{currentStock} шт.</span>
                   )}
                 </div>
               </div>
@@ -990,7 +984,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               <button
                 onClick={handleAddToCart}
                 disabled={!avail.canBuy}
-                className={`w-full text-xl py-4 shadow-lg hover:shadow-xl font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`w-full text-lg md:text-xl py-3 md:py-4 shadow-lg hover:shadow-xl font-semibold rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                   avail.canBuy
                     ? (avail.btnCls || (hasActiveTimedSale
                       ? 'bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white'
@@ -1002,24 +996,24 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </button>
             </div>
 
-            <div className="mt-6 bg-white rounded-xl p-6 shadow-sm">
-              <h3 className="font-semibold text-lg mb-4">Поделиться</h3>
-              <div className="flex flex-wrap gap-3">
-                <button onClick={() => handleShare('vk')} className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">
+            <div className="mt-6 bg-white rounded-xl p-4 md:p-6 shadow-sm">
+              <h3 className="font-semibold text-base md:text-lg mb-3 md:mb-4">Поделиться</h3>
+              <div className="flex flex-wrap gap-2 md:gap-3">
+                <button onClick={() => handleShare('vk')} className="px-3 py-1 md:px-4 md:py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition text-sm md:text-base">
                   VK
                 </button>
-                <button onClick={() => handleShare('telegram')} className="px-4 py-2 rounded-lg bg-sky-500 text-white hover:bg-sky-600 transition">
+                <button onClick={() => handleShare('telegram')} className="px-3 py-1 md:px-4 md:py-2 rounded-lg bg-sky-500 text-white hover:bg-sky-600 transition text-sm md:text-base">
                   Telegram
                 </button>
-                <button onClick={() => handleShare('whatsapp')} className="px-4 py-2 rounded-lg bg-green-500 text-white hover:bg-green-600 transition">
+                <button onClick={() => handleShare('whatsapp')} className="px-3 py-1 md:px-4 md:py-2 rounded-lg bg-green-500 text-white hover:bg-green-600 transition text-sm md:text-base">
                   WhatsApp
                 </button>
-                <button onClick={() => handleShare('copy')} className="px-4 py-2 rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300 transition">
+                <button onClick={() => handleShare('copy')} className="px-3 py-1 md:px-4 md:py-2 rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300 transition text-sm md:text-base">
                   Копировать ссылку
                 </button>
               </div>
 
-              <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-4">
+              <div className="flex flex-wrap justify-center gap-x-3 md:gap-x-4 gap-y-1 mt-4">
                 {[
                   { href: '/docs/returns', label: 'Возврат' },
                   { href: '/docs/delivery', label: 'Доставка' },
@@ -1040,13 +1034,13 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-8 shadow-lg mb-12 mt-12">
+        <div className="bg-white rounded-2xl p-4 md:p-8 shadow-lg mb-8 md:mb-12 mt-8 md:mt-12">
           <ReviewGallery productId={product.id} />
         </div>
 
-        <div className="bg-white rounded-2xl p-8 shadow-lg mb-12">
-          <h2 className="text-3xl font-bold mb-8 flex items-center gap-3">
-            <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white rounded-2xl p-4 md:p-8 shadow-lg mb-8 md:mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8 flex items-center gap-3">
+            <svg className="w-6 h-6 md:w-8 md:h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
             Отзывы
@@ -1054,7 +1048,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
           <ReviewList productId={product.id} />
         </div>
 
-        <div className="mt-12">
+        <div className="mt-8 md:mt-12">
           <ReviewForm productId={product.id} onSuccess={() => window.location.reload()} />
         </div>
 
@@ -1069,34 +1063,34 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
       {/* ===== STICKY BAR ===== */}
       {showStickyBar && (
         <div className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl border-t-2 border-gray-200 z-40 animate-slide-up">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4 min-w-0">
+          <div className="container mx-auto px-3 md:px-4 py-3 md:py-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 md:gap-4">
+              <div className="flex items-center gap-3 md:gap-4 min-w-0 w-full sm:w-auto">
                 <img
                   src={imageUrl}
                   alt={product.name}
-                  className="w-16 h-16 object-cover rounded-lg border-2 border-gray-200 flex-shrink-0"
+                  className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg border-2 border-gray-200 flex-shrink-0"
                 />
                 <div className="min-w-0">
-                  <h3 className="font-bold text-lg line-clamp-1">{product.name}</h3>
-                  <p className="text-2xl font-bold text-primary">{formatPrice(currentPrice)} ₽</p>
+                  <h3 className="font-bold text-sm md:text-lg line-clamp-1">{product.name}</h3>
+                  <p className="text-lg md:text-2xl font-bold text-primary">{formatPrice(currentPrice)} ₽</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 md:gap-3 w-full sm:w-auto justify-between sm:justify-end">
                 {avail.canBuy && (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 md:gap-2">
                     <button
                       onClick={decrementQuantity}
-                      className="w-10 h-10 border-2 border-gray-300 rounded-lg hover:bg-gray-100 transition font-bold disabled:opacity-50"
+                      className="w-8 h-8 md:w-10 md:h-10 border-2 border-gray-300 rounded-lg hover:bg-gray-100 transition font-bold disabled:opacity-50 text-sm md:text-base"
                       disabled={quantity <= 1}
                     >
                       -
                     </button>
-                    <span className="text-xl font-bold w-12 text-center">{quantity}</span>
+                    <span className="text-base md:text-xl font-bold w-8 md:w-12 text-center">{quantity}</span>
                     <button
                       onClick={incrementQuantity}
-                      className="w-10 h-10 border-2 border-gray-300 rounded-lg hover:bg-gray-100 transition font-bold disabled:opacity-50"
+                      className="w-8 h-8 md:w-10 md:h-10 border-2 border-gray-300 rounded-lg hover:bg-gray-100 transition font-bold disabled:opacity-50 text-sm md:text-base"
                       disabled={!isOrderType && quantity >= currentStock}
                     >
                       +
@@ -1107,7 +1101,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                 <button
                   onClick={handleAddToCart}
                   disabled={!avail.canBuy}
-                  className={`px-8 py-3 text-lg font-semibold rounded-xl transition-all disabled:opacity-50 ${
+                  className={`px-4 py-2 md:px-8 md:py-3 text-sm md:text-lg font-semibold rounded-xl transition-all disabled:opacity-50 ${
                     avail.canBuy
                       ? (hasActiveTimedSale
                         ? 'bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white'
@@ -1131,9 +1125,9 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
         >
           <button
             onClick={() => setLightboxOpen(false)}
-            className="absolute top-4 right-4 text-white hover:text-gray-300 transition z-10 bg-black bg-opacity-50 rounded-full p-2"
+            className="absolute top-2 right-2 md:top-4 md:right-4 text-white hover:text-gray-300 transition z-10 bg-black bg-opacity-50 rounded-full p-2"
           >
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -1145,9 +1139,9 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                   e.stopPropagation();
                   setSelectedImage((p) => (p - 1 + normalizedGalleryImages.length) % normalizedGalleryImages.length);
                 }}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-4 rounded-full transition z-10"
+                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-2 md:p-4 rounded-full transition z-10"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
@@ -1157,9 +1151,9 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                   e.stopPropagation();
                   setSelectedImage((p) => (p + 1) % normalizedGalleryImages.length);
                 }}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-4 rounded-full transition z-10"
+                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-2 md:p-4 rounded-full transition z-10"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -1170,7 +1164,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
             <img src={imageUrl} alt={mainImageAlt} className="max-w-full max-h-[95vh] object-contain rounded-lg shadow-2xl" />
           </div>
 
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-full text-sm">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black bg-opacity-70 text-white px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm">
             {selectedVariant ? 'Фото варианта' : `${selectedImage + 1} / ${normalizedGalleryImages.length || 1}`}
           </div>
         </div>
