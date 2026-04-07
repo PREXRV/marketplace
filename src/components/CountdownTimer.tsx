@@ -66,7 +66,8 @@ export default function CountdownTimer({ endDate }: CountdownTimerProps) {
           <div className="text-xl md:text-3xl font-bold">{String(timeLeft.minutes).padStart(2, '0')}</div>
           <div className="text-[10px] md:text-sm opacity-90">минут</div>
         </div>
-        <div className="text-center bg-white bg-opacity-20 rounded-xl p-2 md:p-3">
+        {/* Секунды — скрыты на мобильных, показываются на md+ */}
+        <div className="hidden md:block text-center bg-white bg-opacity-20 rounded-xl p-2 md:p-3">
           <div className="text-xl md:text-3xl font-bold">{String(timeLeft.seconds).padStart(2, '0')}</div>
           <div className="text-[10px] md:text-sm opacity-90">секунд</div>
         </div>

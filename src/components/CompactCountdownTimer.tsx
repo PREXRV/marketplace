@@ -72,12 +72,13 @@ export default function CompactCountdownTimer({ endDate }: CompactCountdownTimer
         <div className="text-[10px] md:text-xs text-white/80">минут</div>
       </div>
       
-      <span className="text-white text-base md:text-xl font-bold">:</span>
-      
-      {/* Секунды */}
-      <div className="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1 md:px-3 md:py-2 min-w-[40px] md:min-w-[60px] text-center">
-        <div className="text-base md:text-xl font-bold text-white animate-pulse">{String(timeLeft.seconds).padStart(2, '0')}</div>
-        <div className="text-[10px] md:text-xs text-white/80">секунд</div>
+      {/* Секунды и разделитель перед ними — скрыты на мобильных, показываются на md+ */}
+      <div className="hidden md:flex md:items-center md:gap-2">
+        <span className="text-white text-base md:text-xl font-bold">:</span>
+        <div className="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1 md:px-3 md:py-2 min-w-[40px] md:min-w-[60px] text-center">
+          <div className="text-base md:text-xl font-bold text-white animate-pulse">{String(timeLeft.seconds).padStart(2, '0')}</div>
+          <div className="text-[10px] md:text-xs text-white/80">секунд</div>
+        </div>
       </div>
     </div>
   );
