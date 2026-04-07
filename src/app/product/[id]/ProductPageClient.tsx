@@ -694,6 +694,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
 
             <h1 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6 text-gray-900">{product.name}</h1>
 
+            {/* Блок маркетплейсов */}
             <div className="mb-6 p-4 md:p-6 bg-white rounded-xl shadow-sm">
               <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Купить на маркетплейсах:</h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
@@ -729,6 +730,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </div>
             </div>
 
+            {/* Информация о товаре */}
             <div className="mb-6 p-4 md:p-6 bg-white rounded-xl shadow-sm">
               <h3 className="border-b mb-3 md:mb-4 pb-3 md:pb-4 font-semibold text-base md:text-lg flex items-center gap-2">
                 Информация о товаре
@@ -784,33 +786,58 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               )}
             </div>
 
+            {/* Блок цены и скидки (исправлен: показывает старую цену и экономию даже если currentOldPrice отсутствует, но есть активная акция) */}
             <div className="mb-6 p-4 md:p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
-              <div className="flex items-center gap-2 md:gap-4 mb-3 flex-wrap">
-                <span className="text-3xl md:text-5xl font-bold text-primary">{formatPrice(currentPrice)} ₽</span>
+              {(() => {
+                // Вычисляем реальную старую цену и процент скидки для отображения
+                let displayOldPrice = currentOldPrice && parseFloat(currentOldPrice) > parseFloat(currentPrice) ? currentOldPrice : null;
+                let displayDiscountPercent = discountPercentage;
+                let displaySavings = savingsAmount;
 
-                {currentOldPrice && parseFloat(currentOldPrice) > parseFloat(currentPrice) && (
+                // Если нет старой цены, но есть активная акция (timed sale) – вычисляем по её проценту
+                if (!displayOldPrice && hasActiveTimedSale && product.active_sale?.discount_value) {
+                  const discountPercentFromSale = product.active_sale.discount_value;
+                  const currentPriceNum = parseFloat(currentPrice);
+                  if (!isNaN(currentPriceNum) && discountPercentFromSale > 0) {
+                    const oldPriceFromSale = currentPriceNum / (1 - discountPercentFromSale / 100);
+                    displayOldPrice = oldPriceFromSale.toFixed(2);
+                    displayDiscountPercent = discountPercentFromSale;
+                    displaySavings = oldPriceFromSale - currentPriceNum;
+                  }
+                }
+
+                return (
                   <>
-                    <span className="text-xl md:text-2xl text-gray-400 line-through">{formatPrice(currentOldPrice)} ₽</span>
-                    <span
-                      className={`px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold shadow-lg ${
-                        hasActiveTimedSale
-                          ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white animate-pulse'
-                          : 'bg-red-500 text-white'
-                      }`}
-                    >
-                      СКИДКА {discountPercentage}%
-                    </span>
-                  </>
-                )}
-              </div>
+                    <div className="flex items-center gap-2 md:gap-4 mb-3 flex-wrap">
+                      <span className="text-3xl md:text-5xl font-bold text-primary">{formatPrice(currentPrice)} ₽</span>
 
-              {savingsAmount > 0 && (
-                <div className="bg-green-50 border-2 border-green-200 text-green-700 px-3 py-2 md:px-4 md:py-3 rounded-lg inline-flex items-center gap-2 text-sm md:text-base">
-                  <span className="font-semibold">Вы экономите {formatPrice(savingsAmount)} ₽</span>
-                </div>
-              )}
+                      {displayOldPrice && parseFloat(displayOldPrice) > parseFloat(currentPrice) && (
+                        <>
+                          <span className="text-xl md:text-2xl text-gray-400 line-through">{formatPrice(displayOldPrice)} ₽</span>
+                          <span
+                            className={`px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-bold shadow-lg ${
+                              hasActiveTimedSale
+                                ? 'bg-gradient-to-r from-red-500 to-orange-500 text-white animate-pulse'
+                                : 'bg-red-500 text-white'
+                            }`}
+                          >
+                            СКИДКА {displayDiscountPercent}%
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    {displaySavings > 0 && (
+                      <div className="bg-green-50 border-2 border-green-200 text-green-700 px-3 py-2 md:px-4 md:py-3 rounded-lg inline-flex items-center gap-2 text-sm md:text-base">
+                        <span className="font-semibold">Вы экономите {formatPrice(displaySavings)} ₽</span>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
 
+            {/* Варианты товаров (исправлено: скидка в одной строке с ценой) */}
             {product.variants && product.variants.length > 0 && (
               <div className="mb-6 bg-white p-4 md:p-6 rounded-xl shadow-sm">
                 <h3 className="font-semibold text-base md:text-lg mb-3 md:mb-4">Выберите вариант:</h3>
@@ -883,15 +910,13 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                               className="w-10 h-10 md:w-12 md:h-12 object-cover rounded-lg border-2 border-gray-200 flex-shrink-0"
                             />
                           )}
-
                           <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
                             selectedVariant?.id === variant.id ? 'bg-primary' : 'bg-gray-300'
                           }`} />
-
                           <span className="font-medium text-base md:text-lg truncate">{variant.name}</span>
                         </div>
 
-                        {/* Цвет и размер (без процента скидки) */}
+                        {/* Цвет и размер (без скидки) */}
                         <div className="flex flex-wrap gap-2 justify-start sm:justify-center w-full sm:w-auto mt-2 sm:mt-0">
                           {variant.color && (
                             <span className="text-xs md:text-sm text-gray-600 bg-gray-100 px-2 py-1 md:px-3 md:py-1 rounded-full">
@@ -930,6 +955,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </div>
             )}
 
+            {/* Выбранный вариант */}
             {selectedVariant && (
               <div className="mb-6 p-3 md:p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
                 <div className="flex items-center justify-between gap-4">
@@ -947,6 +973,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </div>
             )}
 
+            {/* Доступность */}
             <div className={`mb-6 p-3 md:p-4 border-2 rounded-xl flex items-start gap-3 md:gap-4 ${avail.wrapCls}`}>
               <span className="text-xl md:text-2xl mt-0.5">{avail.icon}</span>
               <div>
@@ -955,6 +982,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </div>
             </div>
 
+            {/* Количество */}
             {avail.canBuy && (
               <div className="mb-6">
                 <label className="block text-sm md:text-base font-medium text-gray-700 mb-2">Количество</label>
@@ -966,9 +994,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                   >
                     -
                   </button>
-
                   <span className="text-xl md:text-2xl font-bold w-12 md:w-16 text-center">{quantity}</span>
-
                   <button
                     onClick={incrementQuantity}
                     className="w-10 h-10 md:w-12 md:h-12 border-2 border-gray-300 rounded-lg hover:bg-gray-100 transition font-bold text-lg md:text-xl disabled:opacity-50"
@@ -976,7 +1002,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                   >
                     +
                   </button>
-
                   {!isOrderType && (
                     <span className="text-sm md:text-base text-gray-600 ml-2">{currentStock} шт.</span>
                   )}
@@ -984,6 +1009,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </div>
             )}
 
+            {/* Кнопка в корзину */}
             <div className="space-y-4">
               <button
                 onClick={handleAddToCart}
@@ -999,25 +1025,26 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                 {avail.canBuy ? (avail.btnLabel || 'В корзину') : 'Нет в наличии'}
               </button>
             </div>
-            
-              <div className="flex flex-wrap justify-center gap-x-3 md:gap-x-4 gap-y-1 mt-4">
-                {[
-                  { href: '/docs/returns', label: 'Возврат' },
-                  { href: '/docs/delivery', label: 'Доставка' },
-                  { href: '/docs/payment', label: 'Оплата' },
-                  { href: '/docs/terms', label: 'Условия' },
-                ].map(({ href, label }) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    target="_blank"
-                    className="text-xs text-gray-500 hover:text-primary hover:underline transition"
-                  >
-                    {label}
-                  </Link>
-                ))}
-              </div>
+
+            {/* Ссылки на документы */}
+            <div className="flex flex-wrap justify-center gap-x-3 md:gap-x-4 gap-y-1 mt-4">
+              {[
+                { href: '/docs/returns', label: 'Возврат' },
+                { href: '/docs/delivery', label: 'Доставка' },
+                { href: '/docs/payment', label: 'Оплата' },
+                { href: '/docs/terms', label: 'Условия' },
+              ].map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  target="_blank"
+                  className="text-xs text-gray-500 hover:text-primary hover:underline transition"
+                >
+                  {label}
+                </Link>
+              ))}
             </div>
+          </div>
           </div>
         </div>
 
