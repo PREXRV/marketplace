@@ -105,7 +105,7 @@ function uniqueBy<T>(items: T[], keyGetter: (item: T) => string | null | undefin
 }
 
 export default function ProductPageClient({ productId, initialProduct }: Props) {
-  // ✅ Защита от SSR: если код выполняется на сервере, ничего не рендерим
+  // ✅ Защита от SSR: на сервере ничего не рендерим
   if (typeof window === 'undefined') {
     return null;
   }
@@ -384,7 +384,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
     );
   }
 
-  // Безопасное вычисление активной акции
+  // Безопасное определение активной распродажи
   const hasActiveTimedSale = (() => {
     if (!product.sale_end_date) return false;
     const endDate = new Date(product.sale_end_date);
@@ -703,7 +703,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
 
             <h1 className="text-2xl md:text-4xl font-bold mb-4 md:mb-6 text-gray-900">{product.name}</h1>
 
-            {/* Блок маркетплейсов */}
             <div className="mb-6 p-4 md:p-6 bg-white rounded-xl shadow-sm">
               <h3 className="text-base md:text-lg font-semibold text-gray-800 mb-3 md:mb-4">Купить на маркетплейсах:</h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
@@ -739,7 +738,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </div>
             </div>
 
-            {/* Информация о товаре */}
             <div className="mb-6 p-4 md:p-6 bg-white rounded-xl shadow-sm">
               <h3 className="border-b mb-3 md:mb-4 pb-3 md:pb-4 font-semibold text-base md:text-lg flex items-center gap-2">
                 Информация о товаре
@@ -795,19 +793,19 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               )}
             </div>
 
-            {/* Блок цены и скидки (исправлен: показывает старую цену и экономию даже если currentOldPrice отсутствует, но есть активная акция) */}
+            {/* Блок цены и скидки (исправлена ошибка типа string > number) */}
             <div className="mb-6 p-4 md:p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
               {(() => {
-                // Вычисляем реальную старую цену и процент скидки для отображения
                 let displayOldPrice = currentOldPrice && parseFloat(currentOldPrice) > parseFloat(currentPrice) ? currentOldPrice : null;
                 let displayDiscountPercent = discountPercentage;
                 let displaySavings = savingsAmount;
 
-                // Если нет старой цены, но есть активная акция (timed sale) – вычисляем по её проценту
+                // Если нет старой цены, но есть активная акция – вычисляем по её проценту
                 if (!displayOldPrice && hasActiveTimedSale && product.active_sale?.discount_value) {
-                  const discountPercentFromSale = product.active_sale.discount_value;
+                  // 🔧 ИСПРАВЛЕНИЕ: преобразуем discount_value в число
+                  const discountPercentFromSale = Number(product.active_sale.discount_value);
                   const currentPriceNum = parseFloat(currentPrice);
-                  if (!isNaN(currentPriceNum) && discountPercentFromSale > 0) {
+                  if (!isNaN(currentPriceNum) && !isNaN(discountPercentFromSale) && discountPercentFromSale > 0) {
                     const oldPriceFromSale = currentPriceNum / (1 - discountPercentFromSale / 100);
                     displayOldPrice = oldPriceFromSale.toFixed(2);
                     displayDiscountPercent = discountPercentFromSale;
@@ -846,7 +844,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               })()}
             </div>
 
-            {/* Варианты товаров (исправлено: скидка в одной строке с ценой) */}
             {product.variants && product.variants.length > 0 && (
               <div className="mb-6 bg-white p-4 md:p-6 rounded-xl shadow-sm">
                 <h3 className="font-semibold text-base md:text-lg mb-3 md:mb-4">Выберите вариант:</h3>
@@ -925,7 +922,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                           <span className="font-medium text-base md:text-lg truncate">{variant.name}</span>
                         </div>
 
-                        {/* Цвет и размер (без скидки) */}
                         <div className="flex flex-wrap gap-2 justify-start sm:justify-center w-full sm:w-auto mt-2 sm:mt-0">
                           {variant.color && (
                             <span className="text-xs md:text-sm text-gray-600 bg-gray-100 px-2 py-1 md:px-3 md:py-1 rounded-full">
@@ -939,7 +935,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                           )}
                         </div>
 
-                        {/* Цена и скидка в одной строке */}
                         <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-between sm:justify-end mt-2 sm:mt-0">
                           <div className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
                             <span className="font-bold text-primary text-base md:text-lg">
@@ -964,7 +959,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </div>
             )}
 
-            {/* Выбранный вариант */}
             {selectedVariant && (
               <div className="mb-6 p-3 md:p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
                 <div className="flex items-center justify-between gap-4">
@@ -982,7 +976,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </div>
             )}
 
-            {/* Доступность */}
             <div className={`mb-6 p-3 md:p-4 border-2 rounded-xl flex items-start gap-3 md:gap-4 ${avail.wrapCls}`}>
               <span className="text-xl md:text-2xl mt-0.5">{avail.icon}</span>
               <div>
@@ -991,7 +984,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </div>
             </div>
 
-            {/* Количество */}
             {avail.canBuy && (
               <div className="mb-6">
                 <label className="block text-sm md:text-base font-medium text-gray-700 mb-2">Количество</label>
@@ -1018,7 +1010,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </div>
             )}
 
-            {/* Кнопка в корзину */}
             <div className="space-y-4">
               <button
                 onClick={handleAddToCart}
@@ -1035,7 +1026,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               </button>
             </div>
 
-            {/* Ссылки на документы */}
             <div className="flex flex-wrap justify-center gap-x-3 md:gap-x-4 gap-y-1 mt-4">
               {[
                 { href: '/docs/returns', label: 'Возврат' },
@@ -1082,7 +1072,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
         </div>
       </div>
 
-      {/* ===== STICKY BAR ===== */}
       {showStickyBar && (
         <div className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl border-t-2 border-gray-200 z-40 animate-slide-up">
           <div className="container mx-auto px-3 md:px-4 py-3 md:py-4">
@@ -1139,7 +1128,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
         </div>
       )}
 
-      {/* ===== LIGHTBOX ===== */}
       {lightboxOpen && (
         <div
           className="fixed inset-0 z-50 bg-black bg-opacity-95 flex items-center justify-center p-4"
