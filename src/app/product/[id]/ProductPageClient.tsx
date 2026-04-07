@@ -1045,7 +1045,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               ))}
             </div>
           </div>
-          </div>
         </div>
 
         <div className="bg-white rounded-2xl p-4 md:p-8 shadow-lg mb-8 md:mb-12 mt-8 md:mt-12">
