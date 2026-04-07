@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 import ProductCard from './ProductCard';
 import { Product, api } from '@/lib/api';
+import { useEffect, useState } from 'react';
 
 interface RecentlyViewedProductsProps {
   currentProductId?: number;
@@ -11,10 +11,10 @@ interface RecentlyViewedProductsProps {
   maxItems?: number;
 }
 
-export default function RecentlyViewedProducts({
-  currentProductId,
+export default function RecentlyViewedProducts({ 
+  currentProductId, 
   title = 'Вы недавно смотрели',
-  maxItems = 8,
+  maxItems = 8 
 }: RecentlyViewedProductsProps) {
   const { recentProducts, removeProduct } = useRecentlyViewed();
   const [fullProducts, setFullProducts] = useState<Product[]>([]);
@@ -24,7 +24,7 @@ export default function RecentlyViewedProducts({
     const fetchFullProducts = async () => {
       try {
         setLoading(true);
-
+        
         const filteredIds = recentProducts
           .filter((p) => p.id !== currentProductId)
           .slice(0, maxItems)
@@ -38,17 +38,20 @@ export default function RecentlyViewedProducts({
 
         const productsPromises = filteredIds.map(async (id) => {
           try {
-            return await api.getProduct(id);
+            const product = await api.getProduct(id);
+            return product;
           } catch (error: any) {
             if (error.response?.status === 404) {
+              console.log(`Товар ${id} не найден, удаляем из истории`);
               removeProduct(id);
             }
             return null;
           }
         });
-
+        
         const products = await Promise.all(productsPromises);
         const validProducts = products.filter((p): p is Product => p !== null);
+        
         setFullProducts(validProducts);
       } catch (error) {
         console.error('Ошибка загрузки просмотренных товаров:', error);
@@ -63,19 +66,20 @@ export default function RecentlyViewedProducts({
 
   if (loading) {
     return (
-      <section className="bg-gray-50 py-10 sm:py-12">
-        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-gray-900 sm:mb-8 sm:text-3xl">
-            <svg className="h-7 w-7 text-primary sm:h-8 sm:w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <section className="py-6 md:py-12 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-8 flex items-center gap-2 md:gap-3">
+            <svg className="w-6 h-6 md:w-8 md:h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
             {title}
           </h2>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="animate-pulse rounded-2xl bg-gray-200 h-[360px] sm:h-[420px]" />
+              <div key={i} className="animate-pulse">
+                <div className="bg-gray-200 rounded-xl h-[350px] md:h-[450px]"></div>
+              </div>
             ))}
           </div>
         </div>
@@ -83,40 +87,43 @@ export default function RecentlyViewedProducts({
     );
   }
 
-  if (fullProducts.length === 0) return null;
+  if (fullProducts.length === 0) {
+    return null;
+  }
 
   return (
-    <section className="bg-gray-50 py-10 sm:py-12">
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="flex items-center gap-3 text-2xl font-bold text-gray-900 sm:text-3xl">
-            <svg className="h-7 w-7 text-primary sm:h-8 sm:w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <section className="py-6 md:py-12 bg-gray-50">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 md:gap-4 mb-4 md:mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold flex items-center gap-2 md:gap-3">
+            <svg className="w-6 h-6 md:w-8 md:h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
             {title}
           </h2>
-
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-            <span className="inline-flex w-fit items-center rounded-full bg-white px-4 py-2 text-sm text-gray-600 shadow-sm">
+          
+          <div className="flex items-center gap-2 md:gap-4 w-full sm:w-auto justify-between sm:justify-end">
+            <span className="text-xs md:text-sm text-gray-600 bg-white px-2 py-1 md:px-4 md:py-2 rounded-full shadow-sm">
               {fullProducts.length} {fullProducts.length === 1 ? 'товар' : fullProducts.length < 5 ? 'товара' : 'товаров'}
             </span>
-
-            <button
-              onClick={() => {
-                fullProducts.forEach((p) => removeProduct(p.id));
-                setFullProducts([]);
-              }}
-              className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-red-200 px-4 py-2 text-sm font-medium text-red-600 transition hover:bg-red-500 hover:text-white"
-            >
-              Очистить всё
-            </button>
+            {fullProducts.length > 0 && (
+              <button
+                onClick={() => {
+                  fullProducts.forEach((p) => removeProduct(p.id));
+                  setFullProducts([]);
+                }}
+                className="text-xs md:text-sm text-red-600 hover:text-white hover:bg-red-500 px-2 py-1 md:px-4 md:py-2 rounded-full transition font-medium border border-red-200"
+              >
+                Очистить всё
+              </button>
+            )}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           {fullProducts.map((product) => (
-            <div key={product.id} className="group relative">
+            <div key={product.id} className="relative group">
               <button
                 onClick={(e) => {
                   e.preventDefault();
@@ -124,14 +131,13 @@ export default function RecentlyViewedProducts({
                   removeProduct(product.id);
                   setFullProducts((prev) => prev.filter((p) => p.id !== product.id));
                 }}
-                className="absolute right-2 top-2 z-30 inline-flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-lg transition hover:scale-105 hover:bg-red-600 sm:opacity-0 sm:group-hover:opacity-100"
+                className="absolute -top-1 -right-1 md:-top-2 md:-right-2 z-30 w-6 h-6 md:w-8 md:h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition shadow-lg opacity-0 group-hover:opacity-100 hover:scale-110"
                 title="Удалить из истории"
               >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-
               <ProductCard product={product} />
             </div>
           ))}
