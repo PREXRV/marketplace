@@ -915,7 +915,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                             : 'border-gray-200 hover:border-primary'
                         }`}
                       >
-                        <div className="flex items-center gap-0 min-w-0 w-full sm:w-auto">
+                        <div className="flex items-center gap-2 min-w-0 w-full sm:w-auto">
                           {variant.image_url && (
                             <img
                               src={variantThumb}
@@ -942,7 +942,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                           )}
                         </div>*/}
 
-                        <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-between sm:justify-end mt-2 sm:mt-0">
+                        <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-between sm:justify-end mt-0 sm:mt-0">
                           <div className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
                             <span className="font-bold text-primary text-base md:text-lg">
                               {formatPrice(variantFinalPrice)} ₽
