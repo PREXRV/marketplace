@@ -43,32 +43,35 @@ export default function CountdownTimer({ endDate }: CountdownTimerProps) {
   }
 
   return (
-    <div className="bg-gradient-to-r from-red-500 to-orange-500 text-white p-6 rounded-2xl shadow-xl">
-      <div className="flex items-center gap-2 mb-4">
-        <svg className="w-6 h-6 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+    <div className="rounded-2xl bg-gradient-to-r from-red-500 to-orange-500 p-3 text-white shadow-xl sm:p-6">
+      <div className="mb-3 flex items-start gap-2 sm:mb-4 sm:items-center sm:gap-2">
+        <svg className="mt-0.5 h-5 w-5 animate-pulse shrink-0 sm:h-6 sm:w-6" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
           <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
         </svg>
-        <span className="text-lg font-bold">⚡ Акция заканчивается через:</span>
+        <span className="text-sm font-bold leading-tight sm:text-lg">⚡ Акция заканчивается через:</span>
       </div>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-4">
         {timeLeft.days > 0 && (
-          <div className="text-center bg-white bg-opacity-20 rounded-xl p-3">
-            <div className="text-3xl font-bold">{timeLeft.days}</div>
-            <div className="text-sm opacity-90">дней</div>
+          <div className="rounded-xl bg-white/20 p-2 text-center sm:p-3">
+            <div className="text-2xl font-bold leading-none sm:text-3xl">{timeLeft.days}</div>
+            <div className="mt-1 text-[11px] opacity-90 sm:text-sm">дней</div>
           </div>
         )}
-        <div className="text-center bg-white bg-opacity-20 rounded-xl p-3">
-          <div className="text-3xl font-bold">{String(timeLeft.hours).padStart(2, '0')}</div>
-          <div className="text-sm opacity-90">часов</div>
+        {timeLeft.days > 0 && (
+          <div className="col-span-2 hidden sm:block" aria-hidden="true" />
+        )}
+        <div className="rounded-xl bg-white/20 p-2 text-center sm:p-3">
+          <div className="text-2xl font-bold leading-none sm:text-3xl">{String(timeLeft.hours).padStart(2, '0')}</div>
+          <div className="mt-1 text-[11px] opacity-90 sm:text-sm">часов</div>
         </div>
-        <div className="text-center bg-white bg-opacity-20 rounded-xl p-3">
-          <div className="text-3xl font-bold">{String(timeLeft.minutes).padStart(2, '0')}</div>
-          <div className="text-sm opacity-90">минут</div>
+        <div className="rounded-xl bg-white/20 p-2 text-center sm:p-3">
+          <div className="text-2xl font-bold leading-none sm:text-3xl">{String(timeLeft.minutes).padStart(2, '0')}</div>
+          <div className="mt-1 text-[11px] opacity-90 sm:text-sm">минут</div>
         </div>
-        <div className="text-center bg-white bg-opacity-20 rounded-xl p-3">
-          <div className="text-3xl font-bold">{String(timeLeft.seconds).padStart(2, '0')}</div>
-          <div className="text-sm opacity-90">секунд</div>
+        <div className="col-span-2 rounded-xl bg-white/20 p-2 text-center sm:col-span-1 sm:p-3">
+          <div className="text-2xl font-bold leading-none sm:text-3xl">{String(timeLeft.seconds).padStart(2, '0')}</div>
+          <div className="mt-1 text-[11px] opacity-90 sm:text-sm">секунд</div>
         </div>
       </div>
     </div>
