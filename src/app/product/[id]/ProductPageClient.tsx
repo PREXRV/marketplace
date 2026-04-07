@@ -105,12 +105,16 @@ function uniqueBy<T>(items: T[], keyGetter: (item: T) => string | null | undefin
 }
 
 export default function ProductPageClient({ productId, initialProduct }: Props) {
+  // ✅ Защита от SSR: если код выполняется на сервере, ничего не рендерим
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
   const { addProduct } = useRecentlyViewed();
   const router = useRouter();
   const { addToCart } = useCart();
   const { isAuthenticated } = useAuth();
 
-  // ✅ Инициализируем из initialProduct — данные уже есть с сервера, loading = false
   const [product, setProduct] = useState<Product | null>(initialProduct ?? null);
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedVideoIndex, setSelectedVideoIndex] = useState(0);
@@ -129,7 +133,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
   );
   const [currentStock, setCurrentStock] = useState<number>(initialProduct?.stock ?? 0);
 
-  // ✅ Добавляем в "недавно просмотренные" при монтировании
   useEffect(() => {
     if (initialProduct) {
       const productImage = initialProduct.primary_image || initialProduct.images?.[0]?.image || '';
@@ -145,7 +148,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
     }
   }, [initialProduct, addProduct]);
 
-  // ✅ Если initialProduct не был передан — загружаем сами (fallback)
   useEffect(() => {
     if (initialProduct) return;
 
@@ -382,6 +384,14 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
     );
   }
 
+  // Безопасное вычисление активной акции
+  const hasActiveTimedSale = (() => {
+    if (!product.sale_end_date) return false;
+    const endDate = new Date(product.sale_end_date);
+    if (isNaN(endDate.getTime())) return false;
+    return endDate > new Date();
+  })();
+
   const discountPercentage = currentOldPrice
     ? Math.round((1 - parseFloat(currentPrice) / parseFloat(currentOldPrice)) * 100)
     : product.discount_percentage || 0;
@@ -400,7 +410,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
     (v) => v.size || ''
   );
 
-  const hasActiveTimedSale = Boolean(product.sale_end_date && new Date(product.sale_end_date) > new Date());
   const avail = getAvailabilityInfo(product, currentStock);
   const isOrderType =
     product.availability_status === 'made_to_order' ||
