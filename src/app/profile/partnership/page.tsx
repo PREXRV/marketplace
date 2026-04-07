@@ -159,7 +159,7 @@ export default function PartnershipPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-6 md:mb-8">
-          <Link href="/profile/partnership/products">
+          <Link href="/profile/partnership/request-product">
             <motion.div
               whileHover={{ scale: 1.02 }}
               className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 cursor-pointer shadow-sm border-2 border-purple-100 hover:border-purple-300 transition"

@@ -39,7 +39,6 @@ export default function RequestProductPage() {
 
   useEffect(() => { fetchData(); }, []);
 
-  // ✅ Трекинг поиска по артикулу с дебаунсом
   useEffect(() => {
     if (!searchQuery.trim()) return;
     const timer = setTimeout(() => {
@@ -78,7 +77,6 @@ export default function RequestProductPage() {
     }
   };
 
-  // ✅ Трекинг просмотра товара
   const handleOpenProduct = (product: any) => {
     setSelectedProduct(product);
     const refToken = sessionStorage.getItem('reftoken');
@@ -179,124 +177,125 @@ export default function RequestProductPage() {
 
   return (
     <div className="w-full">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Товары</h1>
-        <p className="text-gray-500 text-sm">
+      <div className="mb-4 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">Товары</h1>
+        <p className="text-gray-500 text-xs md:text-sm">
           Запрашивайте товары, отслеживайте статусы и управляйте своими ссылками
         </p>
       </div>
 
-      {/* Вкладки */}
-      <div className="flex gap-2 mb-8 bg-white rounded-2xl p-1.5 shadow-sm border border-gray-100 w-fit">
-        {TABS.map(({ key, label, icon: Icon, count }) => (
-          <button
-            key={key}
-            onClick={() => setActiveTab(key)}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all
-              ${activeTab === key
-                ? 'bg-purple-600 text-white shadow-md'
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-              }`}
-          >
-            <Icon className="w-4 h-4" />
-            {label}
-            {count !== undefined && count > 0 && (
-              <span className={`text-xs px-1.5 py-0.5 rounded-full font-bold
-                ${activeTab === key ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'}`}>
-                {count}
-              </span>
-            )}
-          </button>
-        ))}
+      {/* Вкладки с горизонтальной прокруткой на мобильных */}
+      <div className="overflow-x-auto pb-2 md:pb-0 mb-6 md:mb-8">
+        <div className="flex gap-2 bg-white rounded-2xl p-1.5 shadow-sm border border-gray-100 w-fit min-w-full md:min-w-0">
+          {TABS.map(({ key, label, icon: Icon, count }) => (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key)}
+              className={`flex items-center gap-1.5 md:gap-2 px-3 py-1.5 md:px-5 md:py-2.5 rounded-xl font-semibold text-xs md:text-sm transition-all whitespace-nowrap
+                ${activeTab === key
+                  ? 'bg-purple-600 text-white shadow-md'
+                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+            >
+              <Icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
+              {label}
+              {count !== undefined && count > 0 && (
+                <span className={`text-[10px] md:text-xs px-1.5 py-0.5 rounded-full font-bold
+                  ${activeTab === key ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'}`}>
+                  {count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* ═══ КАТАЛОГ ═══ */}
       {activeTab === 'catalog' && (
         <div>
           {defaultAddress ? (
-            <div className="bg-green-50 border border-green-200 rounded-2xl p-4 mb-6 flex items-center gap-3">
+            <div className="bg-green-50 border border-green-200 rounded-xl md:rounded-2xl p-3 md:p-4 mb-5 md:mb-6 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
               <MapPin className="w-5 h-5 text-green-600 flex-shrink-0" />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-green-800">Адрес доставки</p>
-                <p className="text-sm text-green-700">
+                <p className="text-xs md:text-sm font-semibold text-green-800">Адрес доставки</p>
+                <p className="text-xs md:text-sm text-green-700">
                   {defaultAddress.city}, {defaultAddress.street}, д. {defaultAddress.house}
                   {defaultAddress.apartment && `, кв. ${defaultAddress.apartment}`}
                 </p>
                 {getDeliveryMethodName(defaultAddress) && (
-                  <p className="text-xs text-green-700 mt-0.5">
+                  <p className="text-[10px] md:text-xs text-green-700 mt-0.5">
                     Способ: {getDeliveryMethodName(defaultAddress)}
                   </p>
                 )}
               </div>
-              <Link href="/profile/addresses" className="text-sm text-green-700 hover:underline font-medium">
+              <Link href="/profile/addresses" className="text-xs md:text-sm text-green-700 hover:underline font-medium">
                 Изменить
               </Link>
             </div>
           ) : (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-6 flex items-center gap-3">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl md:rounded-2xl p-3 md:p-4 mb-5 md:mb-6 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
               <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0" />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-yellow-800">Адрес не указан</p>
-                <p className="text-sm text-yellow-700">Укажите адрес и способ доставки</p>
+                <p className="text-xs md:text-sm font-semibold text-yellow-800">Адрес не указан</p>
+                <p className="text-xs md:text-sm text-yellow-700">Укажите адрес и способ доставки</p>
               </div>
               <button onClick={() => setShowAddressModal(true)}
-                className="text-sm text-yellow-700 hover:underline font-medium flex items-center gap-1">
-                <Plus className="w-4 h-4" /> Добавить
+                className="text-xs md:text-sm text-yellow-700 hover:underline font-medium flex items-center gap-1">
+                <Plus className="w-3.5 h-3.5" /> Добавить
               </button>
             </div>
           )}
 
-          <div className="mb-6 relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <div className="mb-5 md:mb-6 relative">
+            <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 md:w-5 md:h-5" />
             <input
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Поиск товаров..."
-              className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 outline-none transition"
+              className="w-full pl-9 md:pl-12 pr-3 md:pr-4 py-2 md:py-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 outline-none transition text-sm md:text-base"
             />
           </div>
 
           {filteredProducts.length === 0 ? (
-            <div className="text-center py-16 text-gray-400">
-              <Package className="w-16 h-16 mx-auto mb-4 opacity-30" />
-              <p className="text-xl">Товары не найдены</p>
+            <div className="text-center py-12 md:py-16 text-gray-400">
+              <Package className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 opacity-30" />
+              <p className="text-base md:text-xl">Товары не найдены</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filteredProducts.map(product => (
                 <motion.div
                   key={product.id}
                   whileHover={{ scale: 1.02 }}
-                  className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 cursor-pointer"
-                  // ✅ используем handleOpenProduct вместо setSelectedProduct
+                  className="bg-white rounded-xl md:rounded-2xl overflow-hidden shadow-sm border border-gray-100 cursor-pointer"
                   onClick={() => handleOpenProduct(product)}
                 >
                   {product.images?.length > 0 ? (
                     <img
                       src={product.images[0].image}
                       alt={getProductName(product)}
-                      className="w-full h-48 object-cover"
+                      className="w-full h-40 md:h-48 object-cover"
                     />
                   ) : (
-                    <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
-                      <Package className="w-12 h-12 text-gray-300" />
+                    <div className="w-full h-40 md:h-48 bg-gray-100 flex items-center justify-center">
+                      <Package className="w-8 h-8 md:w-12 md:h-12 text-gray-300" />
                     </div>
                   )}
-                  <div className="p-5">
-                    <h3 className="font-bold text-base mb-1 line-clamp-1">
+                  <div className="p-3 md:p-5">
+                    <h3 className="font-bold text-sm md:text-base mb-1 line-clamp-1">
                       {getProductName(product)}
                     </h3>
-                    <p className="text-gray-500 text-sm mb-4 line-clamp-2">
+                    <p className="text-gray-500 text-xs md:text-sm mb-3 md:mb-4 line-clamp-2">
                       {product.description}
                     </p>
                     <div className="flex items-center justify-between">
-                      <span className="text-xl font-bold text-purple-600">
+                      <span className="text-lg md:text-xl font-bold text-purple-600">
                         {product.price} ₽
                       </span>
                       <button
                         onClick={e => { e.stopPropagation(); handleRequest(product.id); }}
-                        className="bg-purple-600 text-white px-4 py-2 rounded-xl font-semibold text-sm hover:bg-purple-700 transition"
+                        className="bg-purple-600 text-white px-3 py-1.5 md:px-4 md:py-2 rounded-lg md:rounded-xl font-semibold text-xs md:text-sm hover:bg-purple-700 transition"
                       >
                         Запросить
                       </button>
@@ -313,50 +312,50 @@ export default function RequestProductPage() {
       {activeTab === 'requests' && (
         <div>
           {requests.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
-              <Clock className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-              <p className="text-gray-500 text-lg">Нет активных запросов</p>
+            <div className="text-center py-12 md:py-20 bg-white rounded-xl md:rounded-2xl shadow-sm">
+              <Clock className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 text-gray-300" />
+              <p className="text-gray-500 text-base md:text-lg">Нет активных запросов</p>
               <button onClick={() => setActiveTab('catalog')}
-                className="mt-4 text-purple-600 hover:underline text-sm font-medium">
+                className="mt-3 md:mt-4 text-purple-600 hover:underline text-xs md:text-sm font-medium">
                 Перейти к каталогу →
               </button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               {requests.map(request => (
                 <motion.div
                   key={request.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center justify-between"
+                  className="bg-white rounded-xl md:rounded-2xl p-3 md:p-5 shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                 >
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3 md:gap-4">
                     {request.product_image ? (
                       <img
                         src={request.product_image}
                         alt={request.product_title}
-                        className="w-16 h-16 object-cover rounded-xl"
+                        className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg md:rounded-xl"
                       />
                     ) : (
-                      <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center">
-                        <Package className="w-7 h-7 text-gray-300" />
+                      <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-100 rounded-lg md:rounded-xl flex items-center justify-center">
+                        <Package className="w-5 h-5 md:w-7 md:h-7 text-gray-300" />
                       </div>
                     )}
                     <div>
-                      <h3 className="font-bold">{request.product_title}</h3>
-                      <p className="text-sm text-gray-400">
+                      <h3 className="font-bold text-sm md:text-base">{request.product_title}</h3>
+                      <p className="text-xs text-gray-400">
                         {new Date(request.created_at).toLocaleDateString('ru-RU')}
                       </p>
                       {request.tracking_number && (
-                        <p className="text-sm text-purple-600 font-mono mt-1">
+                        <p className="text-xs text-purple-600 font-mono mt-1">
                           📦 {request.tracking_number}
                         </p>
                       )}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 self-end sm:self-auto">
                     {getStatusIcon(request.status)}
-                    <span className="font-semibold text-gray-700 text-sm">
+                    <span className="font-semibold text-gray-700 text-xs md:text-sm">
                       {request.status_display}
                     </span>
                   </div>
@@ -371,105 +370,105 @@ export default function RequestProductPage() {
       {activeTab === 'myproducts' && (
         <div>
           {myProducts.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
-              <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-              <p className="text-gray-500 text-lg">Нет доставленных товаров</p>
-              <p className="text-gray-400 text-sm mt-2">
+            <div className="text-center py-12 md:py-20 bg-white rounded-xl md:rounded-2xl shadow-sm">
+              <ShoppingBag className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-3 md:mb-4 text-gray-300" />
+              <p className="text-gray-500 text-base md:text-lg">Нет доставленных товаров</p>
+              <p className="text-gray-400 text-xs md:text-sm mt-1 md:mt-2">
                 Товары появятся здесь после подтверждения доставки
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {myProducts.map(item => (
                 <motion.div
                   key={item.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"
+                  className="bg-white rounded-xl md:rounded-2xl overflow-hidden shadow-sm border border-gray-100"
                 >
-                  <div className="flex gap-4 p-5 border-b border-gray-100">
+                  <div className="flex gap-3 md:gap-4 p-3 md:p-5 border-b border-gray-100">
                     {item.product_image ? (
                       <img
                         src={item.product_image}
                         alt={item.product_name}
-                        className="w-16 h-16 object-cover rounded-xl flex-shrink-0"
+                        className="w-14 h-14 md:w-16 md:h-16 object-cover rounded-lg md:rounded-xl flex-shrink-0"
                       />
                     ) : (
-                      <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <Package className="w-7 h-7 text-gray-300" />
+                      <div className="w-14 h-14 md:w-16 md:h-16 bg-gray-100 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0">
+                        <Package className="w-6 h-6 md:w-7 md:h-7 text-gray-300" />
                       </div>
                     )}
                     <div>
-                      <h3 className="font-bold leading-tight">{item.product_name}</h3>
-                      <p className="text-purple-600 font-bold mt-1">{item.product_price} ₽</p>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <h3 className="font-bold text-sm md:text-base leading-tight">{item.product_name}</h3>
+                      <p className="text-purple-600 font-bold text-sm md:text-base mt-1">{item.product_price} ₽</p>
+                      <p className="text-[10px] md:text-xs text-gray-400 mt-1">
                         Получен: {new Date(item.created_at).toLocaleDateString('ru-RU')}
                       </p>
                     </div>
                   </div>
 
-                  <div className="p-5 space-y-4">
+                  <div className="p-3 md:p-5 space-y-3 md:space-y-4">
                     {/* Реферальная ссылка */}
                     <div>
-                      <p className="text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">
+                      <p className="text-[10px] md:text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">
                         Реферальная ссылка
                       </p>
-                      <div className="flex items-center gap-2 bg-purple-50 rounded-xl p-3">
-                        <span className="text-sm text-purple-700 font-mono flex-1 truncate">
+                      <div className="flex items-center gap-1 md:gap-2 bg-purple-50 rounded-xl p-2 md:p-3">
+                        <span className="text-xs md:text-sm text-purple-700 font-mono flex-1 truncate">
                           {item.referral_link}
                         </span>
                         <button
                           onClick={() => copyToClipboard(item.referral_link, 'Ссылка')}
-                          className="p-1.5 hover:bg-purple-100 rounded-lg transition flex-shrink-0"
+                          className="p-1 hover:bg-purple-100 rounded-lg transition flex-shrink-0"
                         >
-                          <Copy className="w-4 h-4 text-purple-600" />
+                          <Copy className="w-3.5 h-3.5 md:w-4 md:h-4 text-purple-600" />
                         </button>
                         <a
                           href={item.referral_link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 hover:bg-purple-100 rounded-lg transition flex-shrink-0"
+                          className="p-1 hover:bg-purple-100 rounded-lg transition flex-shrink-0"
                         >
-                          <ExternalLink className="w-4 h-4 text-purple-600" />
+                          <ExternalLink className="w-3.5 h-3.5 md:w-4 md:h-4 text-purple-600" />
                         </a>
                       </div>
                     </div>
 
                     {/* Артикул */}
                     <div>
-                      <p className="text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">
+                      <p className="text-[10px] md:text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">
                         Артикул для поиска
                       </p>
-                      <div className="flex items-center gap-2 bg-gray-50 rounded-xl p-3">
-                        <span className="text-sm font-mono font-bold text-gray-700 flex-1">
+                      <div className="flex items-center gap-1 md:gap-2 bg-gray-50 rounded-xl p-2 md:p-3">
+                        <span className="text-xs md:text-sm font-mono font-bold text-gray-700 flex-1 truncate">
                           {item.custom_sku}
                         </span>
                         <button
                           onClick={() => copyToClipboard(item.custom_sku, 'Артикул')}
-                          className="p-1.5 hover:bg-gray-200 rounded-lg transition"
+                          className="p-1 hover:bg-gray-200 rounded-lg transition"
                         >
-                          <Copy className="w-4 h-4 text-gray-500" />
+                          <Copy className="w-3.5 h-3.5 md:w-4 md:h-4 text-gray-500" />
                         </button>
                       </div>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-[10px] md:text-xs text-gray-400 mt-1">
                         По этому артикулу покупатели найдут товар — переходы засчитаются вам
                       </p>
                     </div>
 
-                    {/* ✅ Статистика — данные с бэкенда */}
+                    {/* Статистика */}
                     <div>
-                      <p className="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide flex items-center gap-1">
-                        <BarChart2 className="w-3.5 h-3.5" /> Статистика
+                      <p className="text-[10px] md:text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wide flex items-center gap-1">
+                        <BarChart2 className="w-3 h-3 md:w-3.5 md:h-3.5" /> Статистика
                       </p>
-                      <div className="grid grid-cols-3 gap-2">
+                      <div className="grid grid-cols-3 gap-1.5 md:gap-2">
                         {[
                           { label: 'Просмотры', value: item.views_count ?? 0,  color: 'text-blue-600' },
                           { label: 'В корзину', value: item.cart_adds ?? 0,    color: 'text-orange-600' },
                           { label: 'Покупки',   value: item.purchases ?? 0,    color: 'text-green-600' },
                         ].map(stat => (
-                          <div key={stat.label} className="bg-gray-50 rounded-xl p-3 text-center">
-                            <p className={`text-xl font-bold ${stat.color}`}>{stat.value}</p>
-                            <p className="text-xs text-gray-400 mt-0.5">{stat.label}</p>
+                          <div key={stat.label} className="bg-gray-50 rounded-lg md:rounded-xl p-2 md:p-3 text-center">
+                            <p className={`text-base md:text-xl font-bold ${stat.color}`}>{stat.value}</p>
+                            <p className="text-[10px] md:text-xs text-gray-400 mt-0.5">{stat.label}</p>
                           </div>
                         ))}
                       </div>
@@ -482,62 +481,62 @@ export default function RequestProductPage() {
         </div>
       )}
 
-      {/* Модал товара */}
+      {/* Модал товара (адаптирован) */}
       <AnimatePresence>
         {selectedProduct && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 md:p-4"
             onClick={() => setSelectedProduct(null)}
           >
             <motion.div
               initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}
-              className="bg-white rounded-3xl max-w-2xl w-full overflow-hidden max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-2xl md:rounded-3xl max-w-2xl w-full overflow-hidden max-h-[95vh] overflow-y-auto"
               onClick={e => e.stopPropagation()}
             >
               {selectedProduct.images?.length > 0 ? (
                 <img
                   src={selectedProduct.images[0].image}
                   alt={getProductName(selectedProduct)}
-                  className="w-full h-72 object-cover"
+                  className="w-full h-56 md:h-72 object-cover"
                 />
               ) : (
-                <div className="w-full h-72 bg-gray-100 flex items-center justify-center">
-                  <Package className="w-20 h-20 text-gray-300" />
+                <div className="w-full h-56 md:h-72 bg-gray-100 flex items-center justify-center">
+                  <Package className="w-16 h-16 md:w-20 md:h-20 text-gray-300" />
                 </div>
               )}
-              <div className="p-8">
-                <h2 className="text-2xl font-bold mb-3">{getProductName(selectedProduct)}</h2>
-                <p className="text-gray-500 mb-4">{selectedProduct.description}</p>
+              <div className="p-4 md:p-8">
+                <h2 className="text-xl md:text-2xl font-bold mb-2 md:mb-3">{getProductName(selectedProduct)}</h2>
+                <p className="text-gray-500 text-sm md:text-base mb-3 md:mb-4">{selectedProduct.description}</p>
 
                 {defaultAddress ? (
-                  <div className="bg-green-50 rounded-xl p-3 mb-6 text-sm flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-green-600" />
+                  <div className="bg-green-50 rounded-lg md:rounded-xl p-2 md:p-3 mb-4 md:mb-6 text-xs md:text-sm flex items-center gap-2">
+                    <MapPin className="w-3.5 h-3.5 md:w-4 md:h-4 text-green-600" />
                     <span className="text-green-700">
                       {defaultAddress.city}, {defaultAddress.street}, д. {defaultAddress.house}
                     </span>
                   </div>
                 ) : (
-                  <div className="bg-yellow-50 rounded-xl p-3 mb-6 text-sm flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                  <div className="bg-yellow-50 rounded-lg md:rounded-xl p-2 md:p-3 mb-4 md:mb-6 text-xs md:text-sm flex items-center gap-2">
+                    <AlertTriangle className="w-3.5 h-3.5 md:w-4 md:h-4 text-yellow-600" />
                     <span className="text-yellow-700">Сначала укажите адрес доставки</span>
                   </div>
                 )}
 
-                <div className="flex items-center justify-between">
-                  <span className="text-3xl font-bold text-purple-600">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <span className="text-2xl md:text-3xl font-bold text-purple-600">
                     {selectedProduct.price} ₽
                   </span>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2 md:gap-3">
                     <button
                       onClick={() => setSelectedProduct(null)}
-                      className="bg-gray-100 text-gray-700 px-5 py-2.5 rounded-xl font-semibold hover:bg-gray-200 transition"
+                      className="bg-gray-100 text-gray-700 px-4 py-2 md:px-5 md:py-2.5 rounded-lg md:rounded-xl font-semibold text-sm md:text-base hover:bg-gray-200 transition"
                     >
                       Закрыть
                     </button>
                     <button
                       onClick={() => handleRequest(selectedProduct.id)}
-                      className="bg-purple-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-purple-700 transition"
+                      className="bg-purple-600 text-white px-4 py-2 md:px-5 md:py-2.5 rounded-lg md:rounded-xl font-semibold text-sm md:text-base hover:bg-purple-700 transition"
                     >
                       Запросить товар
                     </button>
@@ -549,31 +548,31 @@ export default function RequestProductPage() {
         )}
       </AnimatePresence>
 
-      {/* Модал адреса */}
+      {/* Модал адреса (адаптирован) */}
       <AnimatePresence>
         {showAddressModal && (
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 md:p-4"
             onClick={() => setShowAddressModal(false)}
           >
             <motion.div
               initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }}
-              className="bg-white rounded-3xl max-w-lg w-full p-8 max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-2xl md:rounded-3xl max-w-lg w-full p-4 md:p-8 max-h-[95vh] overflow-y-auto"
               onClick={e => e.stopPropagation()}
             >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <MapPin className="w-6 h-6 text-purple-600" />
+              <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-purple-100 rounded-lg md:rounded-xl flex items-center justify-center">
+                  <MapPin className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold">Адрес доставки</h2>
-                  <p className="text-gray-400 text-sm">Нужен для отправки товара</p>
+                  <h2 className="text-lg md:text-xl font-bold">Адрес доставки</h2>
+                  <p className="text-gray-400 text-xs md:text-sm">Нужен для отправки товара</p>
                 </div>
               </div>
 
-              <form onSubmit={handleSaveAddress} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+              <form onSubmit={handleSaveAddress} className="space-y-3 md:space-y-4">
+                <div className="grid grid-cols-2 gap-3 md:gap-4">
                   {[
                     { label: 'Город', key: 'city', placeholder: 'Москва', required: true, span: 2 },
                     { label: 'Улица', key: 'street', placeholder: 'ул. Ленина', required: true, span: 2 },
@@ -582,7 +581,7 @@ export default function RequestProductPage() {
                     { label: 'Индекс', key: 'postal_code', placeholder: '123456', required: false, span: 2 },
                   ].map(field => (
                     <div key={field.key} className={`col-span-${field.span}`}>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                      <label className="block text-xs md:text-sm font-semibold text-gray-700 mb-1">
                         {field.label} {field.required && <span className="text-red-500">*</span>}
                       </label>
                       <input
@@ -591,13 +590,13 @@ export default function RequestProductPage() {
                         onChange={e => setAddressForm(p => ({ ...p, [field.key]: e.target.value }))}
                         placeholder={field.placeholder}
                         required={field.required}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 outline-none transition"
+                        className="w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-200 rounded-lg md:rounded-xl focus:border-purple-400 outline-none transition text-sm"
                       />
                     </div>
                   ))}
 
                   <div className="col-span-2">
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    <label className="block text-xs md:text-sm font-semibold text-gray-700 mb-1">
                       Способ доставки <span className="text-red-500">*</span>
                     </label>
                     <select
@@ -606,7 +605,7 @@ export default function RequestProductPage() {
                         ...p, delivery_method: e.target.value ? Number(e.target.value) : ''
                       }))}
                       required
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 outline-none transition bg-white"
+                      className="w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-200 rounded-lg md:rounded-xl focus:border-purple-400 outline-none transition bg-white text-sm"
                     >
                       <option value="">Выберите способ доставки</option>
                       {deliveryMethods.map(m => (
@@ -620,7 +619,7 @@ export default function RequestProductPage() {
                   </div>
 
                   <div className="col-span-2">
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    <label className="block text-xs md:text-sm font-semibold text-gray-700 mb-1">
                       Комментарий
                     </label>
                     <textarea
@@ -628,27 +627,27 @@ export default function RequestProductPage() {
                       onChange={e => setAddressForm(p => ({ ...p, comment: e.target.value }))}
                       placeholder="Код домофона, ориентир..."
                       rows={2}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-purple-400 outline-none transition resize-none"
+                      className="w-full px-3 py-2 md:px-4 md:py-3 border-2 border-gray-200 rounded-lg md:rounded-xl focus:border-purple-400 outline-none transition resize-none text-sm"
                     />
                   </div>
                 </div>
 
-                <div className="flex gap-3 pt-2">
+                <div className="flex gap-2 md:gap-3 pt-2">
                   <button
                     type="button"
                     onClick={() => setShowAddressModal(false)}
-                    className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200 transition"
+                    className="flex-1 bg-gray-100 text-gray-700 py-2 md:py-3 rounded-lg md:rounded-xl font-semibold text-sm md:text-base hover:bg-gray-200 transition"
                   >
                     Отмена
                   </button>
                   <button
                     type="submit"
                     disabled={savingAddress}
-                    className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-xl font-semibold disabled:opacity-70 transition"
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white py-2 md:py-3 rounded-lg md:rounded-xl font-semibold text-sm md:text-base disabled:opacity-70 transition"
                   >
                     {savingAddress ? (
                       <span className="flex items-center justify-center gap-2">
-                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span className="w-3 h-3 md:w-4 md:h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         Сохранение...
                       </span>
                     ) : '💾 Сохранить и продолжить'}

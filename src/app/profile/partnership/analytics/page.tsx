@@ -75,14 +75,13 @@ export default function AnalyticsPage() {
     ? [...analytics.daily_stats].reverse()
     : [];
 
-  // SVG размеры
+  // SVG размеры (адаптивные)
   const W = 800, H = 200;
   const PAD = { top: 20, right: 20, bottom: 30, left: 44 };
   const chartW = W - PAD.left - PAD.right;
   const chartH = H - PAD.top - PAD.bottom;
   const n = dailyStats.length;
 
-  // Максимум по активным метрикам
   const maxVal = Math.max(
     ...dailyStats.flatMap(d =>
       activeMetrics.map(m => (d as any)[m] ?? 0)
@@ -125,74 +124,74 @@ export default function AnalyticsPage() {
   ];
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-4 md:space-y-6">
 
       {/* Заголовок */}
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold">📊 Аналитика</h1>
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 md:gap-4">
+        <h1 className="text-xl md:text-2xl font-bold">📊 Аналитика</h1>
+        <div className="flex items-center gap-2">
           <div className="flex bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
             {PERIODS.map(p => (
               <button key={p.value} onClick={() => setPeriod(p.value)}
-                className={`px-4 py-2 text-sm font-medium transition ${period === p.value ? 'bg-purple-600 text-white' : 'text-gray-600 hover:bg-gray-50'}`}>
+                className={`px-3 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-medium transition ${period === p.value ? 'bg-purple-600 text-white' : 'text-gray-600 hover:bg-gray-50'}`}>
                 {p.label}
               </button>
             ))}
           </div>
           <button onClick={fetchAnalytics} disabled={refreshing}
-            className="p-2 bg-white border border-gray-200 rounded-xl shadow-sm hover:bg-gray-50 disabled:opacity-50">
-            <RefreshCw className={`w-5 h-5 text-gray-500 ${refreshing ? 'animate-spin' : ''}`} />
+            className="p-1.5 md:p-2 bg-white border border-gray-200 rounded-xl shadow-sm hover:bg-gray-50 disabled:opacity-50">
+            <RefreshCw className={`w-4 h-4 md:w-5 md:h-5 text-gray-500 ${refreshing ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </div>
 
-      {/* Карточки */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Карточки статистики: на мобильных 2 колонки */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         {statCards.map(s => (
-          <div key={s.label} className="bg-white rounded-2xl p-5 shadow-sm">
-            <div className={`${s.bg} w-10 h-10 rounded-xl flex items-center justify-center mb-3`}>
-              <s.icon className={`w-5 h-5 ${s.color}`} />
+          <div key={s.label} className="bg-white rounded-xl md:rounded-2xl p-3 md:p-5 shadow-sm">
+            <div className={`${s.bg} w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center mb-2 md:mb-3`}>
+              <s.icon className={`w-4 h-4 md:w-5 md:h-5 ${s.color}`} />
             </div>
-            <p className="text-gray-500 text-xs font-medium mb-1">{s.label}</p>
-            <p className="text-2xl font-bold">{s.value}</p>
+            <p className="text-gray-500 text-[10px] md:text-xs font-medium mb-0.5 md:mb-1">{s.label}</p>
+            <p className="text-base md:text-2xl font-bold">{s.value}</p>
           </div>
         ))}
       </div>
 
       {/* Рост */}
-      <div className={`rounded-2xl p-5 shadow-sm flex items-center gap-4 ${growthRate >= 0 ? 'bg-green-50 border border-green-100' : 'bg-red-50 border border-red-100'}`}>
+      <div className={`rounded-xl md:rounded-2xl p-3 md:p-5 shadow-sm flex items-center gap-3 md:gap-4 ${growthRate >= 0 ? 'bg-green-50 border border-green-100' : 'bg-red-50 border border-red-100'}`}>
         {growthRate >= 0
-          ? <TrendingUp  className="w-8 h-8 text-green-600 flex-shrink-0" />
-          : <TrendingDown className="w-8 h-8 text-red-600 flex-shrink-0" />}
+          ? <TrendingUp  className="w-6 h-6 md:w-8 md:h-8 text-green-600 flex-shrink-0" />
+          : <TrendingDown className="w-6 h-6 md:w-8 md:h-8 text-red-600 flex-shrink-0" />}
         <div>
-          <p className="text-sm text-gray-500">Рост просмотров за период</p>
-          <p className={`text-3xl font-bold ${growthRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+          <p className="text-xs md:text-sm text-gray-500">Рост просмотров за период</p>
+          <p className={`text-xl md:text-3xl font-bold ${growthRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {growthRate >= 0 ? '+' : ''}{growthRate.toFixed(1)}%
           </p>
         </div>
       </div>
 
       {/* ─── График ─── */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-          <h2 className="text-lg font-bold">
+      <div className="bg-white rounded-xl md:rounded-2xl p-3 md:p-6 shadow-sm overflow-x-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <h2 className="text-base md:text-lg font-bold">
             График за {PERIODS.find(p => p.value === period)?.label}
           </h2>
 
           {/* Переключатели метрик */}
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {METRICS.map(m => (
               <button
                 key={m.key}
                 onClick={() => toggleMetric(m.key)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition border ${
+                className={`flex items-center gap-1.5 px-2 py-1 md:px-3 md:py-1.5 rounded-full text-[10px] md:text-xs font-medium transition border ${
                   activeMetrics.includes(m.key)
                     ? `${m.bg} ${m.text} border-transparent`
                     : 'bg-white text-gray-400 border-gray-200'
                 }`}
               >
                 <span
-                  className="w-2 h-2 rounded-full"
+                  className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full"
                   style={{ background: activeMetrics.includes(m.key) ? m.color : '#d1d5db' }}
                 />
                 {m.label}
@@ -203,7 +202,7 @@ export default function AnalyticsPage() {
 
         {/* Tooltip над графиком */}
         {tooltip !== null && dailyStats[tooltip.index] && (
-          <div className="flex gap-4 mb-3 text-sm flex-wrap">
+          <div className="flex gap-3 mb-2 text-xs flex-wrap">
             <span className="text-gray-500 font-medium">
               {new Date(dailyStats[tooltip.index].date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })}
             </span>
@@ -215,8 +214,8 @@ export default function AnalyticsPage() {
           </div>
         )}
 
-        <div className="relative">
-          <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 220 }}
+        <div className="relative min-w-[600px] md:min-w-full">
+          <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 200 }}
             onMouseLeave={() => setTooltip(null)}>
             <defs>
               {METRICS.map(m => (
@@ -298,27 +297,27 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Топ товары */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm">
-        <h2 className="text-lg font-bold mb-4">🏆 Топ товары</h2>
+      <div className="bg-white rounded-xl md:rounded-2xl p-4 md:p-6 shadow-sm">
+        <h2 className="text-base md:text-lg font-bold mb-3 md:mb-4">🏆 Топ товары</h2>
         {analytics.top_products?.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-3 md:space-y-4">
             {analytics.top_products.map((product: any, index: number) => {
               const maxV = analytics.top_products[0]?.total_views || 1;
               const pct  = Math.round((product.total_views / maxV) * 100);
               return (
-                <div key={index} className="flex items-center gap-4">
-                  <span className="text-lg font-bold text-purple-600 w-6 text-center">#{index + 1}</span>
+                <div key={index} className="flex items-center gap-3 md:gap-4">
+                  <span className="text-base md:text-lg font-bold text-purple-600 w-5 md:w-6 text-center">#{index + 1}</span>
                   <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium text-sm">{product.product__name || '—'}</span>
-                      <div className="flex items-center gap-3 text-xs text-gray-500">
-                        <span><Eye className="w-3 h-3 inline mr-0.5" />{product.total_views.toLocaleString()}</span>
-                        <span><ShoppingCart className="w-3 h-3 inline mr-0.5" />{product.purchases}</span>
+                    <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
+                      <span className="font-medium text-xs md:text-sm">{product.product__name || '—'}</span>
+                      <div className="flex items-center gap-2 text-[10px] md:text-xs text-gray-500">
+                        <span><Eye className="w-2.5 h-2.5 md:w-3 md:h-3 inline mr-0.5" />{product.total_views.toLocaleString()}</span>
+                        <span><ShoppingCart className="w-2.5 h-2.5 md:w-3 md:h-3 inline mr-0.5" />{product.purchases}</span>
                       </div>
                     </div>
-                    <div className="w-full bg-gray-100 rounded-full h-2">
+                    <div className="w-full bg-gray-100 rounded-full h-1.5 md:h-2">
                       <div
-                        className="bg-gradient-to-r from-purple-600 to-blue-500 h-2 rounded-full transition-all duration-500"
+                        className="bg-gradient-to-r from-purple-600 to-blue-500 h-full rounded-full transition-all duration-500"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -328,9 +327,9 @@ export default function AnalyticsPage() {
             })}
           </div>
         ) : (
-          <div className="text-center text-gray-400 py-8">
-            <ShoppingCart className="w-10 h-10 mx-auto mb-2 opacity-30" />
-            <p>Нет данных по товарам</p>
+          <div className="text-center text-gray-400 py-6 md:py-8">
+            <ShoppingCart className="w-8 h-8 md:w-10 md:h-10 mx-auto mb-2 opacity-30" />
+            <p className="text-sm">Нет данных по товарам</p>
           </div>
         )}
       </div>
