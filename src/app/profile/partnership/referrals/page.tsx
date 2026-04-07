@@ -53,7 +53,6 @@ export default function ReferralsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
       
       <div className="container mx-auto px-4 py-4 md:py-8 max-w-6xl">
         <Link href="/profile/partnership" className="text-primary hover:underline mb-4 inline-block text-sm md:text-base">
@@ -185,8 +184,6 @@ export default function ReferralsPage() {
           </div>
         )}
       </div>
-
-      <Footer />
     </div>
   );
 }

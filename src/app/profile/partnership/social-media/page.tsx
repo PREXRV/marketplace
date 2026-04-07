@@ -78,7 +78,6 @@ export default function SocialMediaPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
       
       <div className="container mx-auto px-4 py-4 md:py-8 max-w-5xl">
         <Link href="/profile/partnership" className="text-primary hover:underline mb-4 inline-block text-sm md:text-base">
@@ -246,7 +245,6 @@ export default function SocialMediaPage() {
         </div>
       </div>
 
-      <Footer />
     </div>
   );
 }
