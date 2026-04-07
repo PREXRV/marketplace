@@ -891,6 +891,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                           <span className="font-medium text-base md:text-lg truncate">{variant.name}</span>
                         </div>
 
+                        {/* Цвет и размер (без процента скидки) */}
                         <div className="flex flex-wrap gap-2 justify-start sm:justify-center w-full sm:w-auto mt-2 sm:mt-0">
                           {variant.color && (
                             <span className="text-xs md:text-sm text-gray-600 bg-gray-100 px-2 py-1 md:px-3 md:py-1 rounded-full">
@@ -902,20 +903,23 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                               {variant.size}
                             </span>
                           )}
-                          {variantDiscount > 0 && (
-                            <span className="text-xs md:text-sm bg-red-500 text-white px-2 py-1 md:px-3 md:py-1 rounded-full font-bold">
-                              -{variantDiscount}%
-                            </span>
-                          )}
                         </div>
 
+                        {/* Цена и скидка в одной строке */}
                         <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-between sm:justify-end mt-2 sm:mt-0">
-                          <div className="flex items-center gap-2 flex-wrap justify-end">
-                            <span className="font-bold text-primary text-base md:text-lg">{formatPrice(variantFinalPrice)} ₽</span>
+                          <div className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
+                            <span className="font-bold text-primary text-base md:text-lg">
+                              {formatPrice(variantFinalPrice)} ₽
+                            </span>
                             {variantDiscount > 0 && (
-                              <span className="text-xs md:text-sm text-gray-400 line-through">
-                                {formatPrice(variantOriginalPrice)} ₽
-                              </span>
+                              <>
+                                <span className="text-xs md:text-sm text-gray-400 line-through">
+                                  {formatPrice(variantOriginalPrice)} ₽
+                                </span>
+                                <span className="text-xs md:text-sm bg-red-500 text-white px-1.5 py-0.5 md:px-2 md:py-0.5 rounded-full font-bold">
+                                  -{variantDiscount}%
+                                </span>
+                              </>
                             )}
                           </div>
                         </div>
@@ -995,24 +999,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                 {avail.canBuy ? (avail.btnLabel || 'В корзину') : 'Нет в наличии'}
               </button>
             </div>
-
-            <div className="mt-6 bg-white rounded-xl p-4 md:p-6 shadow-sm">
-              <h3 className="font-semibold text-base md:text-lg mb-3 md:mb-4">Поделиться</h3>
-              <div className="flex flex-wrap gap-2 md:gap-3">
-                <button onClick={() => handleShare('vk')} className="px-3 py-1 md:px-4 md:py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition text-sm md:text-base">
-                  VK
-                </button>
-                <button onClick={() => handleShare('telegram')} className="px-3 py-1 md:px-4 md:py-2 rounded-lg bg-sky-500 text-white hover:bg-sky-600 transition text-sm md:text-base">
-                  Telegram
-                </button>
-                <button onClick={() => handleShare('whatsapp')} className="px-3 py-1 md:px-4 md:py-2 rounded-lg bg-green-500 text-white hover:bg-green-600 transition text-sm md:text-base">
-                  WhatsApp
-                </button>
-                <button onClick={() => handleShare('copy')} className="px-3 py-1 md:px-4 md:py-2 rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300 transition text-sm md:text-base">
-                  Копировать ссылку
-                </button>
-              </div>
-
+            
               <div className="flex flex-wrap justify-center gap-x-3 md:gap-x-4 gap-y-1 mt-4">
                 {[
                   { href: '/docs/returns', label: 'Возврат' },
