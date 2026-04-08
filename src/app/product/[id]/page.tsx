@@ -39,7 +39,7 @@ export async function generateMetadata(
     product.images?.[0]?.image_url ||
     product.images?.[0]?.image ||
     '';
-  const url = `${DOMAIN_URL}/product/${params.id}`;
+  const url = `${DOMAIN_URL}/products/${params.id}`;
 
   return {
     title,
@@ -90,7 +90,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
     (img: string, idx: number) => schemaImages.indexOf(img) === idx
   );
 
-  const productUrl = `${DOMAIN_URL}/product/${params.id}`;
+  const productUrl = `${DOMAIN_URL}/products/${params.id}`;
 
   const jsonLd: Record<string, any> = {
     '@context': 'https://schema.org/',
