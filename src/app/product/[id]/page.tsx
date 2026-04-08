@@ -7,7 +7,7 @@ const DOMAIN_URL = process.env.NEXT_PUBLIC_API_URL ;
 
 async function getProduct(id: string) {
   try {
-    const res = await fetch(`${API_ROOT}product/${id}/`, {
+    const res = await fetch(`${API_ROOT}products/${id}/`, {
       next: { revalidate: 60 },
     });
     if (!res.ok) return null;
