@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 const API_ROOT = 'https://fulfilling-success-production-3288.up.railway.app/api/products/';
-const DOMAIN_URL = process.env.NEXT_PUBLIC_API_URL;
+const DOMAIN_URL = process.env.DOMAIN_URL;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const res = await fetch(`${API_ROOT}products/?status=published&page_size=10000`);
   const data = await res.json();
