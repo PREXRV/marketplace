@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import ProductPageClient from './ProductPageClient';
 
-const API_ROOT = 'https://fulfilling-success-production-3288.up.railway.app/api/products';
-const DOMAIN_URL = process.env.NEXT_PUBLIC_API_URL ;
+const API_ROOT = 'https://fulfilling-success-production-3288.up.railway.app/api/products/';
+const DOMAIN_URL = process.env.DOMAIN_URL ;
 
 async function getProduct(id: string) {
   try {
