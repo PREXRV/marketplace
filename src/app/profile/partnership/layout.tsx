@@ -14,14 +14,15 @@ export default function PartnershipLayout({ children }: { children: React.ReactN
     <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="container mx-auto px-4 py-4 md:py-8">
-        <div className="gap-4 md:gap-8 items-start">
+        {/* Основной контейнер: на мобильных колонка, на ПК — строка (flex) */}
+        <div className="flex flex-col md:flex-row gap-4 md:gap-8 items-start">
           {/* Десктопный сайдбар (виден всегда) */}
           <aside className="hidden md:block w-64 lg:w-72 flex-shrink-0 sticky top-24">
             <PartnershipSidebar />
           </aside>
 
-          {/* Мобильная кнопка бургер */}
-          <div className="inline-flex items-center md:hidden sticky top-20 z-30 bg-white/80 backdrop-blur-sm p-2 rounded-lg">
+          {/* Мобильная кнопка бургер — по центру */}
+          <div className="md:hidden sticky top-20 z-30 bg-white/80 backdrop-blur-sm p-2 rounded-lg w-full flex justify-center">
             <button
               onClick={() => setMobileSidebarOpen(true)}
               className="flex items-center gap-2 px-3 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium"
