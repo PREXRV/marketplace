@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import ProductPageClient from './ProductPageClient';
 
-const API_ROOT = 'https://fulfilling-success-production-3288.up.railway.app/api/products/';
+const API_ROOT = 'https://fulfilling-success-production-3288.up.railway.app/api/products';
 const DOMAIN_URL = process.env.NEXT_PUBLIC_API_URL ;
 
 async function getProduct(id: string) {
@@ -39,7 +39,7 @@ export async function generateMetadata(
     product.images?.[0]?.image_url ||
     product.images?.[0]?.image ||
     '';
-  const url = `${DOMAIN_URL}/products/${params.id}`;
+  const url = `${DOMAIN_URL}/product/${params.id}`;
 
   return {
     title,
@@ -90,7 +90,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
     (img: string, idx: number) => schemaImages.indexOf(img) === idx
   );
 
-  const productUrl = `${DOMAIN_URL}/products/${params.id}`;
+  const productUrl = `${DOMAIN_URL}/product/${params.id}`;
 
   const jsonLd: Record<string, any> = {
     '@context': 'https://schema.org/',
