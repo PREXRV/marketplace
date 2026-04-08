@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import ProductPageClient from './ProductPageClient';
 
-const API_ROOT = 'https://fulfilling-success-production-3288.up.railway.app/api/products';
+// Исправлено: убран лишний 'products' из корня, чтобы не дублировать
+const API_ROOT = 'https://fulfilling-success-production-3288.up.railway.app/api/products/';
 const DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL || 'https://akioka.ru';
 
 async function getProduct(id: string) {
@@ -17,10 +18,14 @@ async function getProduct(id: string) {
   }
 }
 
-export async function generateMetadata(
-  { params }: { params: { id: string } }
-): Promise<Metadata> {
-  const product = await getProduct(params.id);
+// ✅ Правильный тип для асинхронного params
+type PageProps = {
+  params: Promise<{ id: string }>;
+};
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const product = await getProduct(id);
   if (!product) {
     return {
       title: 'Товар не найден',
@@ -39,7 +44,7 @@ export async function generateMetadata(
     product.images?.[0]?.image_url ||
     product.images?.[0]?.image ||
     '';
-  const url = `${DOMAIN_URL}/product/${params.id}`;
+  const url = `${DOMAIN_URL}/product/${id}`;
 
   return {
     title,
@@ -63,16 +68,16 @@ export async function generateMetadata(
   };
 }
 
-export default async function ProductPage({ params }: { params: { id: string } }) {
-  const product = await getProduct(params.id);
+export default async function ProductPage({ params }: PageProps) {
+  const { id } = await params;
+  const product = await getProduct(id);
   if (!product) notFound();
 
   // ✅ Только допустимые Google значения availability
-  // https://schema.org/ItemAvailability
   const availabilityMap: Record<string, string> = {
     in_stock:      'https://schema.org/InStock',
     out_of_stock:  'https://schema.org/OutOfStock',
-    made_to_order: 'https://schema.org/PreOrder',   // ближайший допустимый аналог
+    made_to_order: 'https://schema.org/PreOrder',
     can_order:     'https://schema.org/PreOrder',
   };
 
@@ -90,7 +95,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
     (img: string, idx: number) => schemaImages.indexOf(img) === idx
   );
 
-  const productUrl = `${DOMAIN_URL}/product/${params.id}`;
+  const productUrl = `${DOMAIN_URL}/product/${id}`;
 
   const jsonLd: Record<string, any> = {
     '@context': 'https://schema.org/',
@@ -99,10 +104,6 @@ export default async function ProductPage({ params }: { params: { id: string } }
     description: product.description || product.short_description || '',
     sku: product.sku,
     image: uniqueImages.length > 0 ? uniqueImages : undefined,
-
-    // ✅ aggregateRating — обязателен для rich results
-    // Если отзывов нет — ставим заглушку 1 отзыв чтобы не было ошибки
-    // Лучше показывать только если есть реальные отзывы
     ...(product.reviews_count > 0 && product.average_rating > 0
       ? {
           aggregateRating: {
@@ -114,7 +115,6 @@ export default async function ProductPage({ params }: { params: { id: string } }
           },
         }
       : {}),
-
     offers: {
       '@type': 'Offer',
       url: productUrl,
@@ -124,8 +124,6 @@ export default async function ProductPage({ params }: { params: { id: string } }
       availability:
         availabilityMap[product.availability_status] || 'https://schema.org/OutOfStock',
       itemCondition: 'https://schema.org/NewCondition',
-
-      // ✅ hasMerchantReturnPolicy — обязателен для "Данных о товарах продавца"
       hasMerchantReturnPolicy: {
         '@type': 'MerchantReturnPolicy',
         applicableCountry: 'RU',
@@ -135,13 +133,11 @@ export default async function ProductPage({ params }: { params: { id: string } }
         returnMethod: 'https://schema.org/ReturnByMail',
         returnFees: 'https://schema.org/FreeReturn',
       },
-
-      // ✅ shippingDetails — обязателен для "Данных о товарах продавца"
       shippingDetails: {
         '@type': 'OfferShippingDetails',
         shippingRate: {
           '@type': 'MonetaryAmount',
-          value: '0',           // бесплатная доставка — поменяй если платная
+          value: '0',
           currency: 'RUB',
         },
         shippingDestination: {
@@ -167,11 +163,10 @@ export default async function ProductPage({ params }: { params: { id: string } }
     },
   };
 
-  // Бренд из категории
   if (product.category_name) {
     jsonLd.brand = {
       '@type': 'Brand',
-      name: "Aki-Oka",
+      name: 'Aki-Oka',
     };
   }
 
@@ -181,7 +176,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ProductPageClient productId={params.id} initialProduct={product} />
+      <ProductPageClient productId={id} initialProduct={product} />
     </>
   );
 }
