@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import ProductPageClient from './ProductPageClient';
 
 const API_ROOT = 'https://fulfilling-success-production-3288.up.railway.app/apiproducts';
-const DOMAIN_URL = process.env.DOMAIN_URL ;
+const DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL || 'https://akioka.ru';
 
 async function getProduct(id: string) {
   try {
