@@ -187,26 +187,22 @@ export default function ProductCard({ product }: ProductCardProps) {
             <>
               <button
                 onClick={goPrev}
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white/95 backdrop-blur-md hover:bg-white shadow-lg border border-gray-200 rounded-full p-1.5 transition-all duration-200 hover:scale-110 opacity-0 group-hover:opacity-100"
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-50 w-8 h-8 bg-white/95 backdrop-blur-md hover:bg-white shadow-lg border border-gray-200 rounded-full p-1.5 transition-all duration-200 hover:scale-110 opacity-0 group-hover:opacity-100"
               >
-                <svg className="w-full h-full text-gray-700" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
+                {/* ... */}
               </button>
               <button
                 onClick={goNext}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-white/95 backdrop-blur-md hover:bg-white shadow-lg border border-gray-200 rounded-full p-1.5 transition-all duration-200 hover:scale-110 opacity-0 group-hover:opacity-100"
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-50 w-8 h-8 bg-white/95 backdrop-blur-md hover:bg-white shadow-lg border border-gray-200 rounded-full p-1.5 transition-all duration-200 hover:scale-110 opacity-0 group-hover:opacity-100"
               >
-                <svg className="w-full h-full text-gray-700" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
+                {/* ... */}
               </button>
             </>
           )}
 
           {/* Точки-индикаторы */}
           {hasMultipleImages && (
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 flex gap-1.5 bg-black/70 backdrop-blur-md px-4 py-2 rounded-full shadow-lg">
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-50 flex gap-1.5 bg-black/70 backdrop-blur-md px-4 py-2 rounded-full shadow-lg">
               {allImages.slice(0, 5).map((_, i) => (
                 <button
                   key={i}
@@ -227,7 +223,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               fill
               className="object-cover group-hover:scale-110 transition-transform duration-500"
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-              style={{ zIndex: 0 }}   // 👈 добавьте эту строку
+              style={{ zIndex: 0, pointerEvents: 'none' }}  // 👈 добавляем pointerEvents: 'none'
             />
           </div>
 

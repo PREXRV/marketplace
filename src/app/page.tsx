@@ -1,9 +1,19 @@
 import Header from '@/components/Header';
 import HeroBanner from '@/components/HeroBanner';
-import ProductGrid from '@/components/ProductGrid';
 import ClientDynamicContent from '@/components/ClientDynamicContent';
+import SaleProducts from '@/components/homepage/SaleProducts';
 import { unstable_cache } from 'next/cache';
 import { api, Product, Banner, SocialPost, YouTubeVideo } from '@/lib/api';
+
+// Shuffle array helper
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
 
 interface SaleInfo {
   id: number;
@@ -25,7 +35,6 @@ interface HomePageData {
   sale_info: SaleInfo | null;
 }
 
-// ✅ Кэшируем данные между запросами (ускоряет TTFB)
 const getCachedHomePageData = unstable_cache(
   async (): Promise<HomePageData> => {
     const [products, homepage] = await Promise.all([
@@ -33,8 +42,13 @@ const getCachedHomePageData = unstable_cache(
       api.publicHomepage(),
     ]);
 
-    const featured = products.filter((p) => p.is_featured).slice(0, 8);
-    const newProducts = products.filter((p) => p.is_new).slice(0, 8);
+    let featured = products.filter((p) => p.is_featured).slice(0, 8);
+    let newProducts = products.filter((p) => p.is_new).slice(0, 8);
+    let productsOnSale = homepage.products_on_sale ?? [];
+
+    featured = shuffleArray(featured);
+    newProducts = shuffleArray(newProducts);
+    productsOnSale = shuffleArray(productsOnSale);
 
     return {
       featuredProducts: featured,
@@ -42,7 +56,7 @@ const getCachedHomePageData = unstable_cache(
       banners: homepage.banners ?? [],
       social_posts: homepage.social_posts ?? [],
       youtube_videos: homepage.youtube_videos ?? [],
-      products_on_sale: homepage.products_on_sale ?? [],
+      products_on_sale: productsOnSale,
       sale_info: homepage.sale_info ?? null,
     };
   },
@@ -59,27 +73,16 @@ export default async function Home() {
       <main className="overflow-x-hidden">
         {data.banners.length > 0 && <HeroBanner banners={data.banners} />}
 
-        {data.featuredProducts.length > 0 && (
-          <ProductGrid
-            products={data.featuredProducts}
-            title="Рекомендуемые товары"
-          />
+        {data.products_on_sale.length > 0 && (
+          <SaleProducts products={data.products_on_sale} saleInfo={data.sale_info} />
         )}
 
-        {data.newProducts.length > 0 && (
-          <ProductGrid
-            products={data.newProducts}
-            title="Новинки"
-          />
-        )}
-
-        {/* Весь контент ниже первого экрана загружается лениво */}
         <ClientDynamicContent
+          featuredProducts={data.featuredProducts}
+          newProducts={data.newProducts}
           youtubeVideos={data.youtube_videos}
           channelUrl="https://youtube.com/@aki-oka_shop"
           socialPosts={data.social_posts}
-          productsOnSale={data.products_on_sale}
-          saleInfo={data.sale_info}
         />
       </main>
     </div>
