@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { Product, getImageUrl, formatPrice } from '@/lib/api';
 import { useCart } from '@/context/CartContext';
 import StarRating from './StarRating';
@@ -34,7 +33,6 @@ function getAvailabilityBadge(product: Product) {
       canBuy: true,
     };
   }
-  // ✅ out_of_stock — явный статус "нет в наличии"
   if (s === 'out_of_stock') {
     return {
       label: 'Нет в наличии',
@@ -43,7 +41,6 @@ function getAvailabilityBadge(product: Product) {
       canBuy: false,
     };
   }
-  // ✅ in_stock — проверяем stock
   if (product.stock > 0) {
     return {
       label: `В наличии (${product.stock} шт.)`,
@@ -52,7 +49,6 @@ function getAvailabilityBadge(product: Product) {
       canBuy: true,
     };
   }
-  // ✅ in_stock но stock=0 — всё равно canBuy: true (статус приоритетнее stock)
   return {
     label: 'В наличии',
     cls: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -189,13 +185,17 @@ export default function ProductCard({ product }: ProductCardProps) {
                 onClick={goPrev}
                 className="absolute left-2 top-1/2 -translate-y-1/2 z-50 w-8 h-8 bg-white/95 backdrop-blur-md hover:bg-white shadow-lg border border-gray-200 rounded-full p-1.5 transition-all duration-200 hover:scale-110 opacity-0 group-hover:opacity-100"
               >
-                {/* ... */}
+                <svg className="w-full h-full text-gray-700" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
               </button>
               <button
                 onClick={goNext}
                 className="absolute right-2 top-1/2 -translate-y-1/2 z-50 w-8 h-8 bg-white/95 backdrop-blur-md hover:bg-white shadow-lg border border-gray-200 rounded-full p-1.5 transition-all duration-200 hover:scale-110 opacity-0 group-hover:opacity-100"
               >
-                {/* ... */}
+                <svg className="w-full h-full text-gray-700" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
               </button>
             </>
           )}
@@ -223,11 +223,11 @@ export default function ProductCard({ product }: ProductCardProps) {
               fill
               className="object-cover group-hover:scale-110 transition-transform duration-500"
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-              style={{ zIndex: 0, pointerEvents: 'none' }}  // 👈 добавляем pointerEvents: 'none'
+              style={{ zIndex: 0, pointerEvents: 'none' }}
             />
           </div>
 
-          {/* ✅ Оверлей "Нет в наличии" — только для in_stock без остатка */}
+          {/* ✅ Оверлей "Нет в наличии" */}
           {!avail.canBuy && product.availability_status === 'in_stock' && (
             <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
               <div className="text-center">
@@ -299,7 +299,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               </div>
             </div>
 
-            {/* ✅ Бейдж наличия / срока изготовления */}
+            {/* ✅ Бейдж наличия */}
             <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border mb-3 ${avail.cls}`}>
               <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${avail.dot}`} />
               {avail.label}
