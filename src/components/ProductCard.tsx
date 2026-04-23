@@ -7,6 +7,7 @@ import { useCart } from '@/context/CartContext';
 import StarRating from './StarRating';
 import FavoriteButton from './FavoriteButton';
 import { useState } from 'react';
+import OptimizedImage from '@/components/OptimizedImage';
 
 interface ProductCardProps {
   product: Product;
@@ -220,16 +221,12 @@ export default function ProductCard({ product }: ProductCardProps) {
 
           {/* Само фото */}
           <div className="relative w-full aspect-square">
-            <Image
+            <OptimizedImage
               src={imageUrl}
               alt={allImages[currentImageIndex]?.alt_text || product.name}
               fill
               className="object-cover group-hover:scale-110 transition-transform duration-500"
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src =
-                  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23ddd" width="400" height="400"/%3E%3Ctext fill="%23999" font-size="40" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EНет фото%3C/text%3E%3C/svg%3E';
-              }}
             />
           </div>
 

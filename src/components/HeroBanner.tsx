@@ -208,10 +208,12 @@ export default function HeroBanner({ banners }: { banners: Banner[] }) {
                 allowFullScreen
               />
             ) : (
-              <img
+              <OptimizedImage
                 src={mediaUrl}
                 alt={b.title}
-                className="h-full w-full object-cover scale-enter"
+                fill
+                className="object-cover scale-enter"
+                sizes="100vw"
               />
             )}
           </div>
