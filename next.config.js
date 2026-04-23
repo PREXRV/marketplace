@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // ✅ Включаем кэширование компонентов (новый синтаксис)
+  cacheComponents: true,
+
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -13,15 +16,30 @@ const nextConfig = {
   },
 
   async rewrites() {
-    // ✅ Фоллбэк на Railway если переменная не задана
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://fulfilling-success-production-3288.up.railway.app';
-    
     return [
       {
         source: '/api/:path*',
         destination: `${apiUrl}/api/:path*`,
       },
     ];
+  },
+
+  async headers() {
+    return [
+      {
+        source: '/_next/static/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+      {
+        source: '/static/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=86400' }],
+      },
+    ];
+  },
+
+  experimental: {
+    inlineCss: true, // инлайн критического CSS
   },
 };
 

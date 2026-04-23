@@ -215,6 +215,8 @@ export default function HeroBanner({ banners }: { banners: Banner[] }) {
                 fill
                 className="object-cover scale-enter"
                 sizes="100vw"
+                priority={current === 0}                     // ✅ только первый слайд
+                fetchPriority={current === 0 ? 'high' : 'auto'}
               />
             )}
           </div>

@@ -1,16 +1,9 @@
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import HeroBanner from '@/components/HeroBanner';
 import ProductGrid from '@/components/ProductGrid';
-import YouTubeVideos from '@/components/YouTubeVideos';
-import SocialFeed from '@/components/SocialFeed';
-import RecentlyViewedProducts from '@/components/RecentlyViewedProducts';
-import SaleProducts from '@/components/homepage/SaleProducts';
-
+import ClientDynamicContent from '@/components/ClientDynamicContent';
+import { unstable_cache } from 'next/cache';
 import { api, Product, Banner, SocialPost, YouTubeVideo } from '@/lib/api';
-
-export const revalidate = 0;
-export const dynamic = 'force-dynamic';
 
 interface SaleInfo {
   id: number;
@@ -32,28 +25,33 @@ interface HomePageData {
   sale_info: SaleInfo | null;
 }
 
-async function getHomePageData(): Promise<HomePageData> {
-  const [products, homepage] = await Promise.all([
-    api.getProducts(),
-    api.publicHomepage(),
-  ]);
+// ✅ Кэшируем данные между запросами (ускоряет TTFB)
+const getCachedHomePageData = unstable_cache(
+  async (): Promise<HomePageData> => {
+    const [products, homepage] = await Promise.all([
+      api.getProducts(),
+      api.publicHomepage(),
+    ]);
 
-  const featured = products.filter((p) => p.is_featured).slice(0, 8);
-  const newProducts = products.filter((p) => p.is_new).slice(0, 8);
+    const featured = products.filter((p) => p.is_featured).slice(0, 8);
+    const newProducts = products.filter((p) => p.is_new).slice(0, 8);
 
-  return {
-    featuredProducts: featured,
-    newProducts,
-    banners: homepage.banners ?? [],
-    social_posts: homepage.social_posts ?? [],
-    youtube_videos: homepage.youtube_videos ?? [],
-    products_on_sale: homepage.products_on_sale ?? [],
-    sale_info: homepage.sale_info ?? null,
-  };
-}
+    return {
+      featuredProducts: featured,
+      newProducts,
+      banners: homepage.banners ?? [],
+      social_posts: homepage.social_posts ?? [],
+      youtube_videos: homepage.youtube_videos ?? [],
+      products_on_sale: homepage.products_on_sale ?? [],
+      sale_info: homepage.sale_info ?? null,
+    };
+  },
+  ['homepage-data'],
+  { revalidate: 3600, tags: ['homepage'] }
+);
 
 export default async function Home() {
-  const data = await getHomePageData();
+  const data = await getCachedHomePageData();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -61,21 +59,10 @@ export default async function Home() {
       <main className="overflow-x-hidden">
         {data.banners.length > 0 && <HeroBanner banners={data.banners} />}
 
-        {data.products_on_sale.length > 0 && (
-          <SaleProducts products={data.products_on_sale} saleInfo={data.sale_info} />
-        )}
-
         {data.featuredProducts.length > 0 && (
           <ProductGrid
             products={data.featuredProducts}
             title="Рекомендуемые товары"
-          />
-        )}
-
-        {data.youtube_videos.length > 0 && (
-          <YouTubeVideos
-            videos={data.youtube_videos}
-            channelUrl="https://youtube.com/@aki-oka_shop"
           />
         )}
 
@@ -86,12 +73,15 @@ export default async function Home() {
           />
         )}
 
-        {data.social_posts.length > 0 && <SocialFeed posts={data.social_posts} />}
-
-        <RecentlyViewedProducts maxItems={10} />
+        {/* Весь контент ниже первого экрана загружается лениво */}
+        <ClientDynamicContent
+          youtubeVideos={data.youtube_videos}
+          channelUrl="https://youtube.com/@aki-oka_shop"
+          socialPosts={data.social_posts}
+          productsOnSale={data.products_on_sale}
+          saleInfo={data.sale_info}
+        />
       </main>
-
-      <Footer />
     </div>
   );
 }
