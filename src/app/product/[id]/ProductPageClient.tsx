@@ -106,7 +106,6 @@ function uniqueBy<T>(items: T[], keyGetter: (item: T) => string | null | undefin
 }
 
 export default function ProductPageClient({ productId, initialProduct }: Props) {
-  // Защита от SSR: на сервере ничего не рендерим
   if (typeof window === 'undefined') {
     return null;
   }
@@ -385,14 +384,11 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
     );
   }
 
-  // Исправленное определение активной распродажи — проверяем оба поля
   const hasActiveTimedSale = (() => {
-    // Проверяем по product.sale_end_date
     if (product.sale_end_date) {
       const endDate = new Date(product.sale_end_date);
       if (!isNaN(endDate.getTime()) && endDate > new Date()) return true;
     }
-    // Проверяем по product.active_sale.end_date
     if (product.active_sale?.end_date) {
       const endDate = new Date(product.active_sale.end_date);
       if (!isNaN(endDate.getTime()) && endDate > new Date()) return true;
@@ -507,6 +503,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
 
                 <div className="relative overflow-hidden rounded-xl">
                   <OptimizedImage
+                    key={selectedImage}
                     src={imageUrl}
                     alt={mainImageAlt}
                     width={500}
@@ -572,14 +569,11 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                       }`}
                     >
                       <OptimizedImage
-                        key={selectedImage}  // 👈 добавляем key
-                        src={imageUrl}
-                        alt={mainImageAlt}
-                        width={500}
-                        height={500}
-                        className="w-full h-[300px] md:h-[500px] object-contain transition-transform duration-500 group-hover:scale-110 cursor-pointer"
-                        onClick={() => setLightboxOpen(true)}
-                        style={{ zIndex: 0 }}
+                        src={img.normalizedUrl}
+                        alt={img.alt_text || `Фото ${idx + 1}`}
+                        width={80}
+                        height={80}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                       {selectedImage === idx && (
                         <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent pointer-events-none" />
@@ -799,14 +793,12 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
               )}
             </div>
 
-            {/* Блок цены и скидки — теперь всегда показывает старую цену при активной акции */}
             <div className="mb-6 p-4 md:p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
               {(() => {
                 let displayOldPrice = currentOldPrice && parseFloat(currentOldPrice) > parseFloat(currentPrice) ? currentOldPrice : null;
                 let displayDiscountPercent = discountPercentage;
                 let displaySavings = savingsAmount;
 
-                // Если нет старой цены, но есть активная акция (через active_sale или sale_end_date)
                 const isAnySaleActive = hasActiveTimedSale || (product.active_sale && product.active_sale.discount_value);
                 if (!displayOldPrice && isAnySaleActive && product.active_sale?.discount_value) {
                   const discountPercentFromSale = Number(product.active_sale.discount_value);
