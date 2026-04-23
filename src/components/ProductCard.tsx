@@ -227,6 +227,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               fill
               className="object-cover group-hover:scale-110 transition-transform duration-500"
               sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+              style={{ zIndex: 0 }}   // 👈 добавьте эту строку
             />
           </div>
 
