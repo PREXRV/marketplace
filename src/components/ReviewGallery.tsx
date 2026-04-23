@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import OptimizedImage from '@/components/OptimizedImage';
-import Image from 'next/image';
 import { api, getImageUrl, MediaGalleryItem } from '@/lib/api';
 import StarRating from './StarRating';
 import { useAuth } from '@/context/AuthContext';
@@ -204,7 +203,7 @@ export default function ReviewGallery({ productId }: ReviewGalleryProps) {
         ))}
       </div>
 
-      {/* LIGHTBOX */}
+      {/* LIGHTBOX — исправленный */}
       {lightboxOpen && filteredMedia.length > 0 && (
         <div
           className="fixed inset-0 z-50 bg-black bg-opacity-95 flex items-center justify-center p-2 md:p-4"
@@ -212,14 +211,14 @@ export default function ReviewGallery({ productId }: ReviewGalleryProps) {
         >
           <button
             onClick={closeLightbox}
-            className="absolute top-2 right-2 md:top-4 md:right-4 text-white hover:text-gray-300 transition z-10 bg-black bg-opacity-50 rounded-full p-1.5 md:p-2 hover:bg-opacity-70"
+            className="absolute top-2 right-2 md:top-4 md:right-4 text-white hover:text-gray-300 transition z-20 bg-black bg-opacity-50 rounded-full p-1.5 md:p-2 hover:bg-opacity-70"
           >
             <svg className="w-6 h-6 md:w-8 md:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
 
-          <div className="absolute top-2 left-2 md:top-4 md:left-4 bg-black bg-opacity-70 text-white px-2 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium z-10">
+          <div className="absolute top-2 left-2 md:top-4 md:left-4 bg-black bg-opacity-70 text-white px-2 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium z-20">
             {currentImageIndex + 1} / {filteredMedia.length}
           </div>
 
@@ -227,7 +226,7 @@ export default function ReviewGallery({ productId }: ReviewGalleryProps) {
             <>
               <button
                 onClick={(e) => { e.stopPropagation(); prevImage(); }}
-                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-2 md:p-4 rounded-full transition z-10 hover:scale-110"
+                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-2 md:p-4 rounded-full transition z-20 hover:scale-110"
               >
                 <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -235,7 +234,7 @@ export default function ReviewGallery({ productId }: ReviewGalleryProps) {
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); nextImage(); }}
-                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-2 md:p-4 rounded-full transition z-10 hover:scale-110"
+                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-2 md:p-4 rounded-full transition z-20 hover:scale-110"
               >
                 <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -248,6 +247,7 @@ export default function ReviewGallery({ productId }: ReviewGalleryProps) {
             <div className="flex-shrink-0 max-w-4xl">
               {currentMedia.media_type === 'image' ? (
                 <OptimizedImage
+                  key={currentImageIndex}   // 👈 ключ для принудительной перерисовки
                   src={getImageUrl(currentMedia.file)}
                   alt="Gallery media"
                   width={1200}
