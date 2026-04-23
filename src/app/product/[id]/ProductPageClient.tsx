@@ -1138,7 +1138,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                   e.stopPropagation();
                   setSelectedImage((p) => (p - 1 + normalizedGalleryImages.length) % normalizedGalleryImages.length);
                 }}
-                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-2 md:p-4 rounded-full transition z-10"
+                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-2 md:p-4 rounded-full transition z-20"
               >
                 <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -1150,7 +1150,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                   e.stopPropagation();
                   setSelectedImage((p) => (p + 1) % normalizedGalleryImages.length);
                 }}
-                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-2 md:p-4 rounded-full transition z-10"
+                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-2 md:p-4 rounded-full transition z-20"
               >
                 <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -1160,10 +1160,17 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
           )}
 
           <div className="max-w-7xl max-h-full" onClick={(e) => e.stopPropagation()}>
-            <OptimizedImage src={imageUrl} alt={mainImageAlt} width={1200} height={1200} className="max-w-full max-h-[95vh] object-contain rounded-lg shadow-2xl" />
+            <OptimizedImage
+              key={selectedImage}   // 👈 добавить key для принудительной перерисовки
+              src={imageUrl}
+              alt={mainImageAlt}
+              width={1200}
+              height={1200}
+              className="max-w-full max-h-[95vh] object-contain rounded-lg shadow-2xl"
+            />
           </div>
 
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black bg-opacity-70 text-white px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black bg-opacity-70 text-white px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm z-20">
             {selectedVariant ? 'Фото варианта' : `${selectedImage + 1} / ${normalizedGalleryImages.length || 1}`}
           </div>
         </div>
