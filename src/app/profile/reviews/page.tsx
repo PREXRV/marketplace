@@ -7,8 +7,9 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { api, Review, getImageUrl } from '@/lib/api';
+import OptimizedImage from '@/components/OptimizedImage';
 
-// SVG иконки
+// SVG иконки (без изменений)
 const StarIcon = ({ filled, size = 18 }: { filled: boolean; size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill={filled ? '#FFD700' : 'none'} stroke={filled ? '#FFD700' : '#ddd'} strokeWidth="2">
     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
@@ -120,7 +121,6 @@ export default function MyReviewsPage() {
     );
   };
 
-  // ✅ ФУНКЦИЯ ПОЛУЧЕНИЯ ССЫЛКИ НА ОТЗЫВ
   const getReviewUrl = (review: Review) => {
     const productSlug = review.product_slug || review.product;
     return `/product/${productSlug}#review-${review.id}`;
@@ -171,7 +171,6 @@ export default function MyReviewsPage() {
           <div className="space-y-6">
             {reviews.map((review) => (
               <div key={review.id} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
-                {/* ✅ ИСПРАВЛЕННЫЙ ЗАГОЛОВОК */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <Link 
@@ -197,7 +196,6 @@ export default function MyReviewsPage() {
                     </div>
                   </div>
                   
-                  {/* ✅ КНОПКИ ДЕЙСТВИЙ */}
                   <div className="flex items-center gap-2">
                     <Link
                       href={getReviewUrl(review)}
@@ -218,13 +216,11 @@ export default function MyReviewsPage() {
                   </div>
                 </div>
 
-                {/* Содержание */}
                 {review.title && (
                   <h4 className="font-semibold text-gray-900 mb-2">{review.title}</h4>
                 )}
                 <p className="text-gray-700 mb-3 whitespace-pre-wrap">{review.comment}</p>
 
-                {/* Достоинства/Недостатки */}
                 {(review.pros || review.cons) && (
                   <div className="grid md:grid-cols-2 gap-4 mb-4">
                     {review.pros && (
@@ -248,7 +244,6 @@ export default function MyReviewsPage() {
                   </div>
                 )}
 
-                {/* Медиа */}
                 {review.media && review.media.length > 0 && (
                   <div className="mb-4">
                     <p className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
@@ -257,10 +252,12 @@ export default function MyReviewsPage() {
                     </p>
                     <div className="flex gap-2 overflow-x-auto pb-2">
                       {review.media.map((media) => (
-                        <img
+                        <OptimizedImage
                           key={media.id}
                           src={getImageUrl(media.file)}
                           alt="Review media"
+                          width={96}
+                          height={96}
                           className="w-24 h-24 object-cover rounded-lg border-2 border-gray-200 hover:border-primary transition cursor-pointer"
                           onClick={() => window.open(getImageUrl(media.file), '_blank')}
                         />
@@ -269,7 +266,6 @@ export default function MyReviewsPage() {
                   </div>
                 )}
 
-                {/* Ответы */}
                 {review.replies && review.replies.length > 0 && (
                   <div className="mt-4 space-y-3 border-t pt-4">
                     <p className="font-semibold text-gray-900 flex items-center gap-2">
@@ -287,9 +283,11 @@ export default function MyReviewsPage() {
                       >
                         <div className="flex items-start gap-3 mb-2">
                           {reply.author_avatar ? (
-                            <img 
-                              src={getImageUrl(reply.author_avatar)} 
-                              alt={reply.author_username || 'Автор'} 
+                            <OptimizedImage
+                              src={getImageUrl(reply.author_avatar)}
+                              alt={reply.author_username || 'Автор'}
+                              width={40}
+                              height={40}
                               className="w-10 h-10 rounded-full object-cover"
                             />
                           ) : (
@@ -317,7 +315,6 @@ export default function MyReviewsPage() {
                   </div>
                 )}
 
-                {/* Футер */}
                 <div className="flex items-center justify-between mt-4 pt-4 border-t text-sm text-gray-600">
                   <div className="flex items-center gap-4">
                     <span>👍 {review.helpful_count}</span>
@@ -330,7 +327,6 @@ export default function MyReviewsPage() {
           </div>
         )}
 
-        {/* Модальное окно редактирования */}
         {editingReview && (
           <EditReviewModal
             review={editingReview}
@@ -346,7 +342,7 @@ export default function MyReviewsPage() {
   );
 }
 
-// Модальное окно редактирования
+// Модальное окно редактирования (без изображений)
 interface EditReviewModalProps {
   review: Review;
   onClose: () => void;
@@ -400,7 +396,6 @@ function EditReviewModal({ review, onClose, onUpdate, token }: EditReviewModalPr
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Рейтинг */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Оценка <span className="text-red-500">*</span>
@@ -419,7 +414,6 @@ function EditReviewModal({ review, onClose, onUpdate, token }: EditReviewModalPr
             </div>
           </div>
 
-          {/* Заголовок */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Заголовок</label>
             <input
@@ -431,7 +425,6 @@ function EditReviewModal({ review, onClose, onUpdate, token }: EditReviewModalPr
             />
           </div>
 
-          {/* Комментарий */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Комментарий <span className="text-red-500">*</span>
@@ -446,7 +439,6 @@ function EditReviewModal({ review, onClose, onUpdate, token }: EditReviewModalPr
             />
           </div>
 
-          {/* Достоинства */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Достоинства</label>
             <textarea
@@ -458,7 +450,6 @@ function EditReviewModal({ review, onClose, onUpdate, token }: EditReviewModalPr
             />
           </div>
 
-          {/* Недостатки */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Недостатки</label>
             <textarea
@@ -470,7 +461,6 @@ function EditReviewModal({ review, onClose, onUpdate, token }: EditReviewModalPr
             />
           </div>
 
-          {/* Предупреждение */}
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <p className="text-sm text-yellow-800 flex items-center gap-2">
               <ClockIcon size={16} />
@@ -478,7 +468,6 @@ function EditReviewModal({ review, onClose, onUpdate, token }: EditReviewModalPr
             </p>
           </div>
 
-          {/* Кнопки */}
           <div className="flex gap-3 pt-4">
             <button
               type="submit"

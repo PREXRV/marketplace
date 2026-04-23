@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Reply, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import OptimizedImage from '@/components/OptimizedImage';
 
 interface Message {
   id: number;
@@ -66,11 +67,13 @@ export default function ChatMessage({ message, isOwn, onReply, onDelete }: ChatM
             {message.text && <p className="leading-relaxed break-words">{message.text}</p>}
 
             {message.file && isImage(message.file, message.file_name) && (
-              <a href={message.file} target="_blank" rel="noopener noreferrer">
-                <img
+              <a href={message.file} target="_blank" rel="noopener noreferrer" className="mt-3 block">
+                <OptimizedImage
                   src={message.file}
                   alt={message.file_name || 'image'}
-                  className="mt-3 max-w-[240px] rounded-xl"
+                  width={240}
+                  height={240}
+                  className="max-w-[240px] rounded-xl"
                 />
               </a>
             )}

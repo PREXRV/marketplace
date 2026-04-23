@@ -3,7 +3,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
-
+import OptimizedImage from '@/components/OptimizedImage';
 const API_BASE = 'https://fulfilling-success-production-3288.up.railway.app/api/products';
 
 interface AvatarUploadProps {
@@ -116,13 +116,12 @@ export default function AvatarUpload({
         title="Нажмите или перетащите фото"
       >
         {avatarSrc ? (
-          <Image
+          <OptimizedImage
             src={avatarSrc}
             alt="Аватар"
             width={size}
             height={size}
             className="object-cover w-full h-full"
-            unoptimized
             key={avatarSrc}
           />
         ) : (

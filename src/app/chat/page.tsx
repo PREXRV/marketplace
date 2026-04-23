@@ -7,6 +7,7 @@ import {
   Send, Wifi, WifiOff, MessageCircle,
   Smile, Paperclip, X, File, Download,
 } from 'lucide-react';
+import OptimizedImage from '@/components/OptimizedImage';
 
 const EMOJIS = [
   '😊','😂','❤️','👍','🔥','✅','🎉','🙏','😍','🤔',
@@ -218,13 +219,12 @@ export default function PartnerChatPage({
 
                         {msg.file && isImage(msg.file_name) && (
                           <a href={msg.file} target="_blank" rel="noopener noreferrer">
-                            <img
+                            <OptimizedImage
                               src={msg.file}
                               alt={msg.file_name || 'Изображение'}
                               width={220}
                               height={220}
                               className="mt-2 max-w-[220px] rounded-xl cursor-pointer hover:opacity-90 transition object-cover"
-                              loading="lazy"
                             />
                           </a>
                         )}
@@ -278,29 +278,32 @@ export default function PartnerChatPage({
 
         {files.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-3">
-            {files.map((file, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-1.5 bg-purple-50 border border-purple-200 rounded-lg px-3 py-1.5 text-xs text-purple-700"
-              >
-                {isImage(file.name) ? (
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt=""
-                    className="w-8 h-8 rounded object-cover"
-                  />
-                ) : (
-                  <File className="w-3 h-3 flex-shrink-0" />
-                )}
-                <span className="max-w-[120px] truncate">{file.name}</span>
-                <button
-                  onClick={() => setFiles(prev => prev.filter((_, j) => j !== i))}
-                  className="ml-1 hover:text-red-500 transition"
+            {files.map((file, i) => {
+              const previewUrl = URL.createObjectURL(file);
+              return (
+                <div
+                  key={i}
+                  className="flex items-center gap-1.5 bg-purple-50 border border-purple-200 rounded-lg px-3 py-1.5 text-xs text-purple-700"
                 >
-                  <X className="w-3 h-3" />
-                </button>
-              </div>
-            ))}
+                  {isImage(file.name) ? (
+                    <img
+                      src={previewUrl}
+                      alt=""
+                      className="w-8 h-8 rounded object-cover"
+                    />
+                  ) : (
+                    <File className="w-3 h-3 flex-shrink-0" />
+                  )}
+                  <span className="max-w-[120px] truncate">{file.name}</span>
+                  <button
+                    onClick={() => setFiles(prev => prev.filter((_, j) => j !== i))}
+                    className="ml-1 hover:text-red-500 transition"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
+              );
+            })}
           </div>
         )}
 

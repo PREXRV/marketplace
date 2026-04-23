@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import OptimizedImage from '@/components/OptimizedImage';
 
 export default function LeaderboardWidget() {
   const [topPlayers, setTopPlayers] = useState<any[]>([]);
@@ -42,13 +43,12 @@ export default function LeaderboardWidget() {
               <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center font-bold text-white text-sm flex-shrink-0">
                 #{index + 1}
               </div>
-              <img 
-                src={player.avatar || '/default-avatar.png'} 
+              <OptimizedImage
+                src={player.avatar || '/default-avatar.png'}
                 alt={player.username}
+                width={48}
+                height={48}
                 className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-                onError={(e) => {
-                  e.currentTarget.src = '/default-avatar.png';
-                }}
               />
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-gray-900 truncate">{player.username}</p>

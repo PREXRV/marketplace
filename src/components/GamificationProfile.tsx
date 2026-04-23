@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { api, GamificationProfile as GamificationProfileType, RewardItem, UserBadge, RewardPurchase, AllUserTags } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { gamificationAPI } from '@/services/api';
+import OptimizedImage from '@/components/OptimizedImage';
 
 export default function GamificationProfile() {
   const { isAuthenticated, tokens } = useAuth();
@@ -539,9 +540,11 @@ export default function GamificationProfile() {
                         className="bg-white rounded-xl p-6 shadow-md border-2 border-gray-200 hover:border-primary transition"
                       >
                         {item.image && (
-                          <img
+                          <OptimizedImage
                             src={item.image}
                             alt={item.name}
+                            width={400}
+                            height={200}
                             className="w-full h-48 object-cover rounded-lg mb-4"
                           />
                         )}

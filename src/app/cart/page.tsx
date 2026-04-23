@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import { useCart } from '@/context/CartContext';
 import Link from 'next/link';
 import { getImageUrl } from '@/lib/api';
+import OptimizedImage from '@/components/OptimizedImage';
 
 export default function CartPage() {
   const {
@@ -92,13 +93,12 @@ export default function CartPage() {
                 >
                   {/* Изображение */}
                   <div className="relative w-28 h-28 flex-shrink-0">
-                    <img
+                    <OptimizedImage
                       src={getImageUrl(item.image)}
                       alt={item.name}
+                      width={112}
+                      height={112}
                       className="w-full h-full object-cover rounded-lg"
-                      onError={(e) => {
-                        e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23ddd" width="200" height="200"/%3E%3Ctext fill="%23999" font-size="20" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EНет фото%3C/text%3E%3C/svg%3E';
-                      }}
                     />
                     {/* ✅ Бейдж наградного товара */}
                     {item.is_free_reward && (
@@ -301,7 +301,7 @@ export default function CartPage() {
                     <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
-                    <span>Бесплатная доставка при заказе от 3000 ₽</span>
+                    <span>Бесплатная доставка при заказе от 1500 ₽</span>
                   </div>
                   <div className="flex items-start gap-2">
                     <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">

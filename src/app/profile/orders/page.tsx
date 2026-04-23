@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
-import Image from 'next/image';
+import OptimizedImage from '@/components/OptimizedImage';
 import { api, Order, getImageUrl } from '@/lib/api';
 
 export default function OrdersPage() {
@@ -598,9 +598,9 @@ export default function OrdersPage() {
 
                                     <div className={`w-16 h-16 md:w-20 md:h-20 rounded-lg flex-shrink-0 overflow-hidden border-2 ${isFreeReward ? 'border-emerald-200' : 'border-gray-200'} bg-white`}>
                                       {item.product_image ? (
-                                        <Image src={item.product_image} alt={item.product_name} width={80} height={80} className="w-full h-full object-cover" />
+                                        <OptimizedImage src={item.product_image} alt={item.product_name} width={80} height={80} className="w-full h-full object-cover" />
                                       ) : item.product?.image ? (
-                                        <Image src={getImageUrl(item.product.image)} alt={item.product_name} width={80} height={80} className="w-full h-full object-cover" />
+                                        <OptimizedImage src={getImageUrl(item.product.image)} alt={item.product_name} width={80} height={80} className="w-full h-full object-cover" />
                                       ) : (
                                         <div className="w-full h-full flex items-center justify-center text-2xl bg-gray-100">📦</div>
                                       )}
@@ -826,7 +826,7 @@ export default function OrdersPage() {
                   >
                     <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-lg flex-shrink-0 overflow-hidden border-2 border-gray-200">
                       {item.product_image ? (
-                        <Image src={item.product_image} alt={item.product_name} width={80} height={80} className="w-full h-full object-cover" />
+                        <OptimizedImage src={item.product_image} alt={item.product_name} width={80} height={80} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-2xl bg-gray-100">📦</div>
                       )}
@@ -904,7 +904,7 @@ export default function OrdersPage() {
                         </div>
                         <div className="w-12 h-12 md:w-16 md:h-16 rounded-lg overflow-hidden bg-gray-900 border border-gray-700 flex-shrink-0">
                           {item.product_image ? (
-                            <img src={item.product_image} alt={item.product_name} className="w-full h-full object-cover" />
+                            <OptimizedImage src={item.product_image} alt={item.product_name} width={64} height={64} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-xl">📦</div>
                           )}

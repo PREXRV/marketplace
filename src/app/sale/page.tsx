@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { getImageUrl } from '@/lib/api';
+import OptimizedImage from '@/components/OptimizedImage';
 
 export default function SalePage() {
   const [products, setProducts] = useState([]);
@@ -22,7 +23,7 @@ export default function SalePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+       
       <div className="container mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-8 text-center">
           🔥 Все товары на акции
@@ -42,9 +43,11 @@ export default function SalePage() {
                   <div className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                     −{product.discount_percentage}%
                   </div>
-                  <img
+                  <OptimizedImage
                     src={getImageUrl(product.primary_image)}
                     alt={product.name}
+                    width={400}
+                    height={400}
                     className="w-full aspect-square object-cover rounded-lg mb-3"
                   />
                 </div>

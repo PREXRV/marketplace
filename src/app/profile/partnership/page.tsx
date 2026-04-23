@@ -8,6 +8,7 @@ import { toast } from 'react-hot-toast';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Package, Video, Eye, CheckCircle, Clock, TrendingUp, RefreshCw } from 'lucide-react';
+import OptimizedImage from '@/components/OptimizedImage';
 
 export default function PartnershipPage() {
   const [partner, setPartner] = useState<any>(null);
@@ -196,7 +197,7 @@ export default function PartnershipPage() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg md:text-xl font-bold">Последние запросы</h2>
               <Link
-                href="/profile/partnership/products"
+                href="/profile/partnership/request-product"
                 className="text-xs md:text-sm text-primary hover:underline"
               >
                 Все запросы →
@@ -210,9 +211,11 @@ export default function PartnershipPage() {
                 >
                   <div className="flex items-center gap-3">
                     {request.product_image && (
-                      <img
+                      <OptimizedImage
                         src={request.product_image}
                         alt={request.product_title}
+                        width={48}
+                        height={48}
                         className="w-10 h-10 md:w-12 md:h-12 object-cover rounded-lg"
                       />
                     )}

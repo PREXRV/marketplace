@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { Bell, X, Check, Package, Sparkles } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import OptimizedImage from '@/components/OptimizedImage';
 
 export default function NotificationBell() {
   const { tokens } = useAuth();
@@ -241,9 +242,11 @@ export default function NotificationBell() {
                           </p>
 
                           {notification.product_image && (
-                            <img
+                            <OptimizedImage
                               src={notification.product_image}
                               alt={notification.product_name || ''}
+                              width={64}
+                              height={64}
                               className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-lg mb-2"
                             />
                           )}

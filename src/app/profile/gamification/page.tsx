@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { api, RewardItem } from '@/lib/api';
+import OptimizedImage from '@/components/OptimizedImage';
 import {
   Trophy, Target, Gift, Sparkles, Zap,
   Star, ChevronRight, ShoppingBag,
@@ -138,7 +139,7 @@ export default function GamificationPage() {
     setClickingQuest(questId);
 
     try {
-      await api.clickQuest(questId, tokens.access); // ← только эта строка
+      await api.clickQuest(questId, tokens.access);
       await loadData();
     } catch (e) {
       // игнор
@@ -491,7 +492,7 @@ export default function GamificationPage() {
                   <div className="relative p-6">
                     <div className="w-full h-48 bg-gradient-to-br from-purple-100 to-pink-100 rounded-xl mb-4 flex items-center justify-center overflow-hidden">
                       {reward.image
-                        ? <img src={reward.image} alt={reward.name} className="w-full h-full object-cover" />
+                        ? <OptimizedImage src={reward.image} alt={reward.name} width={200} height={200} className="w-full h-full object-cover" />
                         : <span className="text-6xl">🎁</span>}
                     </div>
                     <h3 className="font-bold text-xl mb-2 group-hover:text-purple-600 transition">{reward.name}</h3>
@@ -570,7 +571,7 @@ export default function GamificationPage() {
                       {reward?.free_product_data && (
                         <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3 mb-3">
                           {reward.free_product_data.image && (
-                            <img src={reward.free_product_data.image} alt={reward.free_product_data.name} className="w-12 h-12 object-cover rounded-lg" />
+                            <OptimizedImage src={reward.free_product_data.image} alt={reward.free_product_data.name} width={48} height={48} className="w-12 h-12 object-cover rounded-lg" />
                           )}
                           <div>
                             <p className="font-semibold text-sm">{reward.free_product_data.name}</p>
@@ -658,7 +659,7 @@ export default function GamificationPage() {
             {freeProductModal.reward?.free_product_data && (
               <div className="flex items-center gap-4 bg-gray-50 rounded-2xl p-4 mb-6">
                 {freeProductModal.reward.free_product_data.image && (
-                  <img src={freeProductModal.reward.free_product_data.image} alt={freeProductModal.reward.free_product_data.name} className="w-20 h-20 object-cover rounded-xl" />
+                  <OptimizedImage src={freeProductModal.reward.free_product_data.image} alt={freeProductModal.reward.free_product_data.name} width={80} height={80} className="w-20 h-20 object-cover rounded-xl" />
                 )}
                 <div>
                   <p className="font-bold text-lg leading-tight">{freeProductModal.reward.free_product_data.name}</p>

@@ -8,6 +8,7 @@ import ReviewReplyForm from './ReviewReplyForm';
 import UserBadges from '@/components/UserBadges';
 import Image from 'next/image';
 import { getInitials } from '@/lib/utils';
+import OptimizedImage from '@/components/OptimizedImage';
 
 interface ReviewListProps {
   productId: number;
@@ -250,14 +251,13 @@ export default function ReviewList({ productId }: ReviewListProps) {
               <div className="flex items-start gap-3 md:gap-4 mb-3 md:mb-4">
                 <div className="flex-shrink-0">
                   {reviewAvatarUrl !== '/default-avatar.png' ? (
-                    <Image
+                    <OptimizedImage
                       key={`review-${review.id}-${user?.username}-${user?.avatar}`}
                       src={getImageUrl(getAvatarWithCacheBuster(reviewAvatarUrl, review.author_username))}
                       alt={review.author_name || 'Аноним'}
                       width={44}
                       height={44}
                       className="w-11 h-11 md:w-14 md:h-14 rounded-full object-cover border-2 border-gray-200 shadow-md"
-                      unoptimized
                     />
                   ) : (
                     <div className="w-11 h-11 md:w-14 md:h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-base md:text-xl shadow-md">
@@ -303,9 +303,11 @@ export default function ReviewList({ productId }: ReviewListProps) {
                       onClick={() => openLightbox(item.media_type, getImageUrl(item.file))}
                     >
                       {item.media_type === 'image' ? (
-                        <img
+                        <OptimizedImage
                           src={getImageUrl(item.file)}
                           alt="Review media"
+                          width={96}
+                          height={96}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                         />
                       ) : (
@@ -363,14 +365,13 @@ export default function ReviewList({ productId }: ReviewListProps) {
                       >
                         <div className="flex items-start gap-2 md:gap-3">
                           {replyAvatarUrl !== '/default-avatar.png' ? (
-                            <Image
+                            <OptimizedImage
                               key={`reply-${reply.id}-${user?.username}-${user?.avatar}`}
                               src={getImageUrl(getAvatarWithCacheBuster(replyAvatarUrl, reply.author_username))}
                               alt={reply.author_username || 'Автор'} 
                               width={32}
                               height={32}
                               className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
-                              unoptimized
                             />
                           ) : (
                             <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs md:text-sm">
@@ -492,11 +493,7 @@ export default function ReviewList({ productId }: ReviewListProps) {
           
           <div className="max-w-7xl max-h-full" onClick={(e) => e.stopPropagation()}>
             {lightboxImage.type === 'image' ? (
-              <img
-                src={lightboxImage.url}
-                alt="Review media"
-                className="max-w-full max-h-[95vh] object-contain rounded-lg shadow-2xl"
-              />
+              <OptimizedImage src={lightboxImage.url} alt="Review media" width={1200} height={800} className="max-w-full max-h-[95vh] object-contain rounded-lg shadow-2xl" />
             ) : (
               <video
                 src={lightboxImage.url}

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import VideoEmbed from './VideoEmbed';
+import OptimizedImage from '@/components/OptimizedImage';
 
 interface SocialPost {
   id: number;
@@ -382,9 +383,11 @@ export default function SocialFeed({ posts }: { posts: SocialPost[] }) {
                     >
                       {imageUrl ? (
                         <div className="relative h-48 overflow-hidden sm:h-52">
-                          <img
+                          <OptimizedImage
                             src={imageUrl}
                             alt="Пост из Telegram"
+                            width={350}
+                            height={200}
                             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                           <div className={`absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r ${platformColors[post.platform]} px-2.5 py-1 text-xs font-semibold text-white shadow-lg sm:px-3 sm:py-1.5 sm:text-sm`}>

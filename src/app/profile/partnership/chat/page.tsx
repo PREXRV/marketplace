@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { partnershipAPI } from '@/services/api';
 import { usePartnerChat } from '@/hooks/usePartnerChat';
 import { Send, Wifi, WifiOff, MessageCircle, Smile, Paperclip, X, File, Download } from 'lucide-react';
+import OptimizedImage from '@/components/OptimizedImage';
 
 const EMOJIS = [
   '😊','😂','❤️','👍','🔥','✅','🎉','🙏','😍','🤔',
@@ -173,9 +174,11 @@ export default function PartnerChatPage() {
 
                         {msg.file && isImage(msg.file_name) && (
                           <a href={msg.file} target="_blank" rel="noopener noreferrer">
-                            <img
+                            <OptimizedImage
                               src={msg.file}
                               alt={msg.file_name || 'Изображение'}
+                              width={220}
+                              height={220}
                               className="mt-1 md:mt-2 max-w-[180px] md:max-w-[220px] rounded-lg cursor-pointer hover:opacity-90 transition"
                             />
                           </a>

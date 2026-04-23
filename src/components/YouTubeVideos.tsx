@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { YouTubeVideo } from '@/lib/api';
+import OptimizedImage from '@/components/OptimizedImage';
 
 interface YouTubeVideosProps {
   videos: YouTubeVideo[];
@@ -57,24 +58,12 @@ export default function YouTubeVideos({
             >
               <div className="overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-2xl sm:rounded-3xl">
                 <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800">
-                  <img
+                  <OptimizedImage
                     src={video.thumbnail_url}
                     alt={video.title}
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    onError={(e) => {
-                      const target = e.currentTarget;
-                      const videoId = video.video_id;
-
-                      if (target.src.includes('maxresdefault')) {
-                        target.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-                      } else if (target.src.includes('hqdefault')) {
-                        target.src = `https://img.youtube.com/vi/${videoId}/sddefault.jpg`;
-                      } else if (target.src.includes('sddefault')) {
-                        target.src = `https://img.youtube.com/vi/${videoId}/0.jpg`;
-                      } else {
-                        target.src = 'https://via.placeholder.com/640x360/1f2937/ffffff?text=Video';
-                      }
-                    }}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
 
                   <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent opacity-100 sm:opacity-0 sm:transition-opacity sm:duration-300 sm:group-hover:opacity-100" />

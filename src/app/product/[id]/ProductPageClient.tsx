@@ -18,6 +18,7 @@ import RecentlyViewedProducts from '@/components/RecentlyViewedProducts';
 import { useAuth } from '@/context/AuthContext';
 import CompactCountdownTimer from '@/components/CompactCountdownTimer';
 import Link from 'next/link';
+import OptimizedImage from '@/components/OptimizedImage';
 
 interface Props {
   productId: string;
@@ -505,15 +506,13 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                 </div>
 
                 <div className="relative overflow-hidden rounded-xl">
-                  <img
+                  <OptimizedImage
                     src={imageUrl}
                     alt={mainImageAlt}
+                    width={500}
+                    height={500}
                     className="w-full h-[300px] md:h-[500px] object-contain transition-transform duration-500 group-hover:scale-110 cursor-pointer"
                     onClick={() => setLightboxOpen(true)}
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400"%3E%3Crect fill="%23ddd" width="400" height="400"/%3E%3Ctext fill="%23999" font-size="40" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EНет фото%3C/text%3E%3C/svg%3E';
-                    }}
                   />
 
                   {selectedVariant && (
@@ -579,9 +578,11 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                           : 'border-gray-200 hover:border-primary hover:scale-105'
                       }`}
                     >
-                      <img
+                      <OptimizedImage
                         src={img.normalizedUrl}
                         alt={img.alt_text || `Фото ${idx + 1}`}
+                        width={80}
+                        height={80}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
                       {selectedImage === idx && (
@@ -661,9 +662,11 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                           }`}
                         >
                           {video.thumbnail_url ? (
-                            <img
+                            <OptimizedImage
                               src={getImageUrl(video.thumbnail_url)}
                               alt={video.title || `Видео ${idx + 1}`}
+                              width={80}
+                              height={80}
                               className="w-full h-full object-cover"
                             />
                           ) : (
@@ -917,9 +920,11 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                       >
                         <div className="flex items-center gap-2 min-w-0 w-full sm:w-auto">
                           {variant.image_url && (
-                            <img
+                            <OptimizedImage
                               src={variantThumb}
                               alt={variant.name}
+                              width={48}
+                              height={48}
                               className="w-10 h-10 md:w-12 md:h-12 object-cover rounded-lg border-2 border-gray-200 flex-shrink-0"
                             />
                           )}
@@ -928,19 +933,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                           }`} />
                           <span className="font-medium text-base md:text-lg truncate">{variant.name}</span>
                         </div>
-
-                        {/*<div className="flex flex-wrap gap-2 justify-start sm:justify-center w-full sm:w-auto mt-2 sm:mt-0">
-                          {variant.color && (
-                            <span className="text-xs md:text-sm text-gray-600 bg-gray-100 px-2 py-1 md:px-3 md:py-1 rounded-full">
-                              {variant.color}
-                            </span>
-                          )}
-                          {variant.size && (
-                            <span className="text-xs md:text-sm text-gray-600 bg-gray-100 px-2 py-1 md:px-3 md:py-1 rounded-full">
-                              {variant.size}
-                            </span>
-                          )}
-                        </div>*/}
 
                         <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-between sm:justify-end mt-0 sm:mt-0">
                           <div className="flex items-center gap-2 flex-nowrap whitespace-nowrap">
@@ -1084,9 +1076,11 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
           <div className="container mx-auto px-3 md:px-4 py-3 md:py-4">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 md:gap-4">
               <div className="flex items-center gap-3 md:gap-4 min-w-0 w-full sm:w-auto">
-                <img
+                <OptimizedImage
                   src={imageUrl}
                   alt={product.name}
+                  width={64}
+                  height={64}
                   className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg border-2 border-gray-200 flex-shrink-0"
                 />
                 <div className="min-w-0">
@@ -1178,7 +1172,7 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
           )}
 
           <div className="max-w-7xl max-h-full" onClick={(e) => e.stopPropagation()}>
-            <img src={imageUrl} alt={mainImageAlt} className="max-w-full max-h-[95vh] object-contain rounded-lg shadow-2xl" />
+            <OptimizedImage src={imageUrl} alt={mainImageAlt} width={1200} height={1200} className="max-w-full max-h-[95vh] object-contain rounded-lg shadow-2xl" />
           </div>
 
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black bg-opacity-70 text-white px-3 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm">

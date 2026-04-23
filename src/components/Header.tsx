@@ -8,6 +8,7 @@ import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { getImageUrl } from '@/lib/api';
 import NotificationBell from '@/components/NotificationBell';
+import OptimizedImage from '@/components/OptimizedImage';
 
 export default function Header() {
   const { getTotalItems } = useCart();
@@ -197,7 +198,7 @@ export default function Header() {
                   >
                     <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-blue-600 text-xs font-bold text-white shadow-sm">
                       {avatarUrl ? (
-                        <Image
+                        <OptimizedImage
                           src={avatarUrl}
                           alt={user?.username || 'User'}
                           width={32}
@@ -223,7 +224,7 @@ export default function Header() {
                       <div className="flex items-center gap-3 border-b border-gray-100 p-4">
                         <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary to-blue-600 text-lg font-bold text-white shadow-md">
                           {avatarUrl ? (
-                            <Image
+                            <OptimizedImage
                               src={avatarUrl}
                               alt={user?.username || 'User'}
                               width={48}

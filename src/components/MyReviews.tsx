@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { api, Review } from '@/lib/api';
 import { Star, Edit2, ExternalLink, MessageSquare, Clock, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
+import OptimizedImage from '@/components/OptimizedImage';
 
 export default function MyReviews() {
   const { token } = useAuth();
@@ -167,10 +168,12 @@ export default function MyReviews() {
           {review.media?.length > 0 && (
             <div className="flex gap-2 mb-4 overflow-x-auto">
               {review.media.map((media) => (
-                <img
+                <OptimizedImage
                   key={media.id}
                   src={`http://localhost:8000${media.file}`}
                   alt="Review media"
+                  width={80}
+                  height={80}
                   className="w-20 h-20 object-cover rounded-lg"
                 />
               ))}

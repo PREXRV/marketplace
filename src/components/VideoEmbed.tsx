@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import OptimizedImage from '@/components/OptimizedImage';
 
 interface VideoEmbedProps {
   platform: string;
@@ -83,9 +84,11 @@ export default function VideoEmbed({ platform, embedUrl, videoUrl, thumbnailUrl,
         {/* Loader пока загружается */}
         {!isLoaded && thumbnailUrl && (
           <div className="absolute inset-0 bg-black flex items-center justify-center">
-            <img 
+            <OptimizedImage 
               src={thumbnailUrl} 
               alt="Loading..."
+              width={325}
+              height={600}
               className="w-full h-full object-cover opacity-50"
             />
             <div className="absolute">
@@ -137,9 +140,11 @@ export default function VideoEmbed({ platform, embedUrl, videoUrl, thumbnailUrl,
         className="relative block w-full bg-gradient-to-br from-pink-500 via-purple-600 to-indigo-600 rounded-lg overflow-hidden group mx-auto cursor-pointer"
         style={{ maxWidth: '325px', height: '600px' }}
       >
-        <img
+        <OptimizedImage
           src={thumbnailUrl}
           alt="Video preview"
+          width={325}
+          height={600}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20" />

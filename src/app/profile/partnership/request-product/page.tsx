@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import Link from 'next/link';
+import OptimizedImage from '@/components/OptimizedImage';
 
 type Tab = 'catalog' | 'requests' | 'myproducts';
 
@@ -272,9 +273,11 @@ export default function RequestProductPage() {
                   onClick={() => handleOpenProduct(product)}
                 >
                   {product.images?.length > 0 ? (
-                    <img
+                    <OptimizedImage
                       src={product.images[0].image}
                       alt={getProductName(product)}
+                      width={400}
+                      height={200}
                       className="w-full h-40 md:h-48 object-cover"
                     />
                   ) : (
@@ -331,9 +334,11 @@ export default function RequestProductPage() {
                 >
                   <div className="flex items-center gap-3 md:gap-4">
                     {request.product_image ? (
-                      <img
+                      <OptimizedImage
                         src={request.product_image}
                         alt={request.product_title}
+                        width={64}
+                        height={64}
                         className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-lg md:rounded-xl"
                       />
                     ) : (
@@ -388,9 +393,11 @@ export default function RequestProductPage() {
                 >
                   <div className="flex gap-3 md:gap-4 p-3 md:p-5 border-b border-gray-100">
                     {item.product_image ? (
-                      <img
+                      <OptimizedImage
                         src={item.product_image}
                         alt={item.product_name}
+                        width={64}
+                        height={64}
                         className="w-14 h-14 md:w-16 md:h-16 object-cover rounded-lg md:rounded-xl flex-shrink-0"
                       />
                     ) : (
@@ -495,9 +502,11 @@ export default function RequestProductPage() {
               onClick={e => e.stopPropagation()}
             >
               {selectedProduct.images?.length > 0 ? (
-                <img
+                <OptimizedImage
                   src={selectedProduct.images[0].image}
                   alt={getProductName(selectedProduct)}
+                  width={800}
+                  height={350}
                   className="w-full h-56 md:h-72 object-cover"
                 />
               ) : (

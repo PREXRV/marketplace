@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import OptimizedImage from '@/components/OptimizedImage';
 import Image from 'next/image';
 import { api, getImageUrl, MediaGalleryItem } from '@/lib/api';
 import StarRating from './StarRating';
@@ -171,10 +172,12 @@ export default function ReviewGallery({ productId }: ReviewGalleryProps) {
           >
             {item.media_type === 'image' ? (
               <>
-                <img
+                <OptimizedImage
                   src={getImageUrl(item.file)}
                   alt="Review media"
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                  fill
+                  className="object-cover transition-transform duration-300 group-hover:scale-110"
+                  sizes="(max-width: 768px) 50vw, 20vw"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition flex items-center justify-center">
                   <svg className="w-6 h-6 md:w-10 md:h-10 text-white opacity-0 group-hover:opacity-100 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -240,13 +243,15 @@ export default function ReviewGallery({ productId }: ReviewGalleryProps) {
               </button>
             </>
           )}
-          
+
           <div className="flex items-center justify-center gap-4 md:gap-6 max-w-[95%] max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
             <div className="flex-shrink-0 max-w-4xl">
               {currentMedia.media_type === 'image' ? (
-                <img
+                <OptimizedImage
                   src={getImageUrl(currentMedia.file)}
                   alt="Gallery media"
+                  width={1200}
+                  height={800}
                   className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
                 />
               ) : (
@@ -265,13 +270,12 @@ export default function ReviewGallery({ productId }: ReviewGalleryProps) {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm md:text-xl flex-shrink-0 shadow-md">
                     {getActualAvatar(currentMedia) !== '/default-avatar.png' ? (
-                      <Image
+                      <OptimizedImage
                         src={getActualAvatar(currentMedia)}
                         alt={currentMedia.author_name || 'Аноним'}
                         width={48}
                         height={48}
                         className="w-full h-full object-cover"
-                        unoptimized
                       />
                     ) : (
                       <span>{getInitials(currentMedia.author_name || currentMedia.author_username)}</span>
@@ -317,13 +321,12 @@ export default function ReviewGallery({ productId }: ReviewGalleryProps) {
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
                     {getActualAvatar(currentMedia) !== '/default-avatar.png' ? (
-                      <Image
+                      <OptimizedImage
                         src={getActualAvatar(currentMedia)}
                         alt={currentMedia.author_name || 'Аноним'}
                         width={32}
                         height={32}
                         className="w-full h-full object-cover"
-                        unoptimized
                       />
                     ) : (
                       <span>{getInitials(currentMedia.author_name || currentMedia.author_username)}</span>
@@ -365,7 +368,13 @@ export default function ReviewGallery({ productId }: ReviewGalleryProps) {
                       }`}
                     >
                       {item.media_type === 'image' ? (
-                        <img src={getImageUrl(item.file)} alt={`Thumb ${idx + 1}`} className="w-full h-full object-cover" />
+                        <OptimizedImage
+                          src={getImageUrl(item.file)}
+                          alt={`Thumb ${idx + 1}`}
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
                         <div className="w-full h-full bg-gray-800 flex items-center justify-center">
                           <svg className="w-4 h-4 md:w-6 md:h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
