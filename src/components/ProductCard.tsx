@@ -218,6 +218,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           {/* Само фото */}
           <div className="relative w-full aspect-square">
             <OptimizedImage
+              key={currentImageIndex}  // 👈 добавляем key
               src={imageUrl}
               alt={allImages[currentImageIndex]?.alt_text || product.name}
               fill

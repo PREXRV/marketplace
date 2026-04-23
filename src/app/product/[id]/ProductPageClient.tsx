@@ -572,11 +572,14 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                       }`}
                     >
                       <OptimizedImage
-                        src={img.normalizedUrl}
-                        alt={img.alt_text || `Фото ${idx + 1}`}
-                        width={80}
-                        height={80}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        key={selectedImage}  // 👈 добавляем key
+                        src={imageUrl}
+                        alt={mainImageAlt}
+                        width={500}
+                        height={500}
+                        className="w-full h-[300px] md:h-[500px] object-contain transition-transform duration-500 group-hover:scale-110 cursor-pointer"
+                        onClick={() => setLightboxOpen(true)}
+                        style={{ zIndex: 0 }}
                       />
                       {selectedImage === idx && (
                         <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent pointer-events-none" />
