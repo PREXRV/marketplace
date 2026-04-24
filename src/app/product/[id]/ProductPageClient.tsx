@@ -157,6 +157,14 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
         const data = await api.getProduct(Number(productId));
         setProduct(data);
 
+        console.log('RAW PRODUCT DATA:', {
+          price: data.price,
+          old_price: data.old_price,
+          final_price: data.final_price,
+          discount_percentage: data.discount_percentage,
+          active_sale: data.active_sale,
+        });
+
         const productImage = data.primary_image || data.images?.[0]?.image || '';
         addProduct({
           id: data.id,
