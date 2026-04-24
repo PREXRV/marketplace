@@ -157,14 +157,6 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
         const data = await api.getProduct(Number(productId));
         setProduct(data);
 
-        console.log('RAW PRODUCT DATA:', {
-          price: data.price,
-          old_price: data.old_price,
-          final_price: data.final_price,
-          discount_percentage: data.discount_percentage,
-          active_sale: data.active_sale,
-        });
-
         const productImage = data.primary_image || data.images?.[0]?.image || '';
         addProduct({
           id: data.id,
@@ -813,9 +805,11 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
                   const currentPriceNum = parseFloat(currentPrice);
                   if (!isNaN(currentPriceNum) && !isNaN(discountPercentFromSale) && discountPercentFromSale > 0) {
                     const oldPriceFromSale = currentPriceNum / (1 - discountPercentFromSale / 100);
-                    displayOldPrice = oldPriceFromSale.toFixed(2);
+                    // Округляем до целого
+                    const roundedOldPrice = Math.round(oldPriceFromSale);
+                    displayOldPrice = roundedOldPrice.toString(); // "851"
                     displayDiscountPercent = discountPercentFromSale;
-                    displaySavings = oldPriceFromSale - currentPriceNum;
+                    displaySavings = roundedOldPrice - currentPriceNum; // 851 - 638 = 213
                   }
                 }
 
