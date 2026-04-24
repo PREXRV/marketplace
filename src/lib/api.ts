@@ -1688,7 +1688,8 @@ export const formatPrice = (price: string | number): string => {
   let numPrice = typeof price === 'string' ? parseFloat(price) : price;
   numPrice = Math.round(numPrice); // округление до целого (по математическим правилам)
   return numPrice.toLocaleString('ru-RU');
+  console.log('currentPrice raw:', currentPrice);
+  console.log('oldPrice raw:', currentOldPrice);
 };
-console.log('currentPrice raw:', currentPrice);
-console.log('oldPrice raw:', currentOldPrice);
+
 export default api;
