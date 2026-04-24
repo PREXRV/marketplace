@@ -503,14 +503,14 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
 
                 <div className="relative overflow-hidden rounded-xl">
                   <OptimizedImage
-                    key={selectedImage}
-                    src={imageUrl}
-                    alt={mainImageAlt}
-                    width={500}
-                    height={500}
-                    className="w-full h-[300px] md:h-[500px] object-contain transition-transform duration-500 group-hover:scale-110 cursor-pointer"
-                    onClick={() => setLightboxOpen(true)}
-                    style={{ zIndex: 0 }}
+                      key={selectedVariant ? `variant-${selectedVariant.id}` : `gallery-${selectedImage}`}
+                      src={imageUrl}
+                      alt={mainImageAlt}
+                      width={500}
+                      height={500}
+                      className="w-full h-[300px] md:h-[500px] object-contain transition-transform duration-500 group-hover:scale-110 cursor-pointer"
+                      onClick={() => setLightboxOpen(true)}
+                      style={{ zIndex: 0 }}
                   />
 
                   {selectedVariant && (
@@ -1163,12 +1163,12 @@ export default function ProductPageClient({ productId, initialProduct }: Props) 
 
           <div className="max-w-7xl max-h-full" onClick={(e) => e.stopPropagation()}>
             <OptimizedImage
-              key={selectedImage}   // 👈 добавить key для принудительной перерисовки
-              src={imageUrl}
-              alt={mainImageAlt}
-              width={1200}
-              height={1200}
-              className="max-w-full max-h-[95vh] object-contain rounded-lg shadow-2xl"
+                key={selectedVariant ? `lightbox-${selectedVariant.id}` : `lightbox-${selectedImage}`}
+                src={imageUrl}
+                alt={mainImageAlt}
+                width={1200}
+                height={1200}
+                className="max-w-full max-h-[95vh] object-contain rounded-lg shadow-2xl"
             />
           </div>
 
