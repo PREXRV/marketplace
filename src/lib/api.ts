@@ -1685,7 +1685,8 @@ export const getImageUrl = (imagePath: string | null | undefined): string => {
 };
 
 export const formatPrice = (price: string | number): string => {
-  const numPrice = typeof price === 'string' ? parseFloat(price) : price;
+  let numPrice = typeof price === 'string' ? parseFloat(price) : price;
+  numPrice = Math.round(numPrice); // округление до целого (по математическим правилам)
   return numPrice.toLocaleString('ru-RU');
 };
 
