@@ -86,6 +86,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-gray-100 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <meta name="yandex-verification" content="216dd865d4686ad1" />
+      <meta name="p:domain_verify" content="bae7c5f68c77bda26221c4cee8eb274b"/>
       <div className="mx-auto w-full max-w-7xl px-4">
         <div ref={mobileMenuRef}>
           <div className="flex h-16 items-center justify-between gap-2 md:h-20 md:gap-3">
